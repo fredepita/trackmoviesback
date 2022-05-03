@@ -2,7 +2,9 @@ package fr.epita.trackmoviesback.domaine;
 
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 
-public abstract class Oeuvre {
+import java.util.List;
+
+public class Oeuvre {
 
     public final String TYPE_FILM = "film";
     public final String TYPE_SERIE = "serie";
@@ -14,18 +16,24 @@ public abstract class Oeuvre {
     private StatutVisionnage statutVisionnage;
     private Integer note;
     private String video;
+    //donnee propre aux series
+    private List<Saison> saisons;
+    //donnee propre aux films
+    private Integer duree;
 
 
     public Oeuvre() {
     }
 
-    public Oeuvre(String type, String titre, GenreOeuvre genreOeuvre, StatutVisionnage statutVisionnage, Integer note, String video) {
-        this.setType(type);
+    public Oeuvre(String type, String titre, GenreOeuvre genreOeuvre, StatutVisionnage statutVisionnage, Integer note, String video, List<Saison> saisons, Integer duree) {
+        setType(type);
         this.titre = titre;
         this.genreOeuvre = genreOeuvre;
         this.statutVisionnage = statutVisionnage;
         this.note = note;
         this.video = video;
+        setSaisons(saisons);
+        setDuree(duree);
     }
 
     public Long getId() {
@@ -88,6 +96,31 @@ public abstract class Oeuvre {
         this.video = video;
     }
 
+    public List<Saison> getSaisons() {
+        return saisons;
+    }
+
+    public void setSaisons(List<Saison> saisons) {
+        if(type.equals(TYPE_SERIE)){
+            this.saisons = saisons;
+        } else {
+            throw new MauvaisParamException("Type d'oeuvre : " + type + ". Seules les series peuvent avoir des saisons");
+        }
+    }
+
+
+    public Integer getDuree() {
+        return duree;
+    }
+
+    public void setDuree(Integer duree) {
+        if(type.equals(TYPE_FILM)){
+            this.duree = duree;
+        } else {
+            throw new MauvaisParamException("Type d'oeuvre : " + type + ". Seules les films peuvent avoir des durees");
+        }
+    }
+
     @Override
     public String toString() {
         return "Oeuvre{" +
@@ -98,7 +131,8 @@ public abstract class Oeuvre {
                 ", statutVisionnage=" + statutVisionnage +
                 ", note=" + note +
                 ", video='" + video + '\'' +
+                ", saisons=" + saisons +
+                ", duree=" + duree +
                 '}';
     }
-
 }
