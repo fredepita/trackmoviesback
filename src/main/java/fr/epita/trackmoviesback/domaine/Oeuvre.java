@@ -1,5 +1,7 @@
 package fr.epita.trackmoviesback.domaine;
 
+import fr.epita.trackmoviesback.exception.MauvaisParamException;
+
 public abstract class Oeuvre {
 
     public final String TYPE_FILM = "film";
@@ -18,7 +20,7 @@ public abstract class Oeuvre {
     }
 
     public Oeuvre(String type, String titre, GenreOeuvre genreOeuvre, StatutVisionnage statutVisionnage, Integer note, String video) {
-        this.type = type;
+        this.setType(type);
         this.titre = titre;
         this.genreOeuvre = genreOeuvre;
         this.statutVisionnage = statutVisionnage;
@@ -39,7 +41,11 @@ public abstract class Oeuvre {
     }
 
     public void setType(String type) {
-        this.type = type;
+        if(type.equals(TYPE_FILM) || type.equals(TYPE_SERIE)){
+            this.type = type;
+        } else {
+            throw new MauvaisParamException("Valeur recue : " + type + ". Valeurs acceptees :" + TYPE_SERIE + " ou " + TYPE_FILM);
+        }
     }
 
     public String getTitre() {
