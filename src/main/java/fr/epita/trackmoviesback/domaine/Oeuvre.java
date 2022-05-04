@@ -25,7 +25,7 @@ public class Oeuvre {
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     //@JoinTable(name = "oeuvre_genres")
-    private List<GenreOeuvre> genres;
+    private List<Genre> genres;
 
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private StatutVisionnage statutVisionnage;
@@ -44,7 +44,7 @@ public class Oeuvre {
     public Oeuvre() {
     }
 
-    public Oeuvre(String type, String titre, List<GenreOeuvre> genres, StatutVisionnage statutVisionnage, Integer note, String video, List<Saison> saisons, Integer duree) {
+    public Oeuvre(String type, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String video, List<Saison> saisons, Integer duree) {
         setTypeOeuvre(type);
         this.titre = titre;
         this.genres = genres;
@@ -83,11 +83,11 @@ public class Oeuvre {
         this.titre = titre;
     }
 
-    public List<GenreOeuvre> getGenres() {
+    public List<Genre> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<GenreOeuvre> genres) {
+    public void setGenres(List<Genre> genres) {
         this.genres = genres;
     }
 

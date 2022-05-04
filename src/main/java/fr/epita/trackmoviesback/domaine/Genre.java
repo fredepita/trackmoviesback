@@ -3,8 +3,7 @@ package fr.epita.trackmoviesback.domaine;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "genre")
-public class GenreOeuvre {
+public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -12,7 +11,7 @@ public class GenreOeuvre {
     @Column(nullable = false,unique = true)
     private String libelle;
 
-    public GenreOeuvre() {
+    public Genre() {
     }
 
     public Long getId() {
@@ -34,7 +33,7 @@ public class GenreOeuvre {
 
     @Override
     public String toString() {
-        return "GenreOeuvre{" +
+        return "Genre{" +
                 "id=" + id +
                 ", libelle='" + libelle + '\'' +
                 '}';
