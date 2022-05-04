@@ -1,12 +1,19 @@
 package fr.epita.trackmoviesback.domaine;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "genre")
 public class GenreOeuvre {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false,unique = true)
     private String libelle;
 
     public GenreOeuvre() {
     }
-
 
     public Long getId() {
         return id;
