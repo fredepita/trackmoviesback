@@ -23,8 +23,18 @@ public class Oeuvre {
     @Column(nullable = false,unique = true)
     private String titre;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    //@JoinTable(name = "oeuvre_genres")
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    /*@JoinTable( //sert à forcer les nommage de la table de liaison (evite de se retrouver avec des pluriels)
+            name="oeuvre_genre",
+            joinColumns = {
+                    @JoinColumn(name = "oeuvre_id",referencedColumnName = "id"),
+                    @JoinColumn(name = "genre_id", referencedColumnName = "id")}
+    )*/
+    @JoinTable( //sert à forcer les nommage de la table de liaison et les colonnes(evite de se retrouver avec des pluriels)
+            name="oeuvre_genre",
+            joinColumns = @JoinColumn(name = "oeuvre_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
     private List<Genre> genres;
 
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
@@ -34,6 +44,12 @@ public class Oeuvre {
 
     //donnee propre aux series
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
+   /* @JoinTable( //sert à forcer les nommage de la table de liaison (evite de se retrouver avec des pluriels)
+            name="oeuvre_saison",
+            joinColumns = @JoinColumn( name="oeuvre_id"),
+            inverseJoinColumns = @JoinColumn( name="saison_id")
+    )*/
+    @JoinColumn(name = "oeuvre_id") //définir le JoinColumn permet d'eviter la création d'une table de liaison inutile entre saison et episode puisqu'un episode appartient à une seule saison
     private List<Saison> saisons;
 
     //donnee propre aux films
