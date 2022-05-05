@@ -1,8 +1,8 @@
 package fr.epita.trackmoviesback.infrastructure.genre;
 
 import fr.epita.trackmoviesback.domaine.Genre;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GenreRepository extends CrudRepository<Genre,Long> {
+public interface GenreRepository extends JpaRepository<Genre,Long> {
 
 }

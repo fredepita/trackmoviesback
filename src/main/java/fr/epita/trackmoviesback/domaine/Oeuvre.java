@@ -163,8 +163,31 @@ public class Oeuvre {
         }
     }
 
+
+    /**
+     *
+     * @return le contenu d'une oeuvre sans les saisons (pour les séries)
+     */
     @Override
     public String toString() {
+        //on ne retourne pas les saisons ici car on est en LAZY load sur cette partie
+        return "Oeuvre{" +
+                "id=" + id +
+                ", typeOeuvre='" + typeOeuvre + '\'' +
+                ", titre='" + titre + '\'' +
+                ", genres=" + genres +
+                ", statutVisionnage=" + statutVisionnage +
+                ", note=" + note +
+                ", video='" + video + '\'' +
+                ", duree=" + duree +
+                '}';
+    }
+
+    /**
+     *
+     * @return le contenu d'une oeuvre avec les saisons pour les séries
+     */
+    public String toStringAvecSaison() {
         return "Oeuvre{" +
                 "id=" + id +
                 ", typeOeuvre='" + typeOeuvre + '\'' +
