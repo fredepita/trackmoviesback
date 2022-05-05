@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-//la racine d'URL convient-elle?
 @RequestMapping("/trackmovies/v1")
 public class StatutVisionnageController {
 
