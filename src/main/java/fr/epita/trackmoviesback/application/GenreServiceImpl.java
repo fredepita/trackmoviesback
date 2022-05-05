@@ -1,9 +1,9 @@
 package fr.epita.trackmoviesback.application;
 
-import fr.epita.trackmoviesback.domaine.GenreOeuvre;
+import fr.epita.trackmoviesback.domaine.Genre;
 import fr.epita.trackmoviesback.dto.GenreDto;
 import fr.epita.trackmoviesback.dto.GenreListDto;
-import fr.epita.trackmoviesback.dto.StatutVisionnageListDto;
+import fr.epita.trackmoviesback.infrastructure.genre.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +13,21 @@ import java.util.List;
 public class GenreServiceImpl implements GenreService {
 
     @Autowired
-    GenreOeuvreDao dao;
+    GenreRepository genreRepository;
 
     @Override
-    public GenreListDto getAllGenreOeuvre() {
-    List<GenreDto> genresDto = dao.getAllGenre().stream()
-            .map(this::convertirGenreEnGenreDto);
-        return new StatutVisionnageListDto(genresDto);
-}
-    private GenreDto convertirGenreEnGenreDto(GenreOeuvre genre) {
-        GenreDto genreDto =new GenreDto(genre.getId(), genre.getLibelle());
-        return genreDto;
+    public GenreListDto getAllGenres() {
+        List<Genre> genres = genreRepository.findAll();
+        List<GenreDto> genresDto = convertirListGenreEnDto(genres);
+        return new GenreListDto(genresDto);
+    }
+
+    public GenreDto convertirGenreEnDto(Genre genre) {
+        return new GenreDto(genre.getId(), genre.getLibelle());
+    }
+
+    public List<GenreDto> convertirListGenreEnDto(List<Genre> genres) {
+        return genres.stream().map(this::convertirGenreEnDto).collect(Collectors.toList());
+    }
+
 }

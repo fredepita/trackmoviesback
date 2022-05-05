@@ -8,15 +8,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-//la racine d'URL convient-elle?
 @RequestMapping("/trackmovies/v1")
-public class GenreOeuvreController {
+public class GenreController {
 
     @Autowired
     GenreService service;
 
     @GetMapping("/genres")
-    GenreListDto getAllGenreOeuvre(){
-        return service.getAllGenreOeuvre();
+    GenreListDto getAllGenres(){
+        return service.getAllGenres();
     }
 }

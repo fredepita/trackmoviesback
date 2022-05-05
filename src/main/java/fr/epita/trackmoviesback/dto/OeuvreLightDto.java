@@ -1,7 +1,6 @@
 package fr.epita.trackmoviesback.dto;
 
-import fr.epita.trackmoviesback.domaine.GenreOeuvre;
-import fr.epita.trackmoviesback.domaine.StatutVisionnage;
+import java.util.List;
 
 /**
  * DTO à afficher sur la partie List
@@ -11,20 +10,20 @@ public class OeuvreLightDto {
     private Long id;
     private String type;
     private String titre;
-    private GenreOeuvre genreDTO;
-    private StatutVisionnage statutVisionnage;
+    private List<GenreDto> genres;
+    private StatutVisionnageDto statut;
     private Integer note;
     private String video;
     //donnee propre aux films
     private Integer duree;
 
 
-    public OeuvreLightDto(Long id, String type, String titre, GenreOeuvre genreDTO, StatutVisionnage statutVisionnage, Integer note, String video, Integer duree) {
+    public OeuvreLightDto(Long id, String type, String titre, List<GenreDto> genres, StatutVisionnageDto statut, Integer note, String video, Integer duree) {
         this.id = id;
         this.type = type;
         this.titre = titre;
-        this.genreDTO = genreDTO;
-        this.statutVisionnage = statutVisionnage;
+        this.genres = genres;
+        this.statut = statut;
         this.note = note;
         this.video = video;
         this.duree = duree;
@@ -58,20 +57,20 @@ public class OeuvreLightDto {
         this.titre = titre;
     }
 
-    public GenreOeuvre getGenreOeuvre() {
-        return genreDTO;
+    public List<GenreDto> getGenres() {
+        return genres;
     }
 
-    public void setGenreOeuvre(GenreOeuvre genreOeuvre) {
-        this.genreDTO = genreOeuvre;
+    public void setGenres(List<GenreDto> genres) {
+        this.genres = genres;
     }
 
-    public StatutVisionnage getStatutVisionnage() {
-        return statutVisionnage;
+    public StatutVisionnageDto getStatut() {
+        return statut;
     }
 
-    public void setStatutVisionnage(StatutVisionnage statutVisionnage) {
-        this.statutVisionnage = statutVisionnage;
+    public void setStatut(StatutVisionnageDto statut) {
+        this.statut = statut;
     }
 
     public Integer getNote() {
@@ -108,8 +107,8 @@ public class OeuvreLightDto {
                 "id=" + id +
                 ", type='" + type + '\'' +
                 ", titre='" + titre + '\'' +
-                ", genreOeuvre=" + genreDTO +
-                ", statutVisionnage=" + statutVisionnage +
+                ", genreOeuvre=" + genres +
+                ", statutVisionnage=" + statut +
                 ", note=" + note +
                 ", video='" + video + '\'' +
                 ", duree=" + duree +

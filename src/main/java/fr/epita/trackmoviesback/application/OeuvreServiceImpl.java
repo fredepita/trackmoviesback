@@ -1,9 +1,12 @@
 package fr.epita.trackmoviesback.application;
 
 import fr.epita.trackmoviesback.domaine.Oeuvre;
+import fr.epita.trackmoviesback.dto.GenreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
+import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
+import fr.epita.trackmoviesback.infrastructure.oeuvre.OeuvreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,20 +16,25 @@ import java.util.List;
 public class OeuvreServiceImpl implements OeuvreService{
 
     @Autowired
-    OeuvreDao dao;
+    OeuvreRepository oeuvreRepository;
+    @Autowired
+    GenreService genreService;
+    @Autowired
+    StatutVisionnageService statutVisionnageService;
 
     @Override
     public OeuvreLightListDto getAllOeuvres() {
-       List<OeuvreLightDto> oeuvresLightDto = dao.getAllOeuvres().stream()
-               .map(this::convertirOeuvreEnOeuvreLightDto);
+        List<Oeuvre> oeuvres = oeuvreRepository.findAll();
+       List<OeuvreLightDto> oeuvresLightDto = oeuvres.stream()
+               .map(this::convertirOeuvreEnDto).collect(Collectors.toList());
         return new OeuvreLightListDto(1,1, oeuvresLightDto);
     }
 
 
-
-    private OeuvreLightDto convertirOeuvreEnOeuvreLightDto(Oeuvre oeuvre) {
-        OeuvreLightDto oeuvreLightDTO =new OeuvreLightDto(oeuvre.getId(), oeuvre.getType(), oeuvre.getTitre(), oeuvre.getGenreOeuvre(), oeuvre.getStatutVisionnage(), oeuvre.getNote(), oeuvre.getVideo(), oeuvre.getDuree());
-        return oeuvreLightDTO;
+    private OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre) {
+        List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
+        StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnStatutVisionnageDto(oeuvre.getStatutVisionnage());
+        return new OeuvreLightDto(oeuvre.getId(), oeuvre.getTypeOeuvre(), oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getVideo(), oeuvre.getDuree());
     }
 
 }
