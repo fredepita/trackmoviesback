@@ -1,8 +1,6 @@
 package fr.epita.trackmoviesback.application;
 
-import fr.epita.trackmoviesback.domaine.Genre;
 import fr.epita.trackmoviesback.domaine.StatutVisionnage;
-import fr.epita.trackmoviesback.dto.GenreDto;
 import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
 import fr.epita.trackmoviesback.dto.StatutVisionnageListDto;
 import fr.epita.trackmoviesback.infrastructure.statutvisionnage.StatutVisionnageRepository;
@@ -21,12 +19,12 @@ public class StatutVisionnageServiceImpl implements StatutVisionnageService {
     @Override
     public StatutVisionnageListDto getAllStatutVisionnage() {
         List<StatutVisionnage> statutVisionnages = statutVisionnageRepository.findAll();
-        List<StatutVisionnageDto> statutVisionnagesDto = statutVisionnages.stream()
-                .map(this::convertirStatutVisionnageEnStatutVisionnageDto).collect(Collectors.toList());
-        return new StatutVisionnageListDto(statutVisionnagesDto);
+        List<StatutVisionnageDto> statutsVisionnageDto = statutVisionnages.stream()
+                .map(this::convertirStatutVisionnageEnDto).collect(Collectors.toList());
+        return new StatutVisionnageListDto(statutsVisionnageDto);
     }
 
-    public StatutVisionnageDto convertirStatutVisionnageEnStatutVisionnageDto(StatutVisionnage statutVisionnage) {
+    public StatutVisionnageDto convertirStatutVisionnageEnDto(StatutVisionnage statutVisionnage) {
         return new StatutVisionnageDto(statutVisionnage.getId(), statutVisionnage.getLibelle());
 
     }

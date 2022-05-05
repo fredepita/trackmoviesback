@@ -34,7 +34,7 @@ public class OeuvreServiceImpl implements OeuvreService{
 
     private OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre) {
         List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
-        StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnStatutVisionnageDto(oeuvre.getStatutVisionnage());
+        StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());
         return new OeuvreLightDto(oeuvre.getId(), oeuvre.getTypeOeuvre(), oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getVideo(), oeuvre.getDuree());
     }
 

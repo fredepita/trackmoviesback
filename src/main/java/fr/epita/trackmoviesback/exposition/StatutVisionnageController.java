@@ -17,7 +17,7 @@ public class StatutVisionnageController {
     @Autowired
     StatutVisionnageService service;
 
-    @GetMapping("/statuts")
+    @GetMapping("/statuts_visionnage")
     StatutVisionnageListDto getAllStatutVisionnage(){
         return service.getAllStatutVisionnage();
     }
