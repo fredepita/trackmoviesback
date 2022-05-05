@@ -1,8 +1,15 @@
 package fr.epita.trackmoviesback.domaine;
 
+import javax.persistence.*;
+
+@Entity
 public class StatutVisionnage {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false,unique = true)
     private String libelle;
 
     public StatutVisionnage() {
