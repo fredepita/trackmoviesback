@@ -28,6 +28,3 @@ INSERT INTO SAISON(ID, NUMERO, NOTE, STATUT_VISIONNAGE_ID,OEUVRE_ID) VALUES (5,'
 
 --select * from oeuvre as o
 --    left join saison as s on s.oeuvre_id = o.id;
-
-
-
