@@ -1,7 +1,8 @@
 package fr.epita.trackmoviesback.domaine;
 
+import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
-import org.springframework.util.StringUtils;
+import fr.epita.trackmoviesback.infrastructure.converter.TypeOeuvreAttributeConverter;
 
 import javax.persistence.*;
 import java.util.List;
@@ -9,28 +10,18 @@ import java.util.List;
 @Entity
 public class Oeuvre {
 
-    @Transient
-    public final String TYPE_FILM = "film";
-    @Transient
-    public final String TYPE_SERIE = "serie";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String typeOeuvre;
+    @Convert(converter = TypeOeuvreAttributeConverter.class) //permet de convertir en string l'enum pour le stocker en base de donnée. On utilise son libelle
+    private EnumTypeOeuvre typeOeuvre;
 
     @Column(nullable = false,unique = true)
     private String titre;
 
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    /*@JoinTable( //sert à forcer les nommage de la table de liaison (evite de se retrouver avec des pluriels)
-            name="oeuvre_genre",
-            joinColumns = {
-                    @JoinColumn(name = "oeuvre_id",referencedColumnName = "id"),
-                    @JoinColumn(name = "genre_id", referencedColumnName = "id")}
-    )*/
     @JoinTable( //sert à forcer les nommage de la table de liaison et les colonnes(evite de se retrouver avec des pluriels)
             name="oeuvre_genre",
             joinColumns = @JoinColumn(name = "oeuvre_id"),
@@ -48,11 +39,6 @@ public class Oeuvre {
 
     //donnee propre aux series
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
-   /* @JoinTable( //sert à forcer les nommage de la table de liaison (evite de se retrouver avec des pluriels)
-            name="oeuvre_saison",
-            joinColumns = @JoinColumn( name="oeuvre_id"),
-            inverseJoinColumns = @JoinColumn( name="saison_id")
-    )*/
     @JoinColumn(name = "oeuvre_id") //définir le JoinColumn permet d'eviter la création d'une table de liaison inutile entre saison et episode puisqu'un episode appartient à une seule saison
     private List<Saison> saisons;
 
@@ -64,9 +50,9 @@ public class Oeuvre {
     public Oeuvre() {
     }
 
-    public Oeuvre(String type, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String urlAffiche, String urlBandeAnnonce, List<Saison> saisons, Integer duree) {
-        setTypeOeuvre(type);
-        setTitre(titre);
+    public Oeuvre(EnumTypeOeuvre typeOeuvre, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String urlAffiche, String urlBandeAnnonce, List<Saison> saisons, Integer duree) {
+        setTypeOeuvre(typeOeuvre);
+        this.titre = titre;
         this.genres = genres;
         this.statutVisionnage = statutVisionnage;
         this.note = note;
@@ -84,16 +70,14 @@ public class Oeuvre {
         this.id = id;
     }
 
-    public String getTypeOeuvre() {
+    public EnumTypeOeuvre getTypeOeuvre() {
         return typeOeuvre;
     }
 
-    public void setTypeOeuvre(String typeOeuvre) {
-        if(typeOeuvre.equals(TYPE_FILM) || typeOeuvre.equals(TYPE_SERIE)){
-            this.typeOeuvre = typeOeuvre;
-        } else {
-            throw new MauvaisParamException("Valeur recue : " + typeOeuvre + ". Valeurs acceptees :" + TYPE_SERIE + " ou " + TYPE_FILM);
-        }
+    public void setTypeOeuvre(EnumTypeOeuvre typeOeuvre) {
+        if (typeOeuvre==null)
+            throw new MauvaisParamException("typeOeuvre ne peut pas etre null");
+        this.typeOeuvre = typeOeuvre;
     }
 
     public String getTitre() {
@@ -101,13 +85,7 @@ public class Oeuvre {
     }
 
     public void setTitre(String titre) {
-        //hasLenght vérifie si le titre contient des caractères
-        //.trim() permet de retirer les espaces avant et après la chaine de caractère "titre"
-        if(StringUtils.hasLength(titre.trim())){
-            this.titre = titre;
-        } else {
-            throw new MauvaisParamException("Valeur recue : " + titre + ". Valeurs acceptees : le titre ne peut pas être vide ou null" );
-        }
+        this.titre = titre;
     }
 
     public List<Genre> getGenres() {
@@ -151,10 +129,10 @@ public class Oeuvre {
     }
 
     public void setSaisons(List<Saison> saisons) {
-        if(typeOeuvre.equals(TYPE_SERIE)){
+        if(typeOeuvre==EnumTypeOeuvre.SERIE){
             this.saisons = saisons;
         } else {
-            throw new MauvaisParamException("Type d'oeuvre : " + typeOeuvre + ". Seules les series peuvent avoir des saisons");
+            throw new MauvaisParamException("Type d'oeuvre : " + typeOeuvre.getLibelle() + ". Seule "+EnumTypeOeuvre.SERIE.getLibelle()+" peut avoir des saisons");
         }
     }
 
@@ -171,10 +149,10 @@ public class Oeuvre {
      * @param duree de l'oeuvre en minutes
      */
     public void setDuree(Integer duree) {
-        if(typeOeuvre.equals(TYPE_FILM)){
+        if(typeOeuvre==EnumTypeOeuvre.FILM){
             this.duree = duree;
         } else {
-            throw new MauvaisParamException("Type d'oeuvre : " + typeOeuvre + ". Seules les films peuvent avoir des durees");
+            throw new MauvaisParamException("Type d'oeuvre : " + typeOeuvre + ". Seul "+EnumTypeOeuvre.FILM.getLibelle()+" peuvent avoir des durees");
         }
     }
 
