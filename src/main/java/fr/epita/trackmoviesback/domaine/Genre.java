@@ -14,6 +14,11 @@ public class Genre {
     public Genre() {
     }
 
+    public Genre(Long id, String libelle) {
+        this.id = id;
+        this.libelle = libelle;
+    }
+
     public Long getId() {
         return id;
     }
