@@ -1,6 +1,7 @@
 package fr.epita.trackmoviesback.domaine;
 
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.util.List;
@@ -65,7 +66,7 @@ public class Oeuvre {
 
     public Oeuvre(String type, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String urlAffiche, String urlBandeAnnonce, List<Saison> saisons, Integer duree) {
         setTypeOeuvre(type);
-        this.titre = titre;
+        setTitre(titre);
         this.genres = genres;
         this.statutVisionnage = statutVisionnage;
         this.note = note;
@@ -100,7 +101,13 @@ public class Oeuvre {
     }
 
     public void setTitre(String titre) {
-        this.titre = titre;
+        //hasLenght vérifie si le titre contient des caractères
+        //.trim() permet de retirer les espaces avant et après la chaine de caractère "titre"
+        if(StringUtils.hasLength(titre.trim())){
+            this.titre = titre;
+        } else {
+            throw new MauvaisParamException("Valeur recue : " + titre + ". Valeurs acceptees : le titre ne peut pas être vide ou null" );
+        }
     }
 
     public List<Genre> getGenres() {
