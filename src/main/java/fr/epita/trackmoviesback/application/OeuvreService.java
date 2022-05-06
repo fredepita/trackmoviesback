@@ -1,5 +1,7 @@
 package fr.epita.trackmoviesback.application;
 
+import fr.epita.trackmoviesback.domaine.Oeuvre;
+import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 
 
@@ -9,7 +11,7 @@ public interface OeuvreService {
 
     OeuvreLightListDto getAllOeuvres();
 
-
+    public OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre);
 
 
 }

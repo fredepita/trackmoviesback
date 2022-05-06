@@ -1,7 +1,5 @@
 package fr.epita.trackmoviesback.dto;
 
-import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
-
 import java.util.List;
 
 /**
@@ -15,19 +13,21 @@ public class OeuvreLightDto {
     private List<GenreDto> genres;
     private StatutVisionnageDto statut;
     private Integer note;
-    private String video;
+    private String urlAffiche;
+    private String urlBandeAnnonce;
     //donnee propre aux films
     private Integer duree;
 
 
-    public OeuvreLightDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statut, Integer note, String video, Integer duree) {
+    public OeuvreLightDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statut, Integer note, String urlAffiche, String urlBandeAnnonce, Integer duree) {
         this.id = id;
         this.typeOeuvre = typeOeuvre;
         this.titre = titre;
         this.genres = genres;
         this.statut = statut;
         this.note = note;
-        this.video = video;
+        this.urlAffiche = urlAffiche;
+        this.urlBandeAnnonce = urlBandeAnnonce;
         this.duree = duree;
     }
 
@@ -83,12 +83,16 @@ public class OeuvreLightDto {
         this.note = note;
     }
 
-    public String getVideo() {
-        return video;
+    public String getUrlAffiche() { return urlAffiche;}
+
+    public void setUrlAffiche(String urlAffiche) { this.urlAffiche = urlAffiche;}
+
+    public String getUrlBandeAnnonce() {
+        return urlBandeAnnonce;
     }
 
-    public void setVideo(String video) {
-        this.video = video;
+    public void setUrlBandeAnnonce(String urlBandeAnnonce) {
+        this.urlBandeAnnonce = urlBandeAnnonce;
     }
 
     public Integer getDuree() {
@@ -112,7 +116,7 @@ public class OeuvreLightDto {
                 ", genreOeuvre=" + genres +
                 ", statutVisionnage=" + statut +
                 ", note=" + note +
-                ", video='" + video + '\'' +
+                ", video='" + urlBandeAnnonce + '\'' +
                 ", duree=" + duree +
                 '}';
     }
