@@ -12,10 +12,10 @@ public class OeuvreDto extends OeuvreLightDto{
     //il faudra créer le SaisonDto
   //private List<SaisonDto> saisons;
 
-    public OeuvreDto(Long id, String type, String titre, List<GenreDto> genres, StatutVisionnageDto statutVisionnage, Integer note, String video, Integer duree
+    public OeuvreDto(Long id, String type, String titre, List<GenreDto> genres, StatutVisionnageDto statutVisionnage, Integer note, String urlAffiche, String urlBandeAnnonce, Integer duree
            // , List<SaisonDto> saisons
     ) {
-        super(id, type, titre, genres, statutVisionnage, note, video, duree);
+        super(id, type, titre, genres, statutVisionnage, note, urlAffiche, urlBandeAnnonce, duree);
        // this.saisons = saisons;
     }
 

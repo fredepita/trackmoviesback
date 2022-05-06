@@ -40,7 +40,10 @@ public class Oeuvre {
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private StatutVisionnage statutVisionnage;
     private Integer note;
-    private String video;
+    //lien url vers l'affiche de l'oeuvre
+    private String urlAffiche;
+    //lien url vers la Bande Annonce de l'oeuvre
+    private String urlBandeAnnonce;
 
     //donnee propre aux series
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
@@ -60,13 +63,14 @@ public class Oeuvre {
     public Oeuvre() {
     }
 
-    public Oeuvre(String type, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String video, List<Saison> saisons, Integer duree) {
+    public Oeuvre(String type, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String urlAffiche, String urlBandeAnnonce, List<Saison> saisons, Integer duree) {
         setTypeOeuvre(type);
         this.titre = titre;
         this.genres = genres;
         this.statutVisionnage = statutVisionnage;
         this.note = note;
-        this.video = video;
+        this.urlAffiche = urlAffiche;
+        this.urlBandeAnnonce = urlBandeAnnonce;
         setSaisons(saisons);
         setDuree(duree);
     }
@@ -123,12 +127,16 @@ public class Oeuvre {
         this.note = note;
     }
 
-    public String getVideo() {
-        return video;
+    public String getUrlAffiche() { return urlAffiche;}
+
+    public void setUrlAffiche(String image) { this.urlAffiche = image;}
+
+    public String getUrlBandeAnnonce() {
+        return urlBandeAnnonce;
     }
 
-    public void setVideo(String video) {
-        this.video = video;
+    public void setUrlBandeAnnonce(String video) {
+        this.urlBandeAnnonce = video;
     }
 
     public List<Saison> getSaisons() {
@@ -178,7 +186,8 @@ public class Oeuvre {
                 ", genres=" + genres +
                 ", statutVisionnage=" + statutVisionnage +
                 ", note=" + note +
-                ", video='" + video + '\'' +
+                ", urlAffiche='" + urlAffiche + '\'' +
+                ", urlBandeAnnonce='" + urlBandeAnnonce + '\'' +
                 ", duree=" + duree +
                 '}';
     }
@@ -195,7 +204,8 @@ public class Oeuvre {
                 ", genres=" + genres +
                 ", statutVisionnage=" + statutVisionnage +
                 ", note=" + note +
-                ", video='" + video + '\'' +
+                ", urlAffiche='" + urlAffiche + '\'' +
+                ", urlBandeAnnonce='" + urlBandeAnnonce + '\'' +
                 ", saisons=" + saisons +
                 ", duree=" + duree +
                 '}';
