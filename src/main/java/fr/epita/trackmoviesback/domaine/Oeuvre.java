@@ -2,6 +2,7 @@ package fr.epita.trackmoviesback.domaine;
 
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
+import fr.epita.trackmoviesback.infrastructure.converter.TypeOeuvreAttributeConverter;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,6 +15,7 @@ public class Oeuvre {
     private Long id;
 
     @Column(nullable = false)
+    @Convert(converter = TypeOeuvreAttributeConverter.class) //permet de convertir en string l'enum pour le stocker en base de donnée. On utilise son libelle
     private EnumTypeOeuvre typeOeuvre;
 
     @Column(nullable = false,unique = true)

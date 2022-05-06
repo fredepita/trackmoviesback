@@ -1,6 +1,8 @@
 package fr.epita.trackmoviesback.dto;
 
 
+import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
+
 import java.util.List;
 
 /**
@@ -12,10 +14,10 @@ public class OeuvreDto extends OeuvreLightDto{
     //il faudra créer le SaisonDto
   //private List<SaisonDto> saisons;
 
-    public OeuvreDto(Long id, String type, String titre, List<GenreDto> genres, StatutVisionnageDto statutVisionnage, Integer note, String video, Integer duree
-           // , List<SaisonDto> saisons
+    public OeuvreDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statutVisionnage, Integer note, String video, Integer duree
+                     // , List<SaisonDto> saisons
     ) {
-        super(id, type, titre, genres, statutVisionnage, note, video, duree);
+        super(id, typeOeuvre, titre, genres, statutVisionnage, note, video, duree);
        // this.saisons = saisons;
     }
 

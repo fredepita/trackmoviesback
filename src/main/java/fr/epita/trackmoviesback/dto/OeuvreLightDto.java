@@ -1,5 +1,7 @@
 package fr.epita.trackmoviesback.dto;
 
+import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
+
 import java.util.List;
 
 /**
@@ -8,7 +10,7 @@ import java.util.List;
 public class OeuvreLightDto {
 
     private Long id;
-    private String type;
+    private String typeOeuvre;
     private String titre;
     private List<GenreDto> genres;
     private StatutVisionnageDto statut;
@@ -18,9 +20,9 @@ public class OeuvreLightDto {
     private Integer duree;
 
 
-    public OeuvreLightDto(Long id, String type, String titre, List<GenreDto> genres, StatutVisionnageDto statut, Integer note, String video, Integer duree) {
+    public OeuvreLightDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statut, Integer note, String video, Integer duree) {
         this.id = id;
-        this.type = type;
+        this.typeOeuvre = typeOeuvre;
         this.titre = titre;
         this.genres = genres;
         this.statut = statut;
@@ -37,13 +39,13 @@ public class OeuvreLightDto {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
+    public String getTypeOeuvre() {
+        return typeOeuvre;
     }
 
-    public void setType(String type) {
+    public void setTypeOeuvre(String typeOeuvre) {
         // if(type.equals(Oeuvre.TYPE_FILM) || type.equals(Oeuvre.TYPE_SERIE)){
-        this.type = type;
+        this.typeOeuvre = typeOeuvre;
         // } else {
         //     throw new MauvaisParamException("Valeur recue : " + type + ". Valeurs acceptees :" + TYPE_SERIE + " ou " + TYPE_FILM);
         //  }
@@ -105,7 +107,7 @@ public class OeuvreLightDto {
     public String toString() {
         return "OeuvrelightDTO{" +
                 "id=" + id +
-                ", type='" + type + '\'' +
+                ", type='" + typeOeuvre + '\'' +
                 ", titre='" + titre + '\'' +
                 ", genreOeuvre=" + genres +
                 ", statutVisionnage=" + statut +
