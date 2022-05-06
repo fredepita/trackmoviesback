@@ -32,7 +32,7 @@ public class OeuvreServiceImpl implements OeuvreService{
     }
 
 
-    private OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre) {
+    public OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre) {
         List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
         StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());
         String typeOeuvre= oeuvre.getTypeOeuvre()==null?null:oeuvre.getTypeOeuvre().getLibelle();
