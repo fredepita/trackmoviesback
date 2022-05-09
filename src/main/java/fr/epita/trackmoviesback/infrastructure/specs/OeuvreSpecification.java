@@ -46,8 +46,9 @@ public class OeuvreSpecification implements Specification<Oeuvre> {
                             criteriaBuilder.equal(root.get(critere.getNomPropriete().getProprieteBDD()), critere.getValeur())
                     );
                 } else if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.COMMENCE_PAR)) {
+                    -> mettre un log
                     predicates.add(
-                            criteriaBuilder.like(root.get(critere.getNomPropriete().getProprieteBDD()), critere.getValeur().toString()+ "%")
+                            criteriaBuilder.like(root.get(critere.getNomPropriete().getProprieteBDD().toLowerCase()), critere.getValeur().toString().toLowerCase()+ "%")
                     );
                 }
             }

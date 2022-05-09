@@ -61,8 +61,20 @@ public class OeuvreRepositoryTest {
         oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
         oeuvres.stream().forEach(System.out::println);
 
+        System.out.println("recherche Shazam!");
+        criteresDeRecherche= new OeuvreSpecification();
+        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.TITRE,"Shazam!" , EnumOperationDeRecherche.EGAL));
+        oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
+        oeuvres.stream().forEach(System.out::println);
 
-        -->il faut tester le critere titre avec commence par et = et combinaison avec autre critère
+        System.out.println("recherche commence par Sh");
+        criteresDeRecherche= new OeuvreSpecification();
+        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.TITRE,"Shazam!" , EnumOperationDeRecherche.COMMENCE_PAR));
+        oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
+        oeuvres.stream().forEach(System.out::println);
+
+
+//        -->il faut tester le critere titre avec commence par et = et combinaison avec autre critère
 
     }
 }
