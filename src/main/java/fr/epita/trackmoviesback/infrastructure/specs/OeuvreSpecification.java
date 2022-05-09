@@ -2,7 +2,10 @@ package fr.epita.trackmoviesback.infrastructure.specs;
 
 import fr.epita.trackmoviesback.domaine.Oeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
+import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchable;
+import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
@@ -25,24 +28,30 @@ public class OeuvreSpecification implements Specification<Oeuvre> {
 
         //add add criteria to predicates
         for (CritereDeRecherche critere : critereDeRechercheList) {
-            //cette ecriture marche bien pour genres. Il faut le rendre générique
-            //je crée volontairement cette erreur de compile pour que je sache qu'il faut que je
-            //gere ici le cas particulié de genres et que je test aussi sur les autres critère (statut, titre)
-            -> cette ligne est une erreurVolontaire pour que la prochaine fois je travaille à partir de ce point
+            if (critere.getNomPropriete()== EnumProprieteRecherchable.GENRE) {
+                //cas particulier du critère genres qui a une table de liaison à cause de la relation ManyToMany.
+                // Il faut construire le critere en tenant compte du join supplementaire
 
-            predicates.add(
-                    criteriaBuilder.equal(root.join("genres", JoinType.INNER).get("id"),critere.getValeur())
-            );
-            /* ca ca marche pour type oeuvre mais pas pour le many to many de genre
-            if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.EGAL)) {
-                predicates.add(
-                        criteriaBuilder.equal(root.get(critere.getNomPropriete()), critere.getValeur())
-                );
-            } else if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.COMMENCE_PAR)) {
-                predicates.add(
-                        criteriaBuilder.like(root.get(critere.getNomPropriete()), critere.getValeur().toString()+ "%")
-                );
-            }*/
+                //on ne gère que l'égalité pour ce critère (pas le "commence par"), puisque on utilise l'id
+                if (critere.getOperationDeRecherche()==EnumOperationDeRecherche.EGAL)
+                    predicates.add(
+                            criteriaBuilder.equal(root.join(critere.getNomPropriete().getProprieteBDD(), JoinType.INNER).get("id"), critere.getValeur())
+                    );
+                else
+                    throw new MauvaisParamException("Seule l'operation de recherche "+EnumOperationDeRecherche.EGAL+" est possible pour la propriete genre");
+            } else {
+                //pour les autres critères de recherche
+                if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.EGAL)) {
+                    predicates.add(
+                            criteriaBuilder.equal(root.get(critere.getNomPropriete().getProprieteBDD()), critere.getValeur())
+                    );
+                } else if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.COMMENCE_PAR)) {
+                    predicates.add(
+                            criteriaBuilder.like(root.get(critere.getNomPropriete().getProprieteBDD()), critere.getValeur().toString()+ "%")
+                    );
+                }
+            }
+
         }
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }

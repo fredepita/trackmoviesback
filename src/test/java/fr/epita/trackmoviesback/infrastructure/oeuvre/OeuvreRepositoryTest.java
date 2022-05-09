@@ -3,6 +3,7 @@ package fr.epita.trackmoviesback.infrastructure.oeuvre;
 import fr.epita.trackmoviesback.domaine.Genre;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
+import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchable;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.infrastructure.specs.CritereDeRecherche;
 import fr.epita.trackmoviesback.infrastructure.specs.OeuvreSpecification;
@@ -34,9 +35,18 @@ public class OeuvreRepositoryTest {
         oeuvres = oeuvreRepository.findAll(criteresDeRecherche);
         oeuvres.stream().forEach(System.out::println);
 */
+        System.out.println("recherche des films:");
+        OeuvreSpecification criteresDeRecherche= new OeuvreSpecification();
+        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.TYPE_OEUVRE, EnumTypeOeuvre.FILM, EnumOperationDeRecherche.EGAL));
+        List<Oeuvre> oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
+        oeuvres.stream().forEach(System.out::println);
+
         System.out.println("recherche des series comedie:");
-        OeuvreSpecification criteresDeRecherche2= new OeuvreSpecification();
-       // criteresDeRecherche.add(new CritereDeRecherche("typeOeuvre", EnumTypeOeuvre.SERIE, EnumOperationDeRecherche.EGAL));
+        criteresDeRecherche= new OeuvreSpecification();
+        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.TYPE_OEUVRE, EnumTypeOeuvre.SERIE, EnumOperationDeRecherche.EGAL));
+        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.GENRE, 2, EnumOperationDeRecherche.EGAL));
+        oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
+        oeuvres.stream().forEach(System.out::println);
 
         //new ArrayList<Genre>().add(new Genre(Long.valueOf(2),"Comédie"))
         //ca ca marche
@@ -44,10 +54,15 @@ public class OeuvreRepositoryTest {
         List<Oeuvre> oeuvres2= oeuvreRepository.findAll(criteresDeRecherche2);
         oeuvres2.stream().forEach(System.out::println);*/
 
-        criteresDeRecherche2.add(new CritereDeRecherche("genres",1 , EnumOperationDeRecherche.EGAL));
-        List<Oeuvre> oeuvres2= oeuvreRepository.findAll(criteresDeRecherche2);
-        oeuvres2.stream().forEach(System.out::println);
+        //criteresDeRecherche2.add(new CritereDeRecherche("genres",1 , EnumOperationDeRecherche.EGAL));
+        System.out.println("recherche des oeuvre d'action:");
+        criteresDeRecherche= new OeuvreSpecification();
+        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.GENRE,1 , EnumOperationDeRecherche.EGAL));
+        oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
+        oeuvres.stream().forEach(System.out::println);
 
+
+        -->il faut tester le critere titre avec commence par et = et combinaison avec autre critère
 
     }
 }
