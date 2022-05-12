@@ -10,5 +10,5 @@ import java.util.List;
 public interface OeuvreService {
 
     OeuvreLightListDto getAllOeuvres();
-    public OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre);
+    OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre);
 }

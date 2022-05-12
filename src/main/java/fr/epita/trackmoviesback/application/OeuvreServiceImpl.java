@@ -3,7 +3,6 @@ package fr.epita.trackmoviesback.application;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
 import fr.epita.trackmoviesback.dto.GenreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
-
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
 import fr.epita.trackmoviesback.infrastructure.oeuvre.OeuvreRepository;
@@ -31,7 +30,7 @@ public class OeuvreServiceImpl implements OeuvreService{
         return new OeuvreLightListDto(1,1, oeuvresLightDto);
     }
 
-
+    @Override
     public OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre) {
         List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
         StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());
@@ -39,4 +38,12 @@ public class OeuvreServiceImpl implements OeuvreService{
         return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce(), oeuvre.getDuree());
     }
 
+    @Override
+    public String toString() {
+        return "OeuvreServiceImpl{" +
+                "oeuvreRepository=" + oeuvreRepository +
+                ", genreService=" + genreService +
+                ", statutVisionnageService=" + statutVisionnageService +
+                '}';
+    }
 }

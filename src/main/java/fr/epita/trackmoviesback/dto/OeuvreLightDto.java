@@ -109,15 +109,15 @@ public class OeuvreLightDto {
 
     @Override
     public String toString() {
-        return "OeuvrelightDTO{" +
-                "id=" + id +
-                ", type='" + typeOeuvre + '\'' +
-                ", titre='" + titre + '\'' +
-                ", genreOeuvre=" + genres +
-                ", statutVisionnage=" + statut +
-                ", note=" + note +
-                ", video='" + urlBandeAnnonce + '\'' +
-                ", duree=" + duree +
+        return "OeuvrelightDto{" +
+                "idDto=" + id +
+                ", typeDto='" + typeOeuvre + '\'' +
+                ", titreDto='" + titre + '\'' +
+                ", genreDto=" + genres +
+                ", statutVisionnageDto=" + statut +
+                ", noteDto=" + note +
+                ", videoDto='" + urlBandeAnnonce + '\'' +
+                ", dureeDto=" + duree +
                 '}';
     }
 }

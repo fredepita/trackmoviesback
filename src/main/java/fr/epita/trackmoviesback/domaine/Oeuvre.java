@@ -86,9 +86,7 @@ public class Oeuvre {
     }
 
     public void setTitre(String titre) {
-        //hasLenght vérifie si le titre contient des caractères
-        //.trim() permet de retirer les espaces avant et après la chaine de caractère "titre"
-        if(StringUtils.hasLength(titre.trim())){
+        if(StringUtils.hasText(titre)){
             this.titre = titre;
         } else {
             throw new MauvaisParamException("Valeur recue : " + titre + ". Valeurs acceptees : le titre ne peut pas être vide ou null" );
