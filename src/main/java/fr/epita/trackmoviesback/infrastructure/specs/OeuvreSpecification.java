@@ -4,6 +4,8 @@ import fr.epita.trackmoviesback.domaine.Oeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
 import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchable;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OeuvreSpecification implements Specification<Oeuvre> {
+    private static final Logger logger = LoggerFactory.getLogger(OeuvreSpecification.class);
+
     private List<CritereDeRecherche> critereDeRechercheList;
 
     public OeuvreSpecification() {
@@ -24,10 +28,12 @@ public class OeuvreSpecification implements Specification<Oeuvre> {
 
     @Override
     public Predicate toPredicate(Root<Oeuvre> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+        logger.debug("Appel toPredicate");
         List<Predicate> predicates = new ArrayList<>();
 
         //add add criteria to predicates
         for (CritereDeRecherche critere : critereDeRechercheList) {
+            logger.debug("critere={}",critere);
             if (critere.getNomPropriete()== EnumProprieteRecherchable.GENRE) {
                 //cas particulier du critère genres qui a une table de liaison à cause de la relation ManyToMany.
                 // Il faut construire le critere en tenant compte du join supplementaire
@@ -46,9 +52,9 @@ public class OeuvreSpecification implements Specification<Oeuvre> {
                             criteriaBuilder.equal(root.get(critere.getNomPropriete().getProprieteBDD()), critere.getValeur())
                     );
                 } else if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.COMMENCE_PAR)) {
-                    -> mettre un log
                     predicates.add(
-                            criteriaBuilder.like(root.get(critere.getNomPropriete().getProprieteBDD().toLowerCase()), critere.getValeur().toString().toLowerCase()+ "%")
+                            //criteriaBuilder.like(root.get(critere.getNomPropriete().getProprieteBDD().toLowerCase()), critere.getValeur().toString().toLowerCase()+ "%")
+                            criteriaBuilder.like(root.get(critere.getNomPropriete().getProprieteBDD()), critere.getValeur()+ "%")
                     );
                 }
             }

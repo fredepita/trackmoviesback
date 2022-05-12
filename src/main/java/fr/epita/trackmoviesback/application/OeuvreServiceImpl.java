@@ -39,4 +39,6 @@ public class OeuvreServiceImpl implements OeuvreService{
         return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce(), oeuvre.getDuree());
     }
 
+
+
 }
