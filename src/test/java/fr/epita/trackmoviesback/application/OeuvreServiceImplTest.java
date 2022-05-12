@@ -48,6 +48,14 @@ class OeuvreServiceImplTest {
         assertEquals(1,oeuvreLightDto.getOeuvres().size());
         assertEquals("friends",oeuvreLightDto.getOeuvres().get(0).getTitre());
 
+        //je dois avoir 2 oeuvres vues
+        criteresHttp = new HashMap<>();
+        criteresHttp.put("statut","3");
+        oeuvreLightDto= oeuvreService.getOeuvres(criteresHttp);
+        assertNotNull(oeuvreLightDto);
+        assertNotNull(oeuvreLightDto.getOeuvres());
+        assertEquals(2,oeuvreLightDto.getOeuvres().size());
+
         //tester mauvais intitule critere
         //tester mauvaise valeur (null, vide, seriesqsdqs)
 

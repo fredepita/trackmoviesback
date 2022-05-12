@@ -5,7 +5,8 @@ import fr.epita.trackmoviesback.exception.MauvaisParamException;
 public enum EnumProprieteRecherchable {
     TYPE_OEUVRE("typeOeuvre","type"),
     GENRE("genres","genre"),
-    TITRE("titre","titre");
+    TITRE("titre","titre"),
+    STATUT_VISIONNAGE("statutVisionnage","statut");
     //SERIE("serie");
 
     private String proprieteBDD;

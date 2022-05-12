@@ -35,6 +35,7 @@ public class OeuvreSpecification implements Specification<Oeuvre> {
             logger.debug("critere={}",critere);
             switch (critere.getProprieteRecherchee()) {
                 case GENRE:
+                case STATUT_VISIONNAGE:
                     //cas particulier du critère genres qui a une table de liaison à cause de la relation ManyToMany.
                     // Il faut construire le critere en tenant compte du join supplementaire
                     //on ne gère que l'operation = pour ce critère (pas le "commence par"), puisque on utilise l'id
@@ -46,7 +47,7 @@ public class OeuvreSpecification implements Specification<Oeuvre> {
                             )
                         );
                     else
-                        throw new MauvaisParamException("Seule l'operation de recherche "+EnumOperationDeRecherche.EGAL+" est possible pour la propriete genre");
+                        throw new MauvaisParamException("Seule l'operation de recherche "+EnumOperationDeRecherche.EGAL+" est possible pour la propriete "+critere.getProprieteRecherchee().getParametreRequeteHttp());
                     break;
 
                 default://pour les autres critères de recherche
