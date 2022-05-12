@@ -25,13 +25,13 @@ public class OeuvreRepositoryTest {
     public void findAll_doit_retourner_toutes_les_oeuvres_d_un_utilisateur_sans_les_saisons_pour_les_series() {
         OeuvreSpecification criteresDeRecherche= new OeuvreSpecification();
         List<Oeuvre> oeuvres=null;
-        /*
+
         System.out.println("recherche des films:");
 
         criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.TYPE_OEUVRE, EnumTypeOeuvre.FILM, EnumOperationDeRecherche.EGAL));
-        List<Oeuvre> oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
+        oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
         oeuvres.stream().forEach(System.out::println);
-
+/*
         System.out.println("recherche des series comedie:");
         criteresDeRecherche= new OeuvreSpecification();
         criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.TYPE_OEUVRE, EnumTypeOeuvre.SERIE, EnumOperationDeRecherche.EGAL));

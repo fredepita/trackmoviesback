@@ -7,7 +7,6 @@ import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
@@ -31,32 +30,42 @@ public class OeuvreSpecification implements Specification<Oeuvre> {
         logger.debug("Appel toPredicate");
         List<Predicate> predicates = new ArrayList<>();
 
-        //add add criteria to predicates
+        //on ajoute les criteres à la liste de predicat
         for (CritereDeRecherche critere : critereDeRechercheList) {
             logger.debug("critere={}",critere);
-            if (critere.getNomPropriete()== EnumProprieteRecherchable.GENRE) {
-                //cas particulier du critère genres qui a une table de liaison à cause de la relation ManyToMany.
-                // Il faut construire le critere en tenant compte du join supplementaire
+            switch (critere.getProprieteRecherchee()) {
+                case GENRE:
+                    //cas particulier du critère genres qui a une table de liaison à cause de la relation ManyToMany.
+                    // Il faut construire le critere en tenant compte du join supplementaire
+                    //on ne gère que l'operation = pour ce critère (pas le "commence par"), puisque on utilise l'id
+                    if (critere.getOperationDeRecherche()==EnumOperationDeRecherche.EGAL)
+                        predicates.add(
+                            criteriaBuilder.equal(
+                                    root.join(critere.getProprieteRecherchee().getProprieteBDD(), JoinType.INNER).get("id"),
+                                    critere.getValeur()
+                            )
+                        );
+                    else
+                        throw new MauvaisParamException("Seule l'operation de recherche "+EnumOperationDeRecherche.EGAL+" est possible pour la propriete genre");
+                    break;
 
-                //on ne gère que l'égalité pour ce critère (pas le "commence par"), puisque on utilise l'id
-                if (critere.getOperationDeRecherche()==EnumOperationDeRecherche.EGAL)
-                    predicates.add(
-                            criteriaBuilder.equal(root.join(critere.getNomPropriete().getProprieteBDD(), JoinType.INNER).get("id"), critere.getValeur())
-                    );
-                else
-                    throw new MauvaisParamException("Seule l'operation de recherche "+EnumOperationDeRecherche.EGAL+" est possible pour la propriete genre");
-            } else {
-                //pour les autres critères de recherche
-                if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.EGAL)) {
-                    predicates.add(
-                            criteriaBuilder.equal(root.get(critere.getNomPropriete().getProprieteBDD()), critere.getValeur())
-                    );
-                } else if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.COMMENCE_PAR)) {
-                    predicates.add(
-                            //criteriaBuilder.like(root.get(critere.getNomPropriete().getProprieteBDD().toLowerCase()), critere.getValeur().toString().toLowerCase()+ "%")
-                            criteriaBuilder.like(root.get(critere.getNomPropriete().getProprieteBDD()), critere.getValeur()+ "%")
-                    );
-                }
+                default://pour les autres critères de recherche
+                    if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.EGAL)) {
+                        predicates.add(
+                            criteriaBuilder.equal(
+                                    root.get(critere.getProprieteRecherchee().getProprieteBDD()),
+                                    critere.getValeur()
+                            )
+                        );
+                    } else if (critere.getOperationDeRecherche().equals(EnumOperationDeRecherche.COMMENCE_PAR)) {
+                        predicates.add(
+                            criteriaBuilder.like(
+
+                                criteriaBuilder.lower(root.get(critere.getProprieteRecherchee().getProprieteBDD())),
+                                    critere.getValeur().toString().toLowerCase()+ "%"
+                            )
+                        );
+                    }
             }
 
         }
@@ -64,3 +73,4 @@ public class OeuvreSpecification implements Specification<Oeuvre> {
     }
 
 }
+

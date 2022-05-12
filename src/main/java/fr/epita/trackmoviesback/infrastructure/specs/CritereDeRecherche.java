@@ -9,7 +9,7 @@ import fr.epita.trackmoviesback.exception.MauvaisParamException;
  * Aucun setter, il faut passer par le constructeur afin d'appliquer les controles de coherence metier
  */
 public class CritereDeRecherche {
-    private EnumProprieteRecherchable nomPropriete;
+    private EnumProprieteRecherchable proprieteRecherchee;
 
     private Object valeur;
     private EnumOperationDeRecherche operationDeRecherche;
@@ -17,7 +17,7 @@ public class CritereDeRecherche {
     /**
      * Permet de spécifier un critère de recherche
      *
-     * @param proprieteRecherchable propriete sur laquelle porte la recherche. Valeurs possibles dans EnumProprieteRecherchable
+     * @param proprieteRecherchee propriete sur laquelle porte la recherche. Valeurs possibles dans EnumProprieteRecherchable
      * @param valeur valeur que l'on recherche
      * @param operationDeRecherche operation de recherche. Valeur possible dans EnumOperationDeRecherche
      *
@@ -25,18 +25,18 @@ public class CritereDeRecherche {
      *      Aucun parametre d'entree ne doit etre null
      *      seule la propriete recherchable "titre" accepte l'operation commence par
      */
-    public CritereDeRecherche(EnumProprieteRecherchable proprieteRecherchable, Object valeur, EnumOperationDeRecherche operationDeRecherche) {
-        if (proprieteRecherchable==null || valeur==null || operationDeRecherche==null)
-            throw new MauvaisParamException("Aucun parametre de CritereDeRecherche ne peut etre null. Valeur recues: propriete="+proprieteRecherchable+" ; valeur="+ valeur+" ; operationDeRecherche="+operationDeRecherche);
-        if (proprieteRecherchable!=EnumProprieteRecherchable.TITRE && operationDeRecherche==EnumOperationDeRecherche.COMMENCE_PAR)
+    public CritereDeRecherche(EnumProprieteRecherchable proprieteRecherchee, Object valeur, EnumOperationDeRecherche operationDeRecherche) {
+        if (proprieteRecherchee==null || valeur==null || operationDeRecherche==null)
+            throw new MauvaisParamException("Aucun parametre de CritereDeRecherche ne peut etre null. Valeur recues: propriete="+proprieteRecherchee+" ; valeur="+ valeur+" ; operationDeRecherche="+operationDeRecherche);
+        if (proprieteRecherchee!=EnumProprieteRecherchable.TITRE && operationDeRecherche==EnumOperationDeRecherche.COMMENCE_PAR)
             throw new MauvaisParamException("Seule la propriete "+EnumProprieteRecherchable.TITRE.getProprieteBDD()+" accepte l'operation de recherche "+EnumOperationDeRecherche.COMMENCE_PAR);
-        this.nomPropriete = proprieteRecherchable;
+        this.proprieteRecherchee = proprieteRecherchee;
         this.valeur = valeur;
         this.operationDeRecherche = operationDeRecherche;
     }
 
-    public EnumProprieteRecherchable getNomPropriete() {
-        return nomPropriete;
+    public EnumProprieteRecherchable getProprieteRecherchee() {
+        return proprieteRecherchee;
     }
 
     public Object getValeur() {
@@ -50,7 +50,7 @@ public class CritereDeRecherche {
     @Override
     public String toString() {
         return "CritereDeRecherche{" +
-                "nomPropriete='" + nomPropriete + '\'' +
+                "nomPropriete='" + proprieteRecherchee + '\'' +
                 ", valeur=" + valeur +
                 ", operationDeRecherche=" + operationDeRecherche +
                 '}';
