@@ -36,9 +36,9 @@ public class OeuvreSpecification implements Specification<Oeuvre> {
             switch (critere.getProprieteRecherchee()) {
                 case GENRE:
                 case STATUT_VISIONNAGE:
-                    //cas particulier du critère genres qui a une table de liaison à cause de la relation ManyToMany.
+                    //cas particulier des critères faisant appel a une table de liaison.
                     // Il faut construire le critere en tenant compte du join supplementaire
-                    //on ne gère que l'operation = pour ce critère (pas le "commence par"), puisque on utilise l'id
+                    //on ne gère que l'operation = pour ces critères puisque on utilise l'id
                     if (critere.getOperationDeRecherche()==EnumOperationDeRecherche.EGAL)
                         predicates.add(
                             criteriaBuilder.equal(
