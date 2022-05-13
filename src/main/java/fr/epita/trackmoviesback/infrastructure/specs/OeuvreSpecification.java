@@ -2,7 +2,6 @@ package fr.epita.trackmoviesback.infrastructure.specs;
 
 import fr.epita.trackmoviesback.domaine.Oeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
-import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchable;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

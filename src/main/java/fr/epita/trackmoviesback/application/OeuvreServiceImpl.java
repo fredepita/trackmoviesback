@@ -6,7 +6,7 @@ import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
-import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchable;
+import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchableSurOeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.infrastructure.oeuvre.OeuvreRepository;
 import fr.epita.trackmoviesback.infrastructure.specs.CritereDeRecherche;
@@ -70,6 +70,7 @@ public class OeuvreServiceImpl implements OeuvreService {
      */
     private OeuvreSpecification buildOeuvreSpecification(Map<String, String> criteres) {
         OeuvreSpecification oeuvreSpecification = new OeuvreSpecification();
+
         //pour cahque critere en paramettre
         criteres.keySet().forEach(proprieteRecherchee -> {
             //on recupère la valeur recherchee correspondant dans la map
@@ -88,16 +89,16 @@ public class OeuvreServiceImpl implements OeuvreService {
      */
     private CritereDeRecherche buildCritereDeRecherche(String proprieteRecherchee, String valeurRecherchee) {
         //on converti la propriete recherche en enum afin de controler que c'est bien une valeur connu
-        EnumProprieteRecherchable enumProprieteRecherchee = EnumProprieteRecherchable.getEnumFromValeurParametreRequeteHttp(proprieteRecherchee);
+        EnumProprieteRecherchableSurOeuvre enumProprieteRecherchee = EnumProprieteRecherchableSurOeuvre.getEnumFromValeurParametreRequeteHttp(proprieteRecherchee);
 
         //cas particulier du type d'oeuvre qui est un enumere, dans ce cas, la valeurRecherchee (initialement en string) doit etre convertie dans son enumeree correspondant
         Object valeurRechercheeFinale=valeurRecherchee;
-        if (enumProprieteRecherchee==EnumProprieteRecherchable.TYPE_OEUVRE)
+        if (enumProprieteRecherchee== EnumProprieteRecherchableSurOeuvre.TYPE_OEUVRE)
             valeurRechercheeFinale= EnumTypeOeuvre.getEnumFromlabel(valeurRecherchee);
 
         //on définit l'operateur (= par defaut, "commence par" pour titre)
         EnumOperationDeRecherche operationDeRecherche = EnumOperationDeRecherche.EGAL;
-        if (enumProprieteRecherchee == EnumProprieteRecherchable.TITRE)
+        if (enumProprieteRecherchee == EnumProprieteRecherchableSurOeuvre.TITRE)
             operationDeRecherche = EnumOperationDeRecherche.COMMENCE_PAR;
 
         //on retourne le critere de Recheche

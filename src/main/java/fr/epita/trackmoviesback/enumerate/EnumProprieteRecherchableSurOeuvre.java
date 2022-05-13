@@ -2,7 +2,7 @@ package fr.epita.trackmoviesback.enumerate;
 
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 
-public enum EnumProprieteRecherchable {
+public enum EnumProprieteRecherchableSurOeuvre {
     TYPE_OEUVRE("typeOeuvre","type"),
     GENRE("genres","genre"),
     TITRE("titre","titre"),
@@ -12,7 +12,7 @@ public enum EnumProprieteRecherchable {
     private String proprieteBDD;
     private String parametreRequeteHttp;
 
-    EnumProprieteRecherchable(String proprieteBDD, String parametreRequeteHttp) {
+    EnumProprieteRecherchableSurOeuvre(String proprieteBDD, String parametreRequeteHttp) {
         this.proprieteBDD = proprieteBDD;
         this.parametreRequeteHttp = parametreRequeteHttp;
     }
@@ -25,10 +25,10 @@ public enum EnumProprieteRecherchable {
         return parametreRequeteHttp;
     }
 
-    public static EnumProprieteRecherchable getEnumFromValeurParametreRequeteHttp(String parametreRequeteHttp) {
+    public static EnumProprieteRecherchableSurOeuvre getEnumFromValeurParametreRequeteHttp(String parametreRequeteHttp) {
         if (parametreRequeteHttp==null) throw new MauvaisParamException("parametreRequeteHttp ne peut pas etre null");
-        for (EnumProprieteRecherchable enumProprieteRecherchable:EnumProprieteRecherchable.values()) {
-            if (enumProprieteRecherchable.getParametreRequeteHttp().equals(parametreRequeteHttp)) return enumProprieteRecherchable;
+        for (EnumProprieteRecherchableSurOeuvre enumProprieteRecherchableSurOeuvre : EnumProprieteRecherchableSurOeuvre.values()) {
+            if (enumProprieteRecherchableSurOeuvre.getParametreRequeteHttp().equals(parametreRequeteHttp)) return enumProprieteRecherchableSurOeuvre;
         }
         throw new MauvaisParamException("Propriete recherchee non geree. Valeur recue: "+parametreRequeteHttp);
     }

@@ -1,18 +1,15 @@
 package fr.epita.trackmoviesback.infrastructure.oeuvre;
 
-import fr.epita.trackmoviesback.domaine.Genre;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
-import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchable;
+import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchableSurOeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.infrastructure.specs.CritereDeRecherche;
 import fr.epita.trackmoviesback.infrastructure.specs.OeuvreSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 //utilise la base pour l'instant mais à brancher sur h2
@@ -28,7 +25,7 @@ public class OeuvreRepositoryTest {
 
         System.out.println("recherche des films:");
 
-        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.TYPE_OEUVRE, EnumTypeOeuvre.FILM, EnumOperationDeRecherche.EGAL));
+        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchableSurOeuvre.TYPE_OEUVRE, EnumTypeOeuvre.FILM, EnumOperationDeRecherche.EGAL));
         oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
         oeuvres.stream().forEach(System.out::println);
 /*
@@ -60,7 +57,7 @@ public class OeuvreRepositoryTest {
 */
         System.out.println("recherche commence par Sh");
         criteresDeRecherche= new OeuvreSpecification();
-        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.TITRE,"Sh" , EnumOperationDeRecherche.COMMENCE_PAR));
+        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchableSurOeuvre.TITRE,"Sh" , EnumOperationDeRecherche.COMMENCE_PAR));
         oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
         oeuvres.stream().forEach(System.out::println);
 

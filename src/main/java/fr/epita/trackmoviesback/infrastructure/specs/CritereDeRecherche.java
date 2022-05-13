@@ -1,7 +1,7 @@
 package fr.epita.trackmoviesback.infrastructure.specs;
 
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
-import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchable;
+import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchableSurOeuvre;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 
 /**
@@ -9,7 +9,7 @@ import fr.epita.trackmoviesback.exception.MauvaisParamException;
  * Aucun setter, il faut passer par le constructeur afin d'appliquer les controles de coherence metier
  */
 public class CritereDeRecherche {
-    private EnumProprieteRecherchable proprieteRecherchee;
+    private EnumProprieteRecherchableSurOeuvre proprieteRecherchee;
 
     private Object valeur;
     private EnumOperationDeRecherche operationDeRecherche;
@@ -25,17 +25,17 @@ public class CritereDeRecherche {
      *      Aucun parametre d'entree ne doit etre null
      *      seule la propriete recherchable "titre" accepte l'operation commence par
      */
-    public CritereDeRecherche(EnumProprieteRecherchable proprieteRecherchee, Object valeur, EnumOperationDeRecherche operationDeRecherche) {
+    public CritereDeRecherche(EnumProprieteRecherchableSurOeuvre proprieteRecherchee, Object valeur, EnumOperationDeRecherche operationDeRecherche) {
         if (proprieteRecherchee==null || valeur==null || operationDeRecherche==null)
             throw new MauvaisParamException("Aucun parametre de CritereDeRecherche ne peut etre null. Valeur recues: propriete="+proprieteRecherchee+" ; valeur="+ valeur+" ; operationDeRecherche="+operationDeRecherche);
-        if (proprieteRecherchee!=EnumProprieteRecherchable.TITRE && operationDeRecherche==EnumOperationDeRecherche.COMMENCE_PAR)
-            throw new MauvaisParamException("Seule la propriete "+EnumProprieteRecherchable.TITRE.getProprieteBDD()+" accepte l'operation de recherche "+EnumOperationDeRecherche.COMMENCE_PAR);
+        if (proprieteRecherchee!= EnumProprieteRecherchableSurOeuvre.TITRE && operationDeRecherche==EnumOperationDeRecherche.COMMENCE_PAR)
+            throw new MauvaisParamException("Seule la propriete "+ EnumProprieteRecherchableSurOeuvre.TITRE.getProprieteBDD()+" accepte l'operation de recherche "+EnumOperationDeRecherche.COMMENCE_PAR);
         this.proprieteRecherchee = proprieteRecherchee;
         this.valeur = valeur;
         this.operationDeRecherche = operationDeRecherche;
     }
 
-    public EnumProprieteRecherchable getProprieteRecherchee() {
+    public EnumProprieteRecherchableSurOeuvre getProprieteRecherchee() {
         return proprieteRecherchee;
     }
 
