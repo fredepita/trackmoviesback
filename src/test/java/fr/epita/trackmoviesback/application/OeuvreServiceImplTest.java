@@ -87,8 +87,8 @@ class OeuvreServiceImplTest {
         assertEquals(oeuvreLightDto.getId(), oeuvreTest.getId());
         assertEquals(oeuvreLightDto.getTypeOeuvre(), oeuvreTest.getTypeOeuvre().getLibelle());
         assertEquals(oeuvreLightDto.getTitre(), oeuvreTest.getTitre());
-        //Parler de get[0] à Fabien
-       // assertTrue(oeuvreLightDto.getGenres().size() == oeuvreTest.getGenres().size() && oeuvreLightDto.getGenres(oeuvreTest));
+        assertEquals(oeuvreLightDto.getGenres().size(), oeuvreTest.getGenres().size());
+        //le test sur la conversion du Genre en Dto est faite dans GenreServiceImplTest
         assertEquals(oeuvreLightDto.getStatut().getLibelle(), oeuvreTest.getStatutVisionnage().getLibelle());
         assertEquals(oeuvreLightDto.getNote(), oeuvreTest.getNote());
         assertEquals(oeuvreLightDto.getUrlAffiche(), oeuvreTest.getUrlAffiche());
