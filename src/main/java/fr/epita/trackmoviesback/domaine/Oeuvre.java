@@ -134,6 +134,8 @@ public class Oeuvre {
     }
 
     public void setSaisons(List<Saison> saisons) {
+        if (saisons==null) return;
+
         if(typeOeuvre==EnumTypeOeuvre.SERIE){
             this.saisons = saisons;
         } else {

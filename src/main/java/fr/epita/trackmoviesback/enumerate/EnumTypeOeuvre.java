@@ -8,8 +8,8 @@ public enum EnumTypeOeuvre {
 
     private String libelle;
 
-    EnumTypeOeuvre(String label) {
-        this.libelle = label;
+    EnumTypeOeuvre(String libelle) {
+        this.libelle = libelle;
     }
 
     public String getLibelle() {
