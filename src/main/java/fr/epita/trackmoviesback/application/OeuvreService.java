@@ -3,10 +3,8 @@ package fr.epita.trackmoviesback.application;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
-import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchable;
 
 
-import java.util.List;
 import java.util.Map;
 
 public interface OeuvreService {
