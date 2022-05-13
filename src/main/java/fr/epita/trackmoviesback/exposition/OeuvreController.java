@@ -19,16 +19,16 @@ public class OeuvreController {
     OeuvreService service;
 
     @GetMapping("/mes_oeuvres")
-    OeuvreLightListDto getOeuvres(@RequestParam(name = "type") String typeOeuvre
-            , @RequestParam(name = "genre") Integer genreId
-            , @RequestParam(name = "statut") Integer statutVisionnageId
-            , @RequestParam(name = "titre") String titre
+    OeuvreLightListDto getOeuvres(@RequestParam(name = "type",required = false) String typeOeuvre
+            , @RequestParam(name = "genre",required = false) String genreId
+            , @RequestParam(name = "statut",required = false) String statutVisionnageId
+            , @RequestParam(name = "titre",required = false) String titre
     ){
         Map<String,String> parameters = new HashMap<>();
-        parameters.put("type",typeOeuvre);
-        parameters.put("genre", String.valueOf(genreId));
-        parameters.put("statut",String.valueOf(statutVisionnageId));
-        parameters.put("titre",titre);
+        if (typeOeuvre!=null) parameters.put("type",typeOeuvre);
+        if (genreId!=null) parameters.put("genre", genreId);
+        if (statutVisionnageId!=null) parameters.put("statut",statutVisionnageId);
+        if (titre!=null) parameters.put("titre",titre);
         return service.getOeuvres(parameters);
     }
 
