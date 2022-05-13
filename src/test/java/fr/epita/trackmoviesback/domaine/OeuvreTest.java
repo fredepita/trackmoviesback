@@ -3,7 +3,9 @@ package fr.epita.trackmoviesback.domaine;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import fr.epita.trackmoviesback.infrastructure.oeuvre.OeuvreRepository;
+
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,7 +46,7 @@ class OeuvreTest {
             oeuvreTest.setTitre("");
         });
 
-       assertThrows(MauvaisParamException.class, () -> {
+        assertThrows(MauvaisParamException.class, () -> {
             Oeuvre oeuvreTest = new Oeuvre();
             oeuvreTest.setTitre(" ");
         });
@@ -89,9 +91,10 @@ class OeuvreTest {
             oeuvreTest.setSaisons(listeSaison1);
         });
 
+        //On doit pouvoir affecter une saison vide à une oeuvre
         Oeuvre oeuvreTest = new Oeuvre();
         oeuvreTest.setTypeOeuvre(EnumTypeOeuvre.SERIE);
-        assertTrue(oeuvreTest.getSaisons() == null);
+        assertDoesNotThrow(() -> oeuvreTest.setSaisons(null));
 
         Oeuvre oeuvreTest2 = new Oeuvre();
         oeuvreTest2.setTypeOeuvre(EnumTypeOeuvre.SERIE);

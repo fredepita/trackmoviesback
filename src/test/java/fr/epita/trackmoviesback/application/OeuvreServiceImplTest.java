@@ -81,16 +81,18 @@ class OeuvreServiceImplTest {
         oeuvreTest.setUrlBandeAnnonce("url...");
         oeuvreTest.setSaisons(listeSaison1);
 
-        assertEquals(oeuvreService.convertirOeuvreEnDto(oeuvreTest).getId(), oeuvreTest.getId());
-        assertEquals(oeuvreService.convertirOeuvreEnDto(oeuvreTest).getTypeOeuvre(), oeuvreTest.getTypeOeuvre().getLibelle());
-        assertEquals(oeuvreService.convertirOeuvreEnDto(oeuvreTest).getTitre(), oeuvreTest.getTitre());
+        OeuvreLightDto oeuvreLightDto= oeuvreService.convertirOeuvreEnDto(oeuvreTest);
+
+
+        assertEquals(oeuvreLightDto.getId(), oeuvreTest.getId());
+        assertEquals(oeuvreLightDto.getTypeOeuvre(), oeuvreTest.getTypeOeuvre().getLibelle());
+        assertEquals(oeuvreLightDto.getTitre(), oeuvreTest.getTitre());
         //Parler de get[0] à Fabien
-        assertEquals(oeuvreService.convertirOeuvreEnDto(oeuvreTest).getGenres().get(0).getLibelle(), oeuvreTest.getGenres().get(0).getLibelle());
-        //Parler de getStatut-getStatutVisionnage à Fabien
-        assertEquals(oeuvreService.convertirOeuvreEnDto(oeuvreTest).getStatut().getLibelle(), oeuvreTest.getStatutVisionnage().getLibelle());
-        assertEquals(oeuvreService.convertirOeuvreEnDto(oeuvreTest).getNote(), oeuvreTest.getNote());
-        assertEquals(oeuvreService.convertirOeuvreEnDto(oeuvreTest).getUrlAffiche(), oeuvreTest.getUrlAffiche());
-        assertEquals(oeuvreService.convertirOeuvreEnDto(oeuvreTest).getUrlBandeAnnonce(), oeuvreTest.getUrlBandeAnnonce());
-        assertEquals(oeuvreService.convertirOeuvreEnDto(oeuvreTest).getDuree(), oeuvreTest.getDuree());
+       // assertTrue(oeuvreLightDto.getGenres().size() == oeuvreTest.getGenres().size() && oeuvreLightDto.getGenres(oeuvreTest));
+        assertEquals(oeuvreLightDto.getStatut().getLibelle(), oeuvreTest.getStatutVisionnage().getLibelle());
+        assertEquals(oeuvreLightDto.getNote(), oeuvreTest.getNote());
+        assertEquals(oeuvreLightDto.getUrlAffiche(), oeuvreTest.getUrlAffiche());
+        assertEquals(oeuvreLightDto.getUrlBandeAnnonce(), oeuvreTest.getUrlBandeAnnonce());
+        assertEquals(oeuvreLightDto.getDuree(), oeuvreTest.getDuree());
     }
 }
