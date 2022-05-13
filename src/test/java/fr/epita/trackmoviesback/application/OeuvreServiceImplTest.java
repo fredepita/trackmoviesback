@@ -97,7 +97,7 @@ class OeuvreServiceImplTest {
 
         //je dois recuperer 2 series de ma base test
         Map<String, String> criteresHttp = new HashMap<>();
-        OeuvreLightListDto oeuvreLightDto=null;
+        OeuvreLightListDto oeuvreLightDto;
 
         criteresHttp.put("type","serie");
         oeuvreLightDto= oeuvreService.getOeuvres(criteresHttp);
@@ -144,8 +144,8 @@ class OeuvreServiceImplTest {
 
     @Test
     void getOeuvres_test_critere_titre_qui_doit_me_retourner_film_shazam() {
-        Map<String, String> criteresHttp = new HashMap<>();
-        OeuvreLightListDto oeuvreLightListDto=null;
+        Map<String, String> criteresHttp ;
+        OeuvreLightListDto oeuvreLightListDto;
 
         //test titre complet
         criteresHttp = new HashMap<>();
