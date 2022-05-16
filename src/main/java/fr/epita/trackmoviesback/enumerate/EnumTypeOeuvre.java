@@ -28,4 +28,5 @@ public enum EnumTypeOeuvre {
         }
         throw new MauvaisParamException("Type d'oeuvre inconnue: ne peut pas etre null");
     }
+
 }

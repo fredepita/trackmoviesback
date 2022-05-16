@@ -10,7 +10,7 @@ import java.util.Map;
 public interface OeuvreService {
 
     OeuvreLightListDto getAllOeuvres();
-    public OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre);
+    public OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre);
 
     /**
      * Retourne une liste d'oeuvre (ordonnée par le titre) correspondant aux critères passés en paramètre.

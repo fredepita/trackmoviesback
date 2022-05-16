@@ -1,6 +1,9 @@
 package fr.epita.trackmoviesback.infrastructure.oeuvre;
 
+import fr.epita.trackmoviesback.domaine.Film;
+import fr.epita.trackmoviesback.domaine.Genre;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
+import fr.epita.trackmoviesback.domaine.StatutVisionnage;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
 import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchableSurOeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
@@ -10,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //utilise la base pour l'instant mais à brancher sur h2
@@ -64,6 +68,35 @@ public class OeuvreRepositoryTest {
 
 
 //        -->il faut tester le critere titre avec commence par et = et combinaison avec autre critère
+
+    }
+
+    @Test
+    public void test_creation_film() {
+
+/*
+
+        Genre genreComedie = new Genre();
+        genreComedie.setId(1L);
+        genreComedie.setLibelle("Action");
+        List<Genre> listeGenre = new ArrayList<>();
+        listeGenre.add(genreComedie);
+        //Création d'un statut de visionnage
+        StatutVisionnage statutVu = new StatutVisionnage();
+        statutVu.setId(3L);
+        statutVu.setLibelle("Vu");
+
+        Oeuvre oeuvreTest = new Film();
+        oeuvreTest.setTypeOeuvre(EnumTypeOeuvre.FILM);
+        oeuvreTest.setTitre("titanic");
+        oeuvreTest.setGenres(listeGenre);
+        oeuvreTest.setStatutVisionnage(statutVu);
+        oeuvreTest.setNote(1);
+        oeuvreTest.setUrlAffiche("url...");
+        oeuvreTest.setUrlBandeAnnonce("url...");
+
+        oeuvreRepository.save(oeuvreTest);
+*/
 
     }
 

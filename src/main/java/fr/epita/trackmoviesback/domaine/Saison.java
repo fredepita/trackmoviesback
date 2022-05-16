@@ -12,23 +12,19 @@ public class Saison {
     @Column(nullable = false)
     private String numero;
 
-    @OneToMany (cascade = CascadeType.ALL,fetch = FetchType.EAGER,orphanRemoval = true)
-    @JoinColumn(name = "saison_id") //définir le JoinColumn permet d'eviter la création d'une table de liaison inutile entre saison et episode puisqu'un episode appartient à une seule saison
-    private List<Episode> episodes;
-
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private StatutVisionnage statutVisionnage;
 
-    private Integer note;
+    private Integer nbEpisode;
 
     public Saison() {
     }
 
-    public Saison(String numero, List<Episode> episodes, StatutVisionnage statutVisionnage, Integer note) {
+    public Saison(Long id, String numero, StatutVisionnage statutVisionnage, Integer nbEpisode) {
+        this.id = id;
         this.numero = numero;
-        this.episodes = episodes;
         this.statutVisionnage = statutVisionnage;
-        this.note = note;
+        this.nbEpisode = nbEpisode;
     }
 
     public Long getId() {
@@ -47,14 +43,6 @@ public class Saison {
         this.numero = numero;
     }
 
-    public List<Episode> getEpisodes() {
-        return episodes;
-    }
-
-    public void setEpisodes(List<Episode> episodes) {
-        this.episodes = episodes;
-    }
-
     public StatutVisionnage getStatutVisionnage() {
         return statutVisionnage;
     }
@@ -63,12 +51,12 @@ public class Saison {
         this.statutVisionnage = statutVisionnage;
     }
 
-    public Integer getNote() {
-        return note;
+    public Integer getNbEpisode() {
+        return nbEpisode;
     }
 
-    public void setNote(Integer note) {
-        this.note = note;
+    public void setNbEpisode(Integer nbEpisode) {
+        this.nbEpisode = nbEpisode;
     }
 
     @Override
@@ -76,9 +64,8 @@ public class Saison {
         return "Saison{" +
                 "id=" + id +
                 ", numero='" + numero + '\'' +
-                ", episodes=" + episodes +
                 ", statutVisionnage=" + statutVisionnage +
-                ", note=" + note +
+                ", nbEpisode=" + nbEpisode +
                 '}';
     }
 }

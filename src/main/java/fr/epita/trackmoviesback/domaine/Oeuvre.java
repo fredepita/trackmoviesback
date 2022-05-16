@@ -9,58 +9,58 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-public class Oeuvre {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+
+public abstract class Oeuvre {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    @Convert(converter = TypeOeuvreAttributeConverter.class) //permet de convertir en string l'enum pour le stocker en base de donnée. On utilise son libelle
+    @Convert(converter = TypeOeuvreAttributeConverter.class)
+    //permet de convertir en string l'enum pour le stocker en base de donnée. On utilise son libelle
     private EnumTypeOeuvre typeOeuvre;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String titre;
 
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable( //sert à forcer les nommage de la table de liaison et les colonnes(evite de se retrouver avec des pluriels)
-            name="oeuvre_genre",
+            name = "oeuvre_genre",
             joinColumns = @JoinColumn(name = "oeuvre_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
     private List<Genre> genres;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private StatutVisionnage statutVisionnage;
     private Integer note;
+
+    private String createur;
+    private String acteur;
+
     //lien url vers l'affiche de l'oeuvre
     private String urlAffiche;
     //lien url vers la Bande Annonce de l'oeuvre
     private String urlBandeAnnonce;
 
-    //donnee propre aux series
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
-    @JoinColumn(name = "oeuvre_id") //définir le JoinColumn permet d'eviter la création d'une table de liaison inutile entre saison et episode puisqu'un episode appartient à une seule saison
-    private List<Saison> saisons;
-
-    //donnee propre aux films
-    //duree exprimée en minute
-    private Integer duree;
 
 
     public Oeuvre() {
     }
 
-    public Oeuvre(EnumTypeOeuvre typeOeuvre, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String urlAffiche, String urlBandeAnnonce, List<Saison> saisons, Integer duree) {
-        setTypeOeuvre(typeOeuvre);
-        setTitre(titre);
+    public Oeuvre(Long id, EnumTypeOeuvre typeOeuvre, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createur, String acteur, String urlAffiche, String urlBandeAnnonce) {
+        this.id = id;
+        this.typeOeuvre = typeOeuvre;
+        this.titre = titre;
         this.genres = genres;
         this.statutVisionnage = statutVisionnage;
         this.note = note;
+        this.createur = createur;
+        this.acteur = acteur;
         this.urlAffiche = urlAffiche;
         this.urlBandeAnnonce = urlBandeAnnonce;
-        setSaisons(saisons);
-        setDuree(duree);
     }
 
     public Long getId() {
@@ -76,7 +76,7 @@ public class Oeuvre {
     }
 
     public void setTypeOeuvre(EnumTypeOeuvre typeOeuvre) {
-        if (typeOeuvre==null)
+        if (typeOeuvre == null)
             throw new MauvaisParamException("typeOeuvre ne peut pas etre null");
         this.typeOeuvre = typeOeuvre;
     }
@@ -86,10 +86,10 @@ public class Oeuvre {
     }
 
     public void setTitre(String titre) {
-        if(StringUtils.hasText(titre)){
+        if (StringUtils.hasText(titre)) {
             this.titre = titre;
         } else {
-            throw new MauvaisParamException("Valeur recue : " + titre + ". Valeurs acceptees : le titre ne peut pas être vide ou null" );
+            throw new MauvaisParamException("Valeur recue : " + titre + ". Valeurs acceptees : le titre ne peut pas être vide ou null");
         }
     }
 
@@ -117,9 +117,13 @@ public class Oeuvre {
         this.note = note;
     }
 
-    public String getUrlAffiche() { return urlAffiche;}
+    public String getUrlAffiche() {
+        return urlAffiche;
+    }
 
-    public void setUrlAffiche(String image) { this.urlAffiche = image;}
+    public void setUrlAffiche(String image) {
+        this.urlAffiche = image;
+    }
 
     public String getUrlBandeAnnonce() {
         return urlBandeAnnonce;
@@ -129,77 +133,35 @@ public class Oeuvre {
         this.urlBandeAnnonce = video;
     }
 
-    public List<Saison> getSaisons() {
-        return saisons;
+    public String getCreateur() {
+        return createur;
     }
 
-    public void setSaisons(List<Saison> saisons) {
-        if (saisons==null) return;
-
-        if(typeOeuvre==EnumTypeOeuvre.SERIE){
-            this.saisons = saisons;
-        } else {
-            throw new MauvaisParamException("Type d'oeuvre : " + typeOeuvre.getLibelle() + ". Seule "+EnumTypeOeuvre.SERIE.getLibelle()+" peut avoir des saisons");
-        }
+    public void setCreateur(String createur) {
+        this.createur = createur;
     }
 
-    /**
-     *
-     * @return duree de l'oeuvre en minutes
-     */
-    public Integer getDuree() {
-        return duree;
+    public String getActeur() {
+        return acteur;
     }
 
-    /**
-     *
-     * @param duree de l'oeuvre en minutes
-     */
-    public void setDuree(Integer duree) {
-        if(typeOeuvre==EnumTypeOeuvre.FILM){
-            this.duree = duree;
-        } else {
-            throw new MauvaisParamException("Type d'oeuvre : " + typeOeuvre + ". Seul "+EnumTypeOeuvre.FILM.getLibelle()+" peuvent avoir des durees");
-        }
+    public void setActeur(String acteur) {
+        this.acteur = acteur;
     }
 
-
-    /**
-     *
-     * @return le contenu d'une oeuvre sans les saisons (pour les séries)
-     */
     @Override
     public String toString() {
-        //on ne retourne pas les saisons ici car on est en LAZY load sur cette partie
         return "Oeuvre{" +
                 "id=" + id +
-                ", typeOeuvre='" + typeOeuvre + '\'' +
+                ", typeOeuvre=" + typeOeuvre +
                 ", titre='" + titre + '\'' +
                 ", genres=" + genres +
                 ", statutVisionnage=" + statutVisionnage +
                 ", note=" + note +
+                ", createur='" + createur + '\'' +
+                ", acteur='" + acteur + '\'' +
                 ", urlAffiche='" + urlAffiche + '\'' +
                 ", urlBandeAnnonce='" + urlBandeAnnonce + '\'' +
-                ", duree=" + duree +
-                '}';
-    }
-
-    /**
-     *
-     * @return le contenu d'une oeuvre avec les saisons pour les séries
-     */
-    public String toStringAvecSaison() {
-        return "Oeuvre{" +
-                "id=" + id +
-                ", typeOeuvre='" + typeOeuvre + '\'' +
-                ", titre='" + titre + '\'' +
-                ", genres=" + genres +
-                ", statutVisionnage=" + statutVisionnage +
-                ", note=" + note +
-                ", urlAffiche='" + urlAffiche + '\'' +
-                ", urlBandeAnnonce='" + urlBandeAnnonce + '\'' +
-                ", saisons=" + saisons +
-                ", duree=" + duree +
                 '}';
     }
 }

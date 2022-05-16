@@ -13,22 +13,22 @@ public class OeuvreLightDto {
     private List<GenreDto> genres;
     private StatutVisionnageDto statut;
     private Integer note;
+    private String createur;
+    private String acteur;
     private String urlAffiche;
     private String urlBandeAnnonce;
-    //donnee propre aux films
-    private Integer duree;
 
-
-    public OeuvreLightDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statut, Integer note, String urlAffiche, String urlBandeAnnonce, Integer duree) {
+    public OeuvreLightDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statut, Integer note, String createur, String acteur, String urlAffiche, String urlBandeAnnonce) {
         this.id = id;
         this.typeOeuvre = typeOeuvre;
         this.titre = titre;
         this.genres = genres;
         this.statut = statut;
         this.note = note;
+        this.createur = createur;
+        this.acteur = acteur;
         this.urlAffiche = urlAffiche;
         this.urlBandeAnnonce = urlBandeAnnonce;
-        this.duree = duree;
     }
 
     public Long getId() {
@@ -44,11 +44,7 @@ public class OeuvreLightDto {
     }
 
     public void setTypeOeuvre(String typeOeuvre) {
-        // if(type.equals(Oeuvre.TYPE_FILM) || type.equals(Oeuvre.TYPE_SERIE)){
         this.typeOeuvre = typeOeuvre;
-        // } else {
-        //     throw new MauvaisParamException("Valeur recue : " + type + ". Valeurs acceptees :" + TYPE_SERIE + " ou " + TYPE_FILM);
-        //  }
     }
 
     public String getTitre() {
@@ -83,9 +79,13 @@ public class OeuvreLightDto {
         this.note = note;
     }
 
-    public String getUrlAffiche() { return urlAffiche;}
+    public String getUrlAffiche() {
+        return urlAffiche;
+    }
 
-    public void setUrlAffiche(String urlAffiche) { this.urlAffiche = urlAffiche;}
+    public void setUrlAffiche(String urlAffiche) {
+        this.urlAffiche = urlAffiche;
+    }
 
     public String getUrlBandeAnnonce() {
         return urlBandeAnnonce;
@@ -95,16 +95,20 @@ public class OeuvreLightDto {
         this.urlBandeAnnonce = urlBandeAnnonce;
     }
 
-    public Integer getDuree() {
-        return duree;
+    public String getCreateur() {
+        return createur;
     }
 
-    public void setDuree(Integer duree) {
-        //  if(type.equals(TYPE_FILM)){
-        this.duree = duree;
-        // } else {
-        //    throw new MauvaisParamException("Type d'oeuvreDTO : " + type + ". Seules les films peuvent avoir des durees");
-        // }
+    public void setCreateur(String createur) {
+        this.createur = createur;
+    }
+
+    public String getActeur() {
+        return acteur;
+    }
+
+    public void setActeur(String acteur) {
+        this.acteur = acteur;
     }
 
     @Override
@@ -116,9 +120,10 @@ public class OeuvreLightDto {
                 ", genres=" + genres +
                 ", statut=" + statut +
                 ", note=" + note +
+                ", createur='" + createur + '\'' +
+                ", acteur='" + acteur + '\'' +
                 ", urlAffiche='" + urlAffiche + '\'' +
                 ", urlBandeAnnonce='" + urlBandeAnnonce + '\'' +
-                ", duree=" + duree +
                 '}';
     }
 }

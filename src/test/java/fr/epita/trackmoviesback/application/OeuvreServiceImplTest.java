@@ -41,33 +41,20 @@ class OeuvreServiceImplTest {
     }
 
     @Test
-    void convertirOeuvreEnDto_doit_convertir_une_oeuvre_en_dto() {
+    void convertirOeuvreEnLightDto_doit_convertir_une_oeuvre_en_light_dto() {
         //Création d'une oeuvreTest
         //Création d'une liste de Genres
         Genre genreComedie = new Genre();
-        genreComedie.setId(1L);
-        genreComedie.setLibelle("comédie");
+        genreComedie.setId(2L);
+        genreComedie.setLibelle("Comédie");
         List<Genre> listeGenre = new ArrayList<>();
         listeGenre.add(genreComedie);
         //Création d'un statut de visionnage
         StatutVisionnage statutVu = new StatutVisionnage();
-        statutVu.setId(1L);
-        statutVu.setLibelle("vu");
-        //Création d'une liste d'épisode
-        Episode episode1 = new Episode("1", statutVu, "url...", 112);
-        List<Episode> listeEpisode = new ArrayList<>();
-        listeEpisode.add(episode1);
-        //Création d'une liste de Saisons
-        Saison saison1 = new Saison();
-        saison1.setId(1L);
-        saison1.setEpisodes(listeEpisode);
-        saison1.setStatutVisionnage(statutVu);
-        saison1.setNote(1);
-        saison1.setNumero("1");
-        List<Saison> listeSaison1 = new ArrayList<>();
-        listeSaison1.add(saison1);
+        statutVu.setId(3L);
+        statutVu.setLibelle("Vu");
 
-        Oeuvre oeuvreTest = new Oeuvre();
+        Oeuvre oeuvreTest = new Film();
         oeuvreTest.setTypeOeuvre(EnumTypeOeuvre.SERIE);
         oeuvreTest.setTitre("titanic");
         oeuvreTest.setGenres(listeGenre);
@@ -75,9 +62,8 @@ class OeuvreServiceImplTest {
         oeuvreTest.setNote(1);
         oeuvreTest.setUrlAffiche("url...");
         oeuvreTest.setUrlBandeAnnonce("url...");
-        oeuvreTest.setSaisons(listeSaison1);
 
-        OeuvreLightDto oeuvreLightDto= oeuvreService.convertirOeuvreEnDto(oeuvreTest);
+        OeuvreLightDto oeuvreLightDto= oeuvreService.convertirOeuvreEnLightDto(oeuvreTest);
 
 
         assertEquals(oeuvreLightDto.getId(), oeuvreTest.getId());
@@ -89,7 +75,6 @@ class OeuvreServiceImplTest {
         assertEquals(oeuvreLightDto.getNote(), oeuvreTest.getNote());
         assertEquals(oeuvreLightDto.getUrlAffiche(), oeuvreTest.getUrlAffiche());
         assertEquals(oeuvreLightDto.getUrlBandeAnnonce(), oeuvreTest.getUrlBandeAnnonce());
-        assertEquals(oeuvreLightDto.getDuree(), oeuvreTest.getDuree());
     }
 
     @Test

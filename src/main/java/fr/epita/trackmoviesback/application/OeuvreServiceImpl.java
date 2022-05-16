@@ -35,16 +35,17 @@ public class OeuvreServiceImpl implements OeuvreService {
     @Override
     public OeuvreLightListDto getAllOeuvres() {
         List<Oeuvre> oeuvres = oeuvreRepository.findAll();
-        List<OeuvreLightDto> oeuvresLightDto = oeuvres.stream().map(this::convertirOeuvreEnDto).collect(Collectors.toList());
+        List<OeuvreLightDto> oeuvresLightDto = oeuvres.stream().map(this::convertirOeuvreEnLightDto).collect(Collectors.toList());
         return new OeuvreLightListDto(1, 1, oeuvresLightDto);
     }
 
     @Override
-    public OeuvreLightDto convertirOeuvreEnDto(Oeuvre oeuvre) {
+    public OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre) {
         List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
         StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());
         String typeOeuvre = oeuvre.getTypeOeuvre() == null ? null : oeuvre.getTypeOeuvre().getLibelle();
-        return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce(), oeuvre.getDuree());
+
+        return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(),oeuvre.getCreateur(),oeuvre.getActeur(),  oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce());
     }
 
     @Override
@@ -56,7 +57,7 @@ public class OeuvreServiceImpl implements OeuvreService {
         //on récupère la liste
         List<Oeuvre> oeuvres = oeuvreRepository.findAll(criteresDeRecherche);
         logger.info("fin recherche en BDD. Nb oeuvres trouvees=", oeuvres.size());
-        List<OeuvreLightDto> oeuvresLightDto = oeuvres.stream().map(this::convertirOeuvreEnDto).collect(Collectors.toList());
+        List<OeuvreLightDto> oeuvresLightDto = oeuvres.stream().map(this::convertirOeuvreEnLightDto).collect(Collectors.toList());
         return new OeuvreLightListDto(1, 1, oeuvresLightDto);
     }
 
