@@ -3,9 +3,6 @@ package fr.epita.trackmoviesback.application;
 import fr.epita.trackmoviesback.domaine.*;
 import fr.epita.trackmoviesback.dto.GenreDto;
 import fr.epita.trackmoviesback.dto.GenreListDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
-import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +20,7 @@ public class GenreServiceImplTest {
     GenreService genreService;
 
     @Test
-    void getAllGenres_doit_retourner_toutes_les_oeuvres_d_un_utilisateur() {
+    void getAllGenres_doit_retourner_toutes_les_genres_existants() {
         GenreListDto genreListDto = genreService.getAllGenres();
         List<GenreDto> genreDtoList = genreListDto.getGenres();
 
@@ -31,7 +28,7 @@ public class GenreServiceImplTest {
 
         boolean foundComedie = false;
         for (GenreDto genre : genreDtoList) {
-            if (genre.getLibelle().equals("Comédie")) {
+            if (genre.getLibelle().equals("Action")) {
                 foundComedie = true;
                 break;
             }
