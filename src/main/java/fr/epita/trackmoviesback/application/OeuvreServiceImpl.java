@@ -3,10 +3,7 @@ package fr.epita.trackmoviesback.application;
 import fr.epita.trackmoviesback.domaine.Film;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
 import fr.epita.trackmoviesback.domaine.Serie;
-import fr.epita.trackmoviesback.dto.GenreDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
-import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
+import fr.epita.trackmoviesback.dto.*;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
 import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchableSurOeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
@@ -33,6 +30,8 @@ public class OeuvreServiceImpl implements OeuvreService {
     GenreService genreService;
     @Autowired
     StatutVisionnageService statutVisionnageService;
+    @Autowired
+    SaisonService saisonService;
 
     @Override
     public OeuvreLightListDto getAllOeuvres() {
@@ -53,6 +52,28 @@ public class OeuvreServiceImpl implements OeuvreService {
             typeOeuvre=EnumTypeOeuvre.SERIE.getLibelle();
         }
         return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(),oeuvre.getCreateurs(),oeuvre.getActeurs(),  oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce());
+    }
+
+    @Override
+    public OeuvreLightListDto getOeuvreId() {
+        return null;
+    }
+
+    @Override
+    public OeuvreDto convertirFilmEnOeuvreDto(Film film) {
+        List<GenreDto> genresDto = genreService.convertirListGenreEnDto(film.getGenres());
+        StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(film.getStatutVisionnage());
+        String typeOeuvre = EnumTypeOeuvre.FILM.getLibelle();
+        return new OeuvreDto(film.getId(), typeOeuvre, film.getTitre(), genresDto, statutVisionnageDto, film.getNote(), film.getCreateurs(), film.getActeurs(), film.getUrlAffiche(), film.getUrlBandeAnnonce(), null, film.getDuree());
+    }
+
+    @Override
+    public OeuvreDto convertirSerieEnOeuvreDto (Serie serie) {
+        List<GenreDto> genresDto = genreService.convertirListGenreEnDto(serie.getGenres());
+        List<SaisonDto> saisonDtoList = saisonService.convertirListSaisonEnDto(serie.getSaisons());
+        StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(serie.getStatutVisionnage());
+        String typeOeuvre = EnumTypeOeuvre.SERIE.getLibelle();
+        return new OeuvreDto(serie.getId(), typeOeuvre, serie.getTitre(), genresDto, statutVisionnageDto, serie.getNote(), serie.getCreateurs(), serie.getActeurs(), serie.getUrlAffiche(), serie.getUrlBandeAnnonce(), saisonDtoList, null);
     }
 
     @Override
