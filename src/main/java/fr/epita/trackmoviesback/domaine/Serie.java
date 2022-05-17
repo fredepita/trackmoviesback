@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@DiscriminatorColumn(name="type_oeuvre")
 @DiscriminatorValue("serie")
 public class Serie extends Oeuvre{
 
