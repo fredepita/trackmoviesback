@@ -10,7 +10,7 @@ import java.util.Map;
 public interface OeuvreService {
 
     OeuvreLightListDto getAllOeuvres();
-    public OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre);
+    OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre);
 
     /**
      * Retourne une liste d'oeuvre (ordonnée par le titre) correspondant aux critères passés en paramètre.
@@ -22,5 +22,18 @@ public interface OeuvreService {
      * @return listes des oeuvres correspondant aux critères de recherches
      */
     OeuvreLightListDto getOeuvres(Map<String,String> criteres);
+
+    /**
+     * ajoute une oeuvre à notre liste dans la BDD
+     *
+     * @param oeuvre oeuvre à ajouter
+     * @return l'id de l'oeuvre créée
+     */
+    Long createOeuvre(Oeuvre oeuvre);
+
+    /**
+     * methode temporaire pour test en attendant que la vrai version getDetail soit en place
+     */
+    Oeuvre getOeuvre(Long id);
 
 }

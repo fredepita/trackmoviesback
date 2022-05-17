@@ -4,7 +4,7 @@ package fr.epita.trackmoviesback.application;
 import fr.epita.trackmoviesback.domaine.*;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
-import fr.epita.trackmoviesback.exception.MauvaisParamException;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -20,6 +20,9 @@ class OeuvreServiceImplTest {
 
     @Autowired
     OeuvreService oeuvreService;
+
+    @Autowired
+    StatutVisionnageService statutVisionnageService;
 
     @Test
     void getAllOeuvres_doit_retourner_toutes_les_oeuvres_d_un_utilisateur() {
@@ -180,5 +183,102 @@ class OeuvreServiceImplTest {
 
 
     }
+    @Test
+    void createOeuvre_la_creation_du_film_et_de_la_serie_doit_fonctionner_avec_les_champs_minimum() {
+        final String titreFilm= "film de test";
+        final String titreSerie= "série de test";
+
+
+        Film newFilm= new Film();
+        newFilm.setTitre(titreFilm);
+        Long idFilmCree = oeuvreService.createOeuvre(newFilm);
+
+        assertNotNull(idFilmCree);
+        assertTrue(idFilmCree>0);
+
+        Oeuvre filmInsere=oeuvreService.getOeuvre(idFilmCree);
+        assertNotNull(filmInsere);
+        assertInstanceOf(Film.class,filmInsere);
+        assertEquals(titreFilm,filmInsere.getTitre());
+
+        Serie newSerie= new Serie();
+        newSerie.setTitre(titreSerie);
+        Long idSerieCree = oeuvreService.createOeuvre(newSerie);
+
+        assertNotNull(idSerieCree);
+        assertTrue(idSerieCree>0);
+
+        Oeuvre serieInseree=oeuvreService.getOeuvre(idSerieCree);
+        assertNotNull(serieInseree);
+        assertInstanceOf(Serie.class,serieInseree);
+        assertEquals(titreSerie,serieInseree.getTitre());
+
+
+    }
+
+    @Test
+    void createOeuvre_la_creation_avec_un_statut_visionnage_doit_fonctionner() {
+        final String titreFilm= "film de test2";
+
+        Film newFilm= new Film();
+        newFilm.setTitre(titreFilm);
+
+
+        StatutVisionnage statutVisionnage= new StatutVisionnage(1L,null);
+        newFilm.setStatutVisionnage(statutVisionnage);
+
+        Long idFilmCree = oeuvreService.createOeuvre(newFilm);
+
+        assertNotNull(idFilmCree);
+        assertTrue(idFilmCree>0);
+
+        Oeuvre oeuvreInseree=oeuvreService.getOeuvre(idFilmCree);
+        assertNotNull(oeuvreInseree);
+        assertInstanceOf(Film.class,oeuvreInseree);
+        assertEquals(1L,oeuvreInseree.getStatutVisionnage().getId());
+
+    }
+
+    @Test
+    void createOeuvre_la_creation_avec_un_ou_plusieurs_genre_doit_fonctionner() {
+        final String titreFilm= "film de test3";
+
+        Film newFilm= new Film();
+        newFilm.setTitre(titreFilm);
+
+        List<Genre> genreList = new ArrayList<>();
+        genreList.add(new Genre(1L,null));
+        genreList.add(new Genre(2L,null));
+        newFilm.setGenres(genreList);
+
+        Long idFilmCree = oeuvreService.createOeuvre(newFilm);
+
+        assertNotNull(idFilmCree);
+        assertTrue(idFilmCree>0);
+
+        Oeuvre oeuvreInseree=oeuvreService.getOeuvre(idFilmCree);
+        assertNotNull(oeuvreInseree);
+        assertInstanceOf(Film.class,oeuvreInseree);
+        assertEquals(1L,oeuvreInseree.getGenres().get(0).getId());
+    }
+
+    @Test
+    void createOeuvre_testCreation_film() {
+
+    }
+
+    @Test
+    void createOeuvre_testCreation_serie() {
+
+    }
+
+    @Test
+    void createOeuvre_testCreation_echec_contrainte() {
+        //une oeuvre doit avoir un titre
+        //autre contrainte?
+
+    }
+
 
 }
+

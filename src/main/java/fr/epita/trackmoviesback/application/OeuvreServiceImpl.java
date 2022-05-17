@@ -44,6 +44,23 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
+    public Long createOeuvre(Oeuvre oeuvre) {
+        Oeuvre oeuvreCree = oeuvreRepository.save(oeuvre);
+        logger.info("Oeuvre {} ajoutée a la librairie avec l'id : {}",oeuvreCree.getTitre(),oeuvreCree.getId());
+        return oeuvreCree.getId();
+    }
+
+    /**
+     * sert juste pour test en attendant la version d'olivier
+     * @param id
+     * @return
+     */
+    @Override
+    public Oeuvre getOeuvre(Long id) {
+        return oeuvreRepository.findById(id).get();
+    }
+
+    @Override
     public OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre) {
         List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
         StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());
