@@ -10,12 +10,16 @@ import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-
+@DiscriminatorColumn(name="type_oeuvre", discriminatorType = DiscriminatorType.STRING)
 public abstract class Oeuvre {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    //colonne gérée par le discriminator value des subclass, doit avoir seulement un getter pas de settre
+    @Column(name="type_oeuvre", insertable = false, updatable = false)
+    protected String type_oeuvre;
 
     @Column(nullable = false, unique = true)
     private String titre;
@@ -129,6 +133,10 @@ public abstract class Oeuvre {
 
     public void setActeurs(String acteur) {
         this.acteurs = acteur;
+    }
+
+    public String getType_oeuvre() {
+        return type_oeuvre;
     }
 
     @Override

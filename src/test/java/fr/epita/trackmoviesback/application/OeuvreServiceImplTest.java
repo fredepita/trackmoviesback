@@ -78,7 +78,7 @@ class OeuvreServiceImplTest {
     void getOeuvres_doit_me_retourner_les_oeuvres_correspondant_aux_criteres() {
 
         //je dois recuperer 2 series de ma base test
-/*        Map<String, String> criteresHttp = new HashMap<>();
+        Map<String, String> criteresHttp = new HashMap<>();
         OeuvreLightListDto oeuvreLightDto;
 
         criteresHttp.put("type","serie");
@@ -98,7 +98,7 @@ class OeuvreServiceImplTest {
 
         //je dois avoir 1 serie comedie qui est friends
         criteresHttp = new HashMap<>();
-//        criteresHttp.put("type","serie");
+        criteresHttp.put("type","serie");
         criteresHttp.put("genre","2");
         oeuvreLightDto= oeuvreService.getOeuvres(criteresHttp);
         assertNotNull(oeuvreLightDto);
@@ -114,13 +114,34 @@ class OeuvreServiceImplTest {
         assertNotNull(oeuvreLightDto.getOeuvres());
         assertEquals(2,oeuvreLightDto.getOeuvres().size());
 
-        //tester mauvais intitule critere
-        //tester mauvaise valeur (null, vide, seriesqsdqs)
-*/
+
     }
 
     @Test
-    void getOeuvres_test_critere_avec_mauvaise_entree_doit_generer_exceptions() {
+    void getOeuvres_mauvais_critere_doit_etre_ignore_et_on_retourne_toutes_les_oeuvres() {
+        //test mauvais critere de recherche
+        Map<String, String> criteresHttp = new HashMap<>();
+        criteresHttp.put("sta","shAzA");
+        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+
+        criteresHttp = new HashMap<>();
+        criteresHttp.put("statut",null);
+        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+
+        criteresHttp = new HashMap<>();
+        criteresHttp.put("statut","");
+        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+
+        criteresHttp = new HashMap<>();
+        criteresHttp.put("statut"," ");
+        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+
+        //test avec 2 critères
+        criteresHttp = new HashMap<>();
+        criteresHttp.put("statut"," ");
+        criteresHttp.put("testMauvaisCritere","aez");
+        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+
 
     }
 
@@ -157,14 +178,7 @@ class OeuvreServiceImplTest {
         assertEquals(1,oeuvreLightListDto.getOeuvres().size());
         assertEquals("Shazam!",oeuvreLightListDto.getOeuvres().get(0).getTitre());
 
-        //test mauvaise valeur de filtre
-        assertThrows(
-                MauvaisParamException.class,
-                () -> {
-                    Map<String, String> criteresHttp2 = new HashMap<>();
-                    criteresHttp2.put("tit","shAzA");
-                    OeuvreLightListDto oeuvreLightListDto2= oeuvreService.getOeuvres(criteresHttp2);
-                });
+
     }
 
 }

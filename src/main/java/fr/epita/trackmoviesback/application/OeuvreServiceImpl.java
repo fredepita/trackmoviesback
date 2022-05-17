@@ -10,6 +10,7 @@ import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
 import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchableSurOeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
+import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import fr.epita.trackmoviesback.infrastructure.oeuvre.OeuvreRepository;
 import fr.epita.trackmoviesback.infrastructure.specs.CritereDeRecherche;
 import fr.epita.trackmoviesback.infrastructure.specs.OeuvreSpecification;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -83,7 +85,9 @@ public class OeuvreServiceImpl implements OeuvreService {
         criteres.keySet().forEach(proprieteRecherchee -> {
             //on recupère la valeur recherchee correspondant dans la map
             String valeurRecherchee = criteres.get(proprieteRecherchee);
-            oeuvreSpecification.add(buildCritereDeRecherche(proprieteRecherchee, valeurRecherchee));
+            CritereDeRecherche critereDeRecherche=buildCritereDeRecherche(proprieteRecherchee, valeurRecherchee);
+            if (critereDeRecherche!=null)
+                oeuvreSpecification.add(critereDeRecherche);
         });
         return oeuvreSpecification;
     }
@@ -93,11 +97,26 @@ public class OeuvreServiceImpl implements OeuvreService {
      *
      * @param proprieteRecherchee clé présente dans la query string ex: type, genre, statut...
      * @param valeurRecherchee    valeur correspondant à la clé dans la query string
-     * @return le CritereDeRecherche formaté pour la BDD
+     * @return
+     *      null si la valeur recherchee est vide (null, "", " ") ou si le critere n'est pas bon. Ce qui vaut à ignorer le critere recue
+     *      sinon le CritereDeRecherche formaté pour la BDD
      */
     private CritereDeRecherche buildCritereDeRecherche(String proprieteRecherchee, String valeurRecherchee) {
         //on converti la propriete recherche en enum afin de controler que c'est bien une valeur connu
-        EnumProprieteRecherchableSurOeuvre enumProprieteRecherchee = EnumProprieteRecherchableSurOeuvre.getEnumFromValeurParametreRequeteHttp(proprieteRecherchee);
+        EnumProprieteRecherchableSurOeuvre enumProprieteRecherchee;
+        try {
+            enumProprieteRecherchee = EnumProprieteRecherchableSurOeuvre.getEnumFromValeurParametreRequeteHttp(proprieteRecherchee);
+        } catch (MauvaisParamException e) {
+            logger.debug("critere de recherche non gere. critere recu= {}",proprieteRecherchee);
+            return null;
+        }
+
+        //si la valeur recherchee est vide ou null, on ne tient pas compte du critere
+        if (valeurRecherchee==null || !StringUtils.hasText(valeurRecherchee)) {
+            logger.debug("valeur recherchee vide pour critere : {}. Valeur recue= {}",proprieteRecherchee,valeurRecherchee);
+            return null;
+        }
+
 
         //cas particulier du type d'oeuvre qui est un enumere, dans ce cas, la valeurRecherchee (initialement en string) doit etre convertie dans son enumeree correspondant
         Object valeurRechercheeFinale=valeurRecherchee;
@@ -109,8 +128,9 @@ public class OeuvreServiceImpl implements OeuvreService {
 */
         //on définit l'operateur (= par defaut, "commence par" pour titre)
         EnumOperationDeRecherche operationDeRecherche = EnumOperationDeRecherche.EGAL;
-        if (enumProprieteRecherchee == EnumProprieteRecherchableSurOeuvre.TITRE)
+        if (enumProprieteRecherchee == EnumProprieteRecherchableSurOeuvre.TITRE) {
             operationDeRecherche = EnumOperationDeRecherche.COMMENCE_PAR;
+        }
 
         //on retourne le critere de Recheche
         return new CritereDeRecherche(enumProprieteRecherchee, valeurRechercheeFinale, operationDeRecherche);
