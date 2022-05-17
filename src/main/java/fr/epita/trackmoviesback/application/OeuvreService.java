@@ -9,15 +9,13 @@ import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 
 
 import java.util.Map;
+import java.util.Optional;
 
 public interface OeuvreService {
 
     OeuvreLightListDto getAllOeuvres();
     OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre);
-
-    OeuvreLightListDto getOeuvreId();
-    OeuvreDto convertirFilmEnOeuvreDto(Film film);
-    OeuvreDto convertirSerieEnOeuvreDto (Serie serie);
+    OeuvreDto getOeuvreById(Long id);
 
     /**
      * Retourne une liste d'oeuvre (ordonnée par le titre) correspondant aux critères passés en paramètre.

@@ -30,6 +30,14 @@ public class OeuvreDto extends OeuvreLightDto{
         this.saisons = saisons;
     }
 
+    public Integer getDuree() {
+        return duree;
+    }
+
+    public void setDuree(Integer duree) {
+        this.duree = duree;
+    }
+
     @Override
     public String toString() {
         return "OeuvreDto{" +

@@ -1,6 +1,7 @@
 package fr.epita.trackmoviesback.exposition;
 
 import fr.epita.trackmoviesback.application.OeuvreService;
+import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -40,6 +41,16 @@ public class OeuvreController {
         return service.getOeuvres(parameters);
     }
 
+    @ApiOperation(value = "Recuperer une oeuvre"
+            , notes = "Permet de récupérer une oeuvre et son détail"
+    ) //info pour le swagger
+    @GetMapping("/mes_oeuvres/{id}")
+    OeuvreDto getOeuvreById (
+                             @ApiParam(value = "id de l'oeuvre")
+                             @RequestParam(name = "id", required = true)
+                             @PathVariable("id") Long id) {
+        return service.getOeuvreById(id);
+    }
 
 }
 
