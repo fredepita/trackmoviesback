@@ -3,7 +3,7 @@ package fr.epita.trackmoviesback.enumerate;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 
 public enum EnumProprieteRecherchableSurOeuvre {
-    //TYPE_OEUVRE("dtype","type"),
+    TYPE_OEUVRE("type_oeuvre","type"),
     GENRE("genres","genre"),
     TITRE("titre","titre"),
     STATUT_VISIONNAGE("statutVisionnage","statut");

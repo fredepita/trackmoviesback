@@ -2,6 +2,8 @@ package fr.epita.trackmoviesback.domaine;
 
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
