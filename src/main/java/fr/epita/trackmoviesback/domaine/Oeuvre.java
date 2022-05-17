@@ -19,7 +19,8 @@ public abstract class Oeuvre {
 
     //colonne gérée par le discriminator value des subclass, doit avoir seulement un getter pas de settre
     @Column(name="type_oeuvre", insertable = false, updatable = false)
-    protected String type_oeuvre;
+    @Convert(converter = TypeOeuvreAttributeConverter.class) //permet de convertir en string l'enum pour le stocker en base de donnée. On utilise son libelle
+    protected EnumTypeOeuvre type_oeuvre;
 
     @Column(nullable = false, unique = true)
     private String titre;
@@ -135,7 +136,7 @@ public abstract class Oeuvre {
         this.acteurs = acteur;
     }
 
-    public String getType_oeuvre() {
+    public EnumTypeOeuvre getType_oeuvre() {
         return type_oeuvre;
     }
 

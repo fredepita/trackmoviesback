@@ -122,10 +122,9 @@ public class OeuvreServiceImpl implements OeuvreService {
         Object valeurRechercheeFinale=valeurRecherchee;
 
         //Warning fab gere type oeuvre
-
-/*        if (enumProprieteRecherchee== EnumProprieteRecherchableSurOeuvre.TYPE_OEUVRE)
+        if (enumProprieteRecherchee== EnumProprieteRecherchableSurOeuvre.TYPE_OEUVRE)
             valeurRechercheeFinale= EnumTypeOeuvre.getEnumFromlabel(valeurRecherchee);
-*/
+
         //on définit l'operateur (= par defaut, "commence par" pour titre)
         EnumOperationDeRecherche operationDeRecherche = EnumOperationDeRecherche.EGAL;
         if (enumProprieteRecherchee == EnumProprieteRecherchableSurOeuvre.TITRE) {
