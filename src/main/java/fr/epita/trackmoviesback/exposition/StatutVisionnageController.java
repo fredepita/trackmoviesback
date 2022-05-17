@@ -3,6 +3,7 @@ package fr.epita.trackmoviesback.exposition;
 import fr.epita.trackmoviesback.application.StatutVisionnageService;
 import fr.epita.trackmoviesback.domaine.StatutVisionnage;
 import fr.epita.trackmoviesback.dto.StatutVisionnageListDto;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,9 @@ public class StatutVisionnageController {
     @Autowired
     StatutVisionnageService service;
 
+    @ApiOperation(value = "Recuperer les statuts de visionnage"
+            , notes = "Permet de récupérer la liste des statuts de visionnage"
+    ) //info pour le swagger
     @GetMapping("/statuts_visionnage")
     StatutVisionnageListDto getAllStatutVisionnage(){
         return service.getAllStatutVisionnage();
