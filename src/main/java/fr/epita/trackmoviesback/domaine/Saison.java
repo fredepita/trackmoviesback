@@ -1,7 +1,6 @@
 package fr.epita.trackmoviesback.domaine;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 public class Saison {
@@ -15,16 +14,16 @@ public class Saison {
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private StatutVisionnage statutVisionnage;
 
-    private Integer nbEpisode;
+    private Integer nbEpisodes;
 
     public Saison() {
     }
 
-    public Saison(Long id, String numero, StatutVisionnage statutVisionnage, Integer nbEpisode) {
+    public Saison(Long id, String numero, StatutVisionnage statutVisionnage, Integer nbEpisodes) {
         this.id = id;
         this.numero = numero;
         this.statutVisionnage = statutVisionnage;
-        this.nbEpisode = nbEpisode;
+        this.nbEpisodes = nbEpisodes;
     }
 
     public Long getId() {
@@ -51,12 +50,12 @@ public class Saison {
         this.statutVisionnage = statutVisionnage;
     }
 
-    public Integer getNbEpisode() {
-        return nbEpisode;
+    public Integer getNbEpisodes() {
+        return nbEpisodes;
     }
 
-    public void setNbEpisode(Integer nbEpisode) {
-        this.nbEpisode = nbEpisode;
+    public void setNbEpisodes(Integer nbEpisode) {
+        this.nbEpisodes = nbEpisode;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class Saison {
                 "id=" + id +
                 ", numero='" + numero + '\'' +
                 ", statutVisionnage=" + statutVisionnage +
-                ", nbEpisode=" + nbEpisode +
+                ", nbEpisodes=" + nbEpisodes +
                 '}';
     }
 }

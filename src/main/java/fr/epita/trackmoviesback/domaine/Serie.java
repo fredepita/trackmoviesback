@@ -1,7 +1,5 @@
 package fr.epita.trackmoviesback.domaine;
 
-import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
-
 import javax.persistence.*;
 import java.util.List;
 
@@ -15,7 +13,6 @@ public class Serie extends Oeuvre{
 
     public Serie() {
         super();
-        //uper.setTypeOeuvre(EnumTypeOeuvre.SERIE);
     }
 
     public List<Saison> getSaisons() {
@@ -30,13 +27,12 @@ public class Serie extends Oeuvre{
     public String toString() {
         return "Serie{" +
                 "id=" + getId() +
-                ", typeOeuvre=" + getTypeOeuvre() +
                 ", titre='" + getTitre() + '\'' +
                 ", genres=" + getGenres() +
                 ", statutVisionnage=" + getStatutVisionnage() +
                 ", note=" + getNote() +
-                ", createur='" + getCreateur() + '\'' +
-                ", acteur='" + getActeur() + '\'' +
+                ", createur='" + getCreateurs() + '\'' +
+                ", acteur='" + getActeurs() + '\'' +
                 ", urlAffiche='" + getUrlAffiche() + '\'' +
                 ", urlBandeAnnonce='" + getUrlBandeAnnonce() + '\'' +
                 "saisons=" + saisons +

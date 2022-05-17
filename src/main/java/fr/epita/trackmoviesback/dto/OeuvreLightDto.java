@@ -11,22 +11,22 @@ public class OeuvreLightDto {
     private String typeOeuvre;
     private String titre;
     private List<GenreDto> genres;
-    private StatutVisionnageDto statut;
+    private StatutVisionnageDto statutVisionnage;
     private Integer note;
-    private String createur;
-    private String acteur;
+    private String createurs;
+    private String acteurs;
     private String urlAffiche;
     private String urlBandeAnnonce;
 
-    public OeuvreLightDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statut, Integer note, String createur, String acteur, String urlAffiche, String urlBandeAnnonce) {
+    public OeuvreLightDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce) {
         this.id = id;
         this.typeOeuvre = typeOeuvre;
         this.titre = titre;
         this.genres = genres;
-        this.statut = statut;
+        this.statutVisionnage = statutVisionnage;
         this.note = note;
-        this.createur = createur;
-        this.acteur = acteur;
+        this.createurs = createurs;
+        this.acteurs = acteurs;
         this.urlAffiche = urlAffiche;
         this.urlBandeAnnonce = urlBandeAnnonce;
     }
@@ -63,12 +63,12 @@ public class OeuvreLightDto {
         this.genres = genres;
     }
 
-    public StatutVisionnageDto getStatut() {
-        return statut;
+    public StatutVisionnageDto getStatutVisionnage() {
+        return statutVisionnage;
     }
 
-    public void setStatut(StatutVisionnageDto statut) {
-        this.statut = statut;
+    public void setStatutVisionnage(StatutVisionnageDto statutVisionnage) {
+        this.statutVisionnage = statutVisionnage;
     }
 
     public Integer getNote() {
@@ -95,20 +95,20 @@ public class OeuvreLightDto {
         this.urlBandeAnnonce = urlBandeAnnonce;
     }
 
-    public String getCreateur() {
-        return createur;
+    public String getCreateurs() {
+        return createurs;
     }
 
-    public void setCreateur(String createur) {
-        this.createur = createur;
+    public void setCreateurs(String createurs) {
+        this.createurs = createurs;
     }
 
-    public String getActeur() {
-        return acteur;
+    public String getActeurs() {
+        return acteurs;
     }
 
-    public void setActeur(String acteur) {
-        this.acteur = acteur;
+    public void setActeurs(String acteurs) {
+        this.acteurs = acteurs;
     }
 
     @Override
@@ -118,10 +118,10 @@ public class OeuvreLightDto {
                 ", typeOeuvre='" + typeOeuvre + '\'' +
                 ", titre='" + titre + '\'' +
                 ", genres=" + genres +
-                ", statut=" + statut +
+                ", statutVisionnage=" + statutVisionnage +
                 ", note=" + note +
-                ", createur='" + createur + '\'' +
-                ", acteur='" + acteur + '\'' +
+                ", createurs='" + createurs + '\'' +
+                ", acteurs='" + acteurs + '\'' +
                 ", urlAffiche='" + urlAffiche + '\'' +
                 ", urlBandeAnnonce='" + urlBandeAnnonce + '\'' +
                 '}';

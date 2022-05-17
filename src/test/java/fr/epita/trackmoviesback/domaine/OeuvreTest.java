@@ -20,19 +20,6 @@ class OeuvreTest {
     OeuvreRepository oeuvreRepository;
 
     @Test
-    void setTypeOeuvre_utilise_un_enum_et_doit_verifier_que_le_type_est_non_null() {
-
-        assertThrows(MauvaisParamException.class, () -> {
-            Oeuvre oeuvreTest = new Film();
-            oeuvreTest.setTypeOeuvre(null);
-        });
-
-        //test de l'Enum Film
-        Oeuvre oeuvreTest = new Film();
-        assertEquals("film", oeuvreTest.getTypeOeuvre().getLibelle());
-    }
-
-    @Test
     void setTitre_doit_verifier_que_le_titre_est_non_null_et_non_vide() {
 
         assertThrows(MauvaisParamException.class, () -> {

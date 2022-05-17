@@ -29,10 +29,10 @@ public class OeuvreRepositoryTest {
 
         System.out.println("recherche des films:");
 
-        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchableSurOeuvre.TYPE_OEUVRE, EnumTypeOeuvre.FILM, EnumOperationDeRecherche.EGAL));
+/*        criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchableSurOeuvre.TYPE_OEUVRE, EnumTypeOeuvre.FILM, EnumOperationDeRecherche.EGAL));
         oeuvres= oeuvreRepository.findAll(criteresDeRecherche);
         oeuvres.stream().forEach(System.out::println);
-/*
+
         System.out.println("recherche des series comedie:");
         criteresDeRecherche= new OeuvreSpecification();
         criteresDeRecherche.add(new CritereDeRecherche(EnumProprieteRecherchable.TYPE_OEUVRE, EnumTypeOeuvre.SERIE, EnumOperationDeRecherche.EGAL));

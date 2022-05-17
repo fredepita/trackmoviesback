@@ -4,7 +4,6 @@ import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import java.util.List;
 
 @Entity
 @DiscriminatorValue("film")
@@ -15,7 +14,6 @@ public class Film extends Oeuvre{
 
     public Film() {
         super();
-        super.setTypeOeuvre(EnumTypeOeuvre.FILM);
     }
 
     /**
@@ -38,13 +36,12 @@ public class Film extends Oeuvre{
     public String toString() {
         return "Film{" +
                 "id=" + getId() +
-                ", typeOeuvre=" + getTypeOeuvre() +
                 ", titre='" + getTitre() + '\'' +
                 ", genres=" + getGenres() +
                 ", statutVisionnage=" + getStatutVisionnage() +
                 ", note=" + getNote() +
-                ", createur='" + getCreateur() + '\'' +
-                ", acteur='" + getActeur() + '\'' +
+                ", createur='" + getCreateurs() + '\'' +
+                ", acteur='" + getActeurs() + '\'' +
                 ", urlAffiche='" + getUrlAffiche() + '\'' +
                 ", urlBandeAnnonce='" + getUrlBandeAnnonce() + '\'' +
                 "duree=" + duree +

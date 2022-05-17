@@ -1,6 +1,8 @@
 package fr.epita.trackmoviesback.application;
 
+import fr.epita.trackmoviesback.domaine.Film;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
+import fr.epita.trackmoviesback.domaine.Serie;
 import fr.epita.trackmoviesback.dto.GenreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
@@ -43,9 +45,14 @@ public class OeuvreServiceImpl implements OeuvreService {
     public OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre) {
         List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
         StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());
-        String typeOeuvre = oeuvre.getTypeOeuvre() == null ? null : oeuvre.getTypeOeuvre().getLibelle();
 
-        return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(),oeuvre.getCreateur(),oeuvre.getActeur(),  oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce());
+        String typeOeuvre =null;
+        if (oeuvre instanceof Film) {
+            typeOeuvre=EnumTypeOeuvre.FILM.getLibelle();
+        } else if (oeuvre instanceof Serie){
+            typeOeuvre=EnumTypeOeuvre.SERIE.getLibelle();
+        }
+        return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(),oeuvre.getCreateurs(),oeuvre.getActeurs(),  oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce());
     }
 
     @Override
@@ -94,9 +101,12 @@ public class OeuvreServiceImpl implements OeuvreService {
 
         //cas particulier du type d'oeuvre qui est un enumere, dans ce cas, la valeurRecherchee (initialement en string) doit etre convertie dans son enumeree correspondant
         Object valeurRechercheeFinale=valeurRecherchee;
-        if (enumProprieteRecherchee== EnumProprieteRecherchableSurOeuvre.TYPE_OEUVRE)
-            valeurRechercheeFinale= EnumTypeOeuvre.getEnumFromlabel(valeurRecherchee);
 
+        //Warning fab gere type oeuvre
+
+/*        if (enumProprieteRecherchee== EnumProprieteRecherchableSurOeuvre.TYPE_OEUVRE)
+            valeurRechercheeFinale= EnumTypeOeuvre.getEnumFromlabel(valeurRecherchee);
+*/
         //on définit l'operateur (= par defaut, "commence par" pour titre)
         EnumOperationDeRecherche operationDeRecherche = EnumOperationDeRecherche.EGAL;
         if (enumProprieteRecherchee == EnumProprieteRecherchableSurOeuvre.TITRE)
