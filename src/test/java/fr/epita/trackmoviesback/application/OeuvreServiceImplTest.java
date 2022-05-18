@@ -182,26 +182,25 @@ class OeuvreServiceImplTest {
     }
 
     @Test
-    void getOeuvreById_doit_retourner_une_oeuvre_pour_un_id_donné() {
+    void getOeuvreCompleteById_doit_retourner_une_oeuvre_pour_un_id_donné() {
         OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
         assertEquals(oeuvreTest.getTitre(), "Shazam!");
     }
 
     @Test
-    void getOeuvreById_doit_tester_la_duree_du_film_shazam() {
+    void getOeuvreCompleteById_doit_tester_la_duree_du_film_shazam() {
         OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
         assertEquals(oeuvreTest.getDuree(), 166);
     }
 
-    @Test
-    void getOeuvreById_doit_tester_que_la_serie_friends_a_une_saisonList() {
-        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(3L);
-        System.out.println(oeuvreTest.getSaisons());
+ //  @Test
+  //  void getOeuvreCompleteById_doit_tester_que_la_serie_friends_a_une_saisonList() {
+  //      OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(3L);
+ //       System.out.println(oeuvreTest.getSaisons());
+  //  }
 
-    }
-
-    @Test
-    void convertirOeuvreEnOeuvreDto() {
-    }
+ //   @Test
+  //  void convertirOeuvreEnOeuvreDto() {
+  //  }
 
 }
