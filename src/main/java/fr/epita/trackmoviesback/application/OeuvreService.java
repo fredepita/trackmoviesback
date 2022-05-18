@@ -36,4 +36,6 @@ public interface OeuvreService {
      */
     Oeuvre getOeuvre(Long id);
 
+    void deleteOeuvre(Long id);
+
 }

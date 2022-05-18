@@ -4,6 +4,7 @@ package fr.epita.trackmoviesback.application;
 import fr.epita.trackmoviesback.domaine.*;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +24,7 @@ class OeuvreServiceImplTest {
 
     @Autowired
     StatutVisionnageService statutVisionnageService;
+
 
     @Test
     void getAllOeuvres_doit_retourner_toutes_les_oeuvres_d_un_utilisateur() {
@@ -120,8 +122,14 @@ class OeuvreServiceImplTest {
 
     }
 
+
     @Test
     void getOeuvres_mauvais_critere_doit_etre_ignore_et_on_retourne_toutes_les_oeuvres() {
+        System.out.println("getOeuvres_mauvais_critere_doit_etre_ignore_et_on_retourne_toutes_les_oeuvres");
+        OeuvreLightListDto oeuvreLightListDto=oeuvreService.getAllOeuvres();
+        System.out.println("oeuvreLightListDto:" +oeuvreLightListDto);
+        oeuvreService.getAllOeuvres().getOeuvres().forEach(System.out::println);
+
         //test mauvais critere de recherche
         Map<String, String> criteresHttp = new HashMap<>();
         criteresHttp.put("sta","shAzA");
@@ -147,6 +155,8 @@ class OeuvreServiceImplTest {
 
 
     }
+
+
 
     @Test
     void getOeuvres_test_critere_titre_qui_doit_me_retourner_film_shazam() {
@@ -183,6 +193,8 @@ class OeuvreServiceImplTest {
 
 
     }
+
+
     @Test
     void createOeuvre_la_creation_du_film_et_de_la_serie_doit_fonctionner_avec_les_champs_minimum() {
         final String titreFilm= "film de test";
@@ -201,6 +213,8 @@ class OeuvreServiceImplTest {
         assertInstanceOf(Film.class,filmInsere);
         assertEquals(titreFilm,filmInsere.getTitre());
 
+        oeuvreService.deleteOeuvre(filmInsere.getId());
+
         Serie newSerie= new Serie();
         newSerie.setTitre(titreSerie);
         Long idSerieCree = oeuvreService.createOeuvre(newSerie);
@@ -213,9 +227,10 @@ class OeuvreServiceImplTest {
         assertInstanceOf(Serie.class,serieInseree);
         assertEquals(titreSerie,serieInseree.getTitre());
 
+        oeuvreService.deleteOeuvre(serieInseree.getId());
 
     }
-
+/*
     @Test
     void createOeuvre_la_creation_avec_un_statut_visionnage_doit_fonctionner() {
         final String titreFilm= "film de test2";
@@ -278,7 +293,7 @@ class OeuvreServiceImplTest {
         //autre contrainte?
 
     }
-
+*/
 
 }
 
