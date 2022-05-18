@@ -6,7 +6,6 @@ import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -24,10 +23,6 @@ class OeuvreServiceImplTest {
 
     @Autowired
     OeuvreService oeuvreService;
-
-    @Autowired
-    StatutVisionnageService statutVisionnageService;
-
 
     @Test
     void getAllOeuvres_doit_retourner_toutes_les_oeuvres_d_un_utilisateur() {
@@ -54,7 +49,7 @@ class OeuvreServiceImplTest {
         //Création d'une liste de Genres
         Genre genreComedie = new Genre();
         genreComedie.setId(2L);
-        genreComedie.setLibelle("Comédie");
+        genreComedie.setLibelle("Action");
         List<Genre> listeGenre = new ArrayList<>();
         listeGenre.add(genreComedie);
         //Création d'un statut de visionnage
@@ -126,7 +121,6 @@ class OeuvreServiceImplTest {
 
     }
 
-
     @Test
     void getOeuvres_mauvais_critere_doit_etre_ignore_et_on_retourne_toutes_les_oeuvres() {
         System.out.println("getOeuvres_mauvais_critere_doit_etre_ignore_et_on_retourne_toutes_les_oeuvres");
@@ -159,8 +153,6 @@ class OeuvreServiceImplTest {
 
 
     }
-
-
 
     @Test
     void getOeuvres_test_critere_titre_qui_doit_me_retourner_film_shazam() {
@@ -196,8 +188,20 @@ class OeuvreServiceImplTest {
         assertEquals("Shazam!",oeuvreLightListDto.getOeuvres().get(0).getTitre());
 
 
+
     }
 
+    @Test
+    void getOeuvreCompleteById_doit_retourner_une_oeuvre_pour_un_id_donné() {
+        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
+        assertEquals(oeuvreTest.getTitre(), "Shazam!");
+    }
+
+    @Test
+    void getOeuvreCompleteById_doit_tester_la_duree_du_film_shazam() {
+        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
+        assertEquals(oeuvreTest.getDuree(), 166);
+    }
 
     @Test
     void createOeuvre_la_creation_du_film_et_de_la_serie_doit_fonctionner_avec_les_champs_minimum() {
@@ -311,7 +315,4 @@ class OeuvreServiceImplTest {
 
     }
 */
-
-
 }
-

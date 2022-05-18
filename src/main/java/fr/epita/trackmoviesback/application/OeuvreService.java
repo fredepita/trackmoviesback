@@ -1,21 +1,20 @@
 package fr.epita.trackmoviesback.application;
 
-import fr.epita.trackmoviesback.domaine.Film;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
-import fr.epita.trackmoviesback.domaine.Serie;
 import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 
 
 import java.util.Map;
-import java.util.Optional;
 
 public interface OeuvreService {
 
     OeuvreLightListDto getAllOeuvres();
     OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre);
-    OeuvreDto getOeuvreById(Long id);
+    // getOeuvreCompleteById retourne une oeuvre et ses saisons (pour les séries) ou sa durée (pour les films)
+    OeuvreDto getOeuvreCompleteById(Long id);
+    OeuvreDto convertirOeuvreEnOeuvreDto(Oeuvre oeuvre);
 
     /**
      * Retourne une liste d'oeuvre (ordonnée par le titre) correspondant aux critères passés en paramètre.

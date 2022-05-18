@@ -22,7 +22,6 @@ public class SaisonServiceImpl implements SaisonService {
         return new SaisonDto(saison.getId(), saison.getNumero(), statutVisionnageDto, saison.getNbEpisodes());
     }
 
-    @Override
     public List<SaisonDto> convertirListSaisonEnDto(List<Saison> saisons){
         return saisons==null?null:saisons.stream().map(this::convertirSaisonEnDto).collect(Collectors.toList());
     }
