@@ -217,7 +217,7 @@ class OeuvreServiceImplTest {
         assertTrue(idFilmCree>0);
 
         //on verifie que le film insere est correcte en le rechargant
-        OeuvreDto filmInsere=oeuvreService.getOeuvreById(idFilmCree);
+        OeuvreDto filmInsere=oeuvreService.getOeuvreCompleteById(idFilmCree);
         assertNotNull(filmInsere);
         assertEquals(EnumTypeOeuvre.FILM.getLibelle(),filmInsere.getTypeOeuvre());
         assertEquals(titreFilm,filmInsere.getTitre());
@@ -234,7 +234,7 @@ class OeuvreServiceImplTest {
         assertNotNull(idSerieCree);
         assertTrue(idSerieCree>0);
 
-        OeuvreDto serieInseree=oeuvreService.getOeuvreById(idSerieCree);
+        OeuvreDto serieInseree=oeuvreService.getOeuvreCompleteById(idSerieCree);
         assertNotNull(serieInseree);
         assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),serieInseree.getTypeOeuvre());
         assertEquals(titreSerie,serieInseree.getTitre());
@@ -245,7 +245,7 @@ class OeuvreServiceImplTest {
 
     @Test
     void getOeuvreById_doit_me_retourner_toute_les_infos_d_une_oeuvre() {
-        OeuvreDto oeuvreDtoSerie=oeuvreService.getOeuvreById(4L);
+        OeuvreDto oeuvreDtoSerie=oeuvreService.getOeuvreCompleteById(4L);
 
         System.out.println(oeuvreDtoSerie);
     }

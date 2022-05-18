@@ -59,16 +59,16 @@ public class GenreServiceImplTest {
         GenreListTest.add(genreComedie);
 
         //création d'une GenreListDto à comparer avec notre GenrelistTest
-        List<GenreDto> GenreListDto = genreService.convertirListGenreEnDto(GenreListTest);
+        List<GenreDto> genreDtoList = genreService.convertirListGenreEnDto(GenreListTest);
         //Vérification sur la taille de la liste
-        assertEquals(GenreListDto.size(), GenreListTest.size());
+        assertEquals(genreDtoList.size(), GenreListTest.size());
 
-        listGenreDto = genreService.convertirListGenreEnDto(null);
-        assertNull(listGenreDto);
+        genreDtoList = genreService.convertirListGenreEnDto(null);
+        assertNull(genreDtoList);
 
-        listGenreDto = genreService.convertirListGenreEnDto(new ArrayList<>());
-        assertNotNull(listGenreDto);
-        assertEquals(0,listGenreDto.size());
+        genreDtoList = genreService.convertirListGenreEnDto(new ArrayList<>());
+        assertNotNull(genreDtoList);
+        assertEquals(0,genreDtoList.size());
     }
 
 }
