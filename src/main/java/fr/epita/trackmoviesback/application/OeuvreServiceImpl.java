@@ -2,11 +2,9 @@ package fr.epita.trackmoviesback.application;
 
 import fr.epita.trackmoviesback.domaine.Film;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
+import fr.epita.trackmoviesback.domaine.Saison;
 import fr.epita.trackmoviesback.domaine.Serie;
-import fr.epita.trackmoviesback.dto.GenreDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
-import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
+import fr.epita.trackmoviesback.dto.*;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
 import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchableSurOeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
@@ -22,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +34,8 @@ public class OeuvreServiceImpl implements OeuvreService {
     GenreService genreService;
     @Autowired
     StatutVisionnageService statutVisionnageService;
+    @Autowired
+    SaisonService saisonService;
 
     @Override
     public OeuvreLightListDto getAllOeuvres() {
@@ -79,6 +80,29 @@ public class OeuvreServiceImpl implements OeuvreService {
             typeOeuvre=EnumTypeOeuvre.SERIE.getLibelle();
         }
         return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(),oeuvre.getCreateurs(),oeuvre.getActeurs(),  oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce());
+    }
+
+    @Override
+    public OeuvreDto getOeuvreById(Long id) {
+      Oeuvre oeuvre = oeuvreRepository.findById(id).get();
+      return convertirOeuvreEnOeuvreDto(oeuvre);
+    }
+
+    public OeuvreDto convertirOeuvreEnOeuvreDto(Oeuvre oeuvre) {
+        List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
+        StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());
+        String typeOeuvre = EnumTypeOeuvre.FILM.getLibelle();
+        Integer duree = null;
+        List<SaisonDto> saisonDtoList = null;
+        if ( oeuvre instanceof Film) {
+            Film film = (Film) oeuvre;
+            duree = film.getDuree();
+        }else {
+            Serie serie = (Serie) oeuvre;
+            saisonDtoList = saisonService.convertirListSaisonEnDto(serie.getSaisons());
+        }
+
+        return new OeuvreDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getCreateurs(), oeuvre.getActeurs(), oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce(), saisonDtoList, duree);
     }
 
     @Override

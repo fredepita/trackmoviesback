@@ -1,16 +1,21 @@
 package fr.epita.trackmoviesback.application;
 
+import fr.epita.trackmoviesback.domaine.Film;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
+import fr.epita.trackmoviesback.domaine.Serie;
+import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 
 
 import java.util.Map;
+import java.util.Optional;
 
 public interface OeuvreService {
 
     OeuvreLightListDto getAllOeuvres();
     OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre);
+    OeuvreDto getOeuvreById(Long id);
 
     /**
      * Retourne une liste d'oeuvre (ordonnée par le titre) correspondant aux critères passés en paramètre.
@@ -30,11 +35,6 @@ public interface OeuvreService {
      * @return l'id de l'oeuvre créée
      */
     Long createOeuvre(Oeuvre oeuvre);
-
-    /**
-     * methode temporaire pour test en attendant que la vrai version getDetail soit en place
-     */
-    Oeuvre getOeuvre(Long id);
 
     void deleteOeuvre(Long id);
 
