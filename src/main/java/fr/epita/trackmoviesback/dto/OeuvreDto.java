@@ -14,7 +14,6 @@ public class OeuvreDto extends OeuvreLightDto{
     //donnee propre aux films
     private Integer duree;
 
-
     public OeuvreDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, List<SaisonDto> saisons, Integer duree) {
         super(id, typeOeuvre, titre, genres, statutVisionnage, note, createurs, acteurs, urlAffiche, urlBandeAnnonce);
         this.saisons = saisons;

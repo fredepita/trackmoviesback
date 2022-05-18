@@ -2,10 +2,11 @@ package fr.epita.trackmoviesback.application;
 
 
 import fr.epita.trackmoviesback.domaine.*;
-import fr.epita.trackmoviesback.dto.OeuvreDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
+import fr.epita.trackmoviesback.dto.*;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
+import fr.epita.trackmoviesback.exception.MauvaisParamException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -18,8 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class OeuvreServiceImplTest {
-
     private static int NB_OEUVRE_TOTAL_EN_BDD = 5;
+
+    private static final Logger logger = LoggerFactory.getLogger(OeuvreServiceImpl.class);
 
     @Autowired
     OeuvreService oeuvreService;
@@ -187,8 +189,6 @@ class OeuvreServiceImplTest {
         assertEquals(1,oeuvreLightListDto.getOeuvres().size());
         assertEquals("Shazam!",oeuvreLightListDto.getOeuvres().get(0).getTitre());
 
-
-
     }
 
     @Test
@@ -203,15 +203,37 @@ class OeuvreServiceImplTest {
         assertEquals(oeuvreTest.getDuree(), 166);
     }
 
+    private OeuvreDto createOeuvreDtoMinimal(String typeOeuvre,String titreFilm) {
+        return new OeuvreDto(null,typeOeuvre, titreFilm,
+                null,null,null,null,null,null,null,null,null);
+    }
+
+    private OeuvreDto createOeuvreDtoComplete(String typeOeuvre,String titreFilm) {
+        OeuvreDto oeuvreDto=createOeuvreDtoMinimal(typeOeuvre,titreFilm);
+        List<GenreDto> genreDtoList = new ArrayList<>();
+        genreDtoList.add(new GenreDto(1L,"Action"));
+        genreDtoList.add(new GenreDto(2L,"Comédie"));
+        oeuvreDto.setGenres(genreDtoList);
+        StatutVisionnageDto statutVisionnageDto= new StatutVisionnageDto(1L,"A voir");
+        oeuvreDto.setStatutVisionnage(statutVisionnageDto);
+        oeuvreDto.setNote(2);
+        oeuvreDto.setCreateurs("createur1");
+        oeuvreDto.setActeurs("Acteur1, Acteur2");
+        oeuvreDto.setUrlAffiche("monAfficheTest");
+        oeuvreDto.setUrlBandeAnnonce("maBOTest");
+        return oeuvreDto;
+    }
+
+
     @Test
     void createOeuvre_la_creation_du_film_et_de_la_serie_doit_fonctionner_avec_les_champs_minimum() {
         final String titreFilm= "film de test";
         final String titreSerie= "série de test";
 
         //creation d'un film
-        Film newFilm= new Film();
-        newFilm.setTitre(titreFilm);
-        Long idFilmCree = oeuvreService.createOeuvre(newFilm);
+        OeuvreDto newFilm=createOeuvreDtoMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+
+        Long idFilmCree = oeuvreService.saveOeuvre(newFilm);
 
         assertNotNull(idFilmCree);
         assertTrue(idFilmCree>0);
@@ -227,9 +249,9 @@ class OeuvreServiceImplTest {
 
 
         //creation d'une serie
-        Serie newSerie= new Serie();
-        newSerie.setTitre(titreSerie);
-        Long idSerieCree = oeuvreService.createOeuvre(newSerie);
+        OeuvreDto newSerie=createOeuvreDtoMinimal(EnumTypeOeuvre.SERIE.getLibelle(), titreSerie);
+
+        Long idSerieCree = oeuvreService.saveOeuvre(newSerie);
 
         assertNotNull(idSerieCree);
         assertTrue(idSerieCree>0);
@@ -248,12 +270,12 @@ class OeuvreServiceImplTest {
     void createOeuvre_la_creation_avec_un_statut_visionnage_doit_fonctionner() {
         final String titreFilm= "film de test";
 
-        Film newFilm= new Film();
-        newFilm.setTitre(titreFilm);
-        StatutVisionnage statutVisionnage= new StatutVisionnage(1L,null);
+        OeuvreDto newFilm=createOeuvreDtoMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+
+        StatutVisionnageDto statutVisionnage= new StatutVisionnageDto(1L,null);
         newFilm.setStatutVisionnage(statutVisionnage);
 
-        Long idFilmCree = oeuvreService.createOeuvre(newFilm);
+        Long idFilmCree = oeuvreService.saveOeuvre(newFilm);
 
         assertNotNull(idFilmCree);
         assertTrue(idFilmCree>0);
@@ -270,15 +292,14 @@ class OeuvreServiceImplTest {
     void createOeuvre_la_creation_avec_un_ou_plusieurs_genre_doit_fonctionner() {
         final String titreFilm= "film de test";
 
-        Film newFilm= new Film();
-        newFilm.setTitre(titreFilm);
+        OeuvreDto newFilm=createOeuvreDtoMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
 
-        List<Genre> genreList = new ArrayList<>();
-        genreList.add(new Genre(1L,null));
-        genreList.add(new Genre(2L,null));
-        newFilm.setGenres(genreList);
+        List<GenreDto> genreDtoList = new ArrayList<>();
+        genreDtoList.add(new GenreDto(1L,null));
+        genreDtoList.add(new GenreDto(2L,null));
+        newFilm.setGenres(genreDtoList);
 
-        Long idFilmCree = oeuvreService.createOeuvre(newFilm);
+        Long idFilmCree = oeuvreService.saveOeuvre(newFilm);
 
         assertNotNull(idFilmCree);
         assertTrue(idFilmCree>0);
@@ -297,24 +318,11 @@ class OeuvreServiceImplTest {
     void createOeuvre_testCreation_film() {
         //creation du film
         final String titreFilm= "film de test";
-
-        Film newFilm= new Film();
-        newFilm.setTitre(titreFilm);
-        List<Genre> genreList = new ArrayList<>();
-        genreList.add(new Genre(1L,"Action"));
-        genreList.add(new Genre(2L,"Comédie"));
-        newFilm.setGenres(genreList);
-        StatutVisionnage statutVisionnage= new StatutVisionnage(1L,"A voir");
-        newFilm.setStatutVisionnage(statutVisionnage);
-        newFilm.setNote(2);
-        newFilm.setCreateurs("createur1");
-        newFilm.setActeurs("Acteur1, Acteur2");
-        newFilm.setUrlAffiche("monAfficheTest");
-        newFilm.setUrlBandeAnnonce("maBOTest");
+        OeuvreDto newFilm=createOeuvreDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
         newFilm.setDuree(155);
         //fin creation du film
 
-        Long idFilmCree = oeuvreService.createOeuvre(newFilm);
+        Long idFilmCree = oeuvreService.saveOeuvre(newFilm);
 
         assertNotNull(idFilmCree);
         assertTrue(idFilmCree>0);
@@ -335,33 +343,22 @@ class OeuvreServiceImplTest {
 
         oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
     }
-
     @Test
     void createOeuvre_testCreation_serie() {
+
         //creation de la serie
-        final String titreFilm= "serie de test";
+        final String titreOeuvre= "serie de test";
+        OeuvreDto newSerie =createOeuvreDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), titreOeuvre);
+        //on ajoute les saisons (on reutilise le statut visionnage de l'oeuvre pour les saisons)
+        List<SaisonDto> saisonDtoList = new ArrayList<>();
+        saisonDtoList.add(new SaisonDto ( null ,"S01_test",newSerie.getStatutVisionnage(),5));
+        saisonDtoList.add(new SaisonDto(null,"S02_test",newSerie.getStatutVisionnage(),5));
+        newSerie.setSaisons(saisonDtoList);
+        //fin de la creation de la serie
 
-        Serie newSerie= new Serie();
-        newSerie.setTitre(titreFilm);
-        List<Genre> genreList = new ArrayList<>();
-        genreList.add(new Genre(1L,"Action"));
-        genreList.add(new Genre(2L,"Comédie"));
-        newSerie.setGenres(genreList);
-        StatutVisionnage statutVisionnage= new StatutVisionnage(1L,"A voir");
-        newSerie.setStatutVisionnage(statutVisionnage);
-        newSerie.setNote(2);
-        newSerie.setCreateurs("createur1");
-        newSerie.setActeurs("Acteur1, Acteur2");
-        newSerie.setUrlAffiche("monAfficheTest");
-        newSerie.setUrlBandeAnnonce("maBOTest");
-
-        List<Saison> saisonList = new ArrayList<>();
-        saisonList.add(new Saison(0L,"S01_test",statutVisionnage,5));
-        saisonList.add(new Saison(0L,"S02_test",statutVisionnage,5));
-        newSerie.setSaisons(saisonList);
-        //fin creation de la serie
-
-        Long idSerieCree = oeuvreService.createOeuvre(newSerie);
+        logger.debug("Debut insertion Serie test. Titre= {}",newSerie.getTitre());
+        logger.debug("Detail de la serie: {}",newSerie);
+        Long idSerieCree = oeuvreService.saveOeuvre(newSerie);
 
         assertNotNull(idSerieCree);
         assertTrue(idSerieCree>0);
@@ -378,17 +375,49 @@ class OeuvreServiceImplTest {
         assertEquals(newSerie.getActeurs(),oeuvreDtoInseree.getActeurs());
         assertEquals(newSerie.getUrlAffiche(),oeuvreDtoInseree.getUrlAffiche());
         assertEquals(newSerie.getUrlBandeAnnonce(),oeuvreDtoInseree.getUrlBandeAnnonce());
-        //assertEquals(newSerie.getSaisons().size(),oeuvreDtoInseree.getSaisons().size());
+        assertEquals(newSerie.getSaisons().size(),oeuvreDtoInseree.getSaisons().size());
 
         oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
 
     }
 
     @Test
-    void createOeuvre_testCreation_echec_contrainte() {
-        //une oeuvre doit avoir un titre
-        //autre contrainte?
+    void createOeuvre_modification_dune_saison_doit_fonctionner() {
+        //je recupere une serie existante
+        //friends
+        Long oeuvreId=3L;
+
+        OeuvreDto oeuvreFriends= oeuvreService.getOeuvreCompleteById(oeuvreId);
+
+        //je modifie sa saison S2 en mettant nb episode = 99
+        for (SaisonDto saison: oeuvreFriends.getSaisons()) {
+            if (saison.getNumero().equals("S2")) {
+                assertEquals(10,saison.getNbEpisodes());
+                saison.setNbEpisodes(99);
+            }
+        }
+
+        //je sauve
+        Long id=oeuvreService.saveOeuvre(oeuvreFriends);
+        //on check que l'id est le meme
+        assertEquals(oeuvreId,id);
+
+        //on verifie les données en base que la saison fait bien 99 episode maintenant
+        oeuvreService.getOeuvreCompleteById(oeuvreId);
+        for (SaisonDto saison: oeuvreFriends.getSaisons()) {
+            if (saison.getNumero().equals("S2")) {
+                assertEquals(99,saison.getNbEpisodes());
+            }
+        }
+
+        //on vérifie que si on essaye de changer le type d'une oeuvre existante, on a une exception
+        assertThrows(MauvaisParamException.class, () -> {
+            oeuvreFriends.setTypeOeuvre(EnumTypeOeuvre.FILM.getLibelle());
+            oeuvreService.saveOeuvre(oeuvreFriends);
+        });
+
 
     }
+
 
 }

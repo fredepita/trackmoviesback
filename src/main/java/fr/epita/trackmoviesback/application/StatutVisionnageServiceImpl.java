@@ -28,4 +28,9 @@ public class StatutVisionnageServiceImpl implements StatutVisionnageService {
     public StatutVisionnageDto convertirStatutVisionnageEnDto(StatutVisionnage statutVisionnage) {
         return statutVisionnage==null?null:new StatutVisionnageDto(statutVisionnage.getId(), statutVisionnage.getLibelle());
     }
+
+    @Override
+    public StatutVisionnage convertirStatutVisionnageDtoEnStatutVisionnage(StatutVisionnageDto statutVisionnageDto) {
+        return statutVisionnageDto==null?null:new StatutVisionnage(statutVisionnageDto.getId(), statutVisionnageDto.getLibelle());
+    }
 }

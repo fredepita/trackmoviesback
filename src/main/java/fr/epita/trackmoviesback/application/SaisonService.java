@@ -8,8 +8,9 @@ import fr.epita.trackmoviesback.dto.SaisonListDto;
 import java.util.List;
 
 public interface SaisonService {
-
     SaisonDto convertirSaisonEnDto(Saison saison);
-
     List<SaisonDto> convertirListSaisonEnDto(List<Saison> saisons);
+
+    Saison convertirSaisonDtoEnSaison(SaisonDto saisonDto);
+    List<Saison> convertirListSaisonDtoEnListSaion(List<SaisonDto> saisonDtoList);
 }

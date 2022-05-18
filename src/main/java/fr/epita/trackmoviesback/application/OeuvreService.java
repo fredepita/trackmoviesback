@@ -16,6 +16,8 @@ public interface OeuvreService {
     OeuvreDto getOeuvreCompleteById(Long id);
     OeuvreDto convertirOeuvreEnOeuvreDto(Oeuvre oeuvre);
 
+    Oeuvre convertirOeuvreDtoEnOeuvre(OeuvreDto oeuvreDto);
+
     /**
      * Retourne une liste d'oeuvre (ordonnée par le titre) correspondant aux critères passés en paramètre.
      * A noter :
@@ -29,11 +31,14 @@ public interface OeuvreService {
 
     /**
      * ajoute une oeuvre à notre liste dans la BDD
+     * Si l'id de l'oeuvre est positionné, on modifiera l'oeuvre en question
      *
-     * @param oeuvre oeuvre à ajouter
+     * Une oeuvre ne peut pas changer de type (passer de film à série et inversement)
+     *
+     * @param oeuvreDto oeuvre à ajouter
      * @return l'id de l'oeuvre créée
      */
-    Long createOeuvre(Oeuvre oeuvre);
+    Long saveOeuvre(OeuvreDto oeuvreDto);
 
     void deleteOeuvre(Long id);
 

@@ -6,6 +6,7 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("film")
@@ -16,6 +17,11 @@ public class Film extends Oeuvre{
 
     public Film() {
         super();
+    }
+
+    public Film(Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, Integer duree) {
+        super(id, titre, genres, statutVisionnage, note, createurs, acteurs, urlAffiche, urlBandeAnnonce);
+        this.duree = duree;
     }
 
     /**
