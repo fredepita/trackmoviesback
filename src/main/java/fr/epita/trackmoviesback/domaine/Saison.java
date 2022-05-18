@@ -11,7 +11,7 @@ public class Saison {
     @Column(nullable = false)
     private String numero;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     private StatutVisionnage statutVisionnage;
 
     private Integer nbEpisodes;
