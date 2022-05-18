@@ -238,6 +238,15 @@ class OeuvreServiceImplTest {
         oeuvreService.deleteOeuvre(serieInseree.getId());
 
     }
+
+    @Test
+    void getOeuvreById_doit_me_retourner_toute_les_infos_d_une_oeuvre() {
+        OeuvreDto oeuvreDtoSerie=oeuvreService.getOeuvreById(4L);
+
+        System.out.println(oeuvreDtoSerie);
+    }
+
+
 /*
     @Test
     void createOeuvre_la_creation_avec_un_statut_visionnage_doit_fonctionner() {

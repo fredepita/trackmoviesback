@@ -23,10 +23,13 @@ public class GenreServiceImpl implements GenreService {
         return new GenreListDto(genresDto);
     }
 
+    @Override
     public GenreDto convertirGenreEnDto(Genre genre) {
+
         return new GenreDto(genre.getId(), genre.getLibelle());
     }
 
+    @Override
     public List<GenreDto> convertirListGenreEnDto(List<Genre> genres) {
         return genres==null?null:genres.stream().map(this::convertirGenreEnDto).collect(Collectors.toList());
     }
