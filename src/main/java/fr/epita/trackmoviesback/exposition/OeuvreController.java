@@ -49,7 +49,7 @@ public class OeuvreController {
                              @ApiParam(value = "id de l'oeuvre")
                              @RequestParam(name = "id", required = true)
                              @PathVariable("id") Long id) {
-        return service.getOeuvreById(id);
+        return service.getOeuvreCompleteById(id);
     }
 
 }

@@ -59,23 +59,26 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
-    public OeuvreDto getOeuvreById(Long id) {
+    public OeuvreDto getOeuvreCompleteById(Long id) {
       Oeuvre oeuvre = oeuvreRepository.findById(id).get();
       return convertirOeuvreEnOeuvreDto(oeuvre);
     }
-
+    @Override
     public OeuvreDto convertirOeuvreEnOeuvreDto(Oeuvre oeuvre) {
+        if (oeuvre==null) return null;
         List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
         StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());
-        String typeOeuvre = EnumTypeOeuvre.FILM.getLibelle();
+        String typeOeuvre = null;
         Integer duree = null;
         List<SaisonDto> saisonDtoList = null;
         if ( oeuvre instanceof Film) {
             Film film = (Film) oeuvre;
             duree = film.getDuree();
+            typeOeuvre = EnumTypeOeuvre.FILM.getLibelle();
         }else {
             Serie serie = (Serie) oeuvre;
             saisonDtoList = saisonService.convertirListSaisonEnDto(serie.getSaisons());
+            typeOeuvre = EnumTypeOeuvre.SERIE.getLibelle();
         }
 
         return new OeuvreDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getCreateurs(), oeuvre.getActeurs(), oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce(), saisonDtoList, duree);

@@ -2,9 +2,9 @@ package fr.epita.trackmoviesback.application;
 
 
 import fr.epita.trackmoviesback.domaine.*;
+import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
-import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -45,7 +45,7 @@ class OeuvreServiceImplTest {
         //Création d'une liste de Genres
         Genre genreComedie = new Genre();
         genreComedie.setId(2L);
-        genreComedie.setLibelle("Comédie");
+        genreComedie.setLibelle("Action");
         List<Genre> listeGenre = new ArrayList<>();
         listeGenre.add(genreComedie);
         //Création d'un statut de visionnage
@@ -179,6 +179,29 @@ class OeuvreServiceImplTest {
         assertEquals("Shazam!",oeuvreLightListDto.getOeuvres().get(0).getTitre());
 
 
+    }
+
+    @Test
+    void getOeuvreById_doit_retourner_une_oeuvre_pour_un_id_donné() {
+        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
+        assertEquals(oeuvreTest.getTitre(), "Shazam!");
+    }
+
+    @Test
+    void getOeuvreById_doit_tester_la_duree_du_film_shazam() {
+        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
+        assertEquals(oeuvreTest.getDuree(), 166);
+    }
+
+    @Test
+    void getOeuvreById_doit_tester_que_la_serie_friends_a_une_saisonList() {
+        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(3L);
+        System.out.println(oeuvreTest.getSaisons());
+
+    }
+
+    @Test
+    void convertirOeuvreEnOeuvreDto() {
     }
 
 }
