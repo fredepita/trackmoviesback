@@ -2,9 +2,10 @@ package fr.epita.trackmoviesback.application;
 
 
 import fr.epita.trackmoviesback.domaine.*;
+import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
-import org.junit.jupiter.api.BeforeAll;
+import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class OeuvreServiceImplTest {
 
+    private static int NB_OEUVRE_TOTAL_EN_BDD = 5;
+
     @Autowired
     OeuvreService oeuvreService;
 
@@ -31,7 +34,8 @@ class OeuvreServiceImplTest {
         OeuvreLightListDto oeuvreLightListDto = oeuvreService.getAllOeuvres();
         List<OeuvreLightDto> oeuvreLightDtoList = oeuvreLightListDto.getOeuvres();
 
-        assertEquals(oeuvreLightDtoList.size(), 4);
+        assertEquals(oeuvreLightDtoList.size(), NB_OEUVRE_TOTAL_EN_BDD);
+
 
         boolean foundShazam = false;
         for (OeuvreLightDto oeuvre : oeuvreLightDtoList) {
@@ -133,25 +137,25 @@ class OeuvreServiceImplTest {
         //test mauvais critere de recherche
         Map<String, String> criteresHttp = new HashMap<>();
         criteresHttp.put("sta","shAzA");
-        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
 
         criteresHttp = new HashMap<>();
         criteresHttp.put("statut",null);
-        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
 
         criteresHttp = new HashMap<>();
         criteresHttp.put("statut","");
-        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
 
         criteresHttp = new HashMap<>();
         criteresHttp.put("statut"," ");
-        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
 
         //test avec 2 critères
         criteresHttp = new HashMap<>();
         criteresHttp.put("statut"," ");
         criteresHttp.put("testMauvaisCritere","aez");
-        assertEquals(4,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
 
 
     }
@@ -200,7 +204,7 @@ class OeuvreServiceImplTest {
         final String titreFilm= "film de test";
         final String titreSerie= "série de test";
 
-
+        //creation d'un film
         Film newFilm= new Film();
         newFilm.setTitre(titreFilm);
         Long idFilmCree = oeuvreService.createOeuvre(newFilm);
@@ -208,13 +212,17 @@ class OeuvreServiceImplTest {
         assertNotNull(idFilmCree);
         assertTrue(idFilmCree>0);
 
-        Oeuvre filmInsere=oeuvreService.getOeuvre(idFilmCree);
+        //on verifie que le film insere est correcte en le rechargant
+        OeuvreDto filmInsere=oeuvreService.getOeuvreById(idFilmCree);
         assertNotNull(filmInsere);
-        assertInstanceOf(Film.class,filmInsere);
+        assertEquals(EnumTypeOeuvre.FILM.getLibelle(),filmInsere.getTypeOeuvre());
         assertEquals(titreFilm,filmInsere.getTitre());
 
+        //on supprime le film de la base test
         oeuvreService.deleteOeuvre(filmInsere.getId());
 
+
+        //creation d'une serie
         Serie newSerie= new Serie();
         newSerie.setTitre(titreSerie);
         Long idSerieCree = oeuvreService.createOeuvre(newSerie);
@@ -222,9 +230,9 @@ class OeuvreServiceImplTest {
         assertNotNull(idSerieCree);
         assertTrue(idSerieCree>0);
 
-        Oeuvre serieInseree=oeuvreService.getOeuvre(idSerieCree);
+        OeuvreDto serieInseree=oeuvreService.getOeuvreById(idSerieCree);
         assertNotNull(serieInseree);
-        assertInstanceOf(Serie.class,serieInseree);
+        assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),serieInseree.getTypeOeuvre());
         assertEquals(titreSerie,serieInseree.getTitre());
 
         oeuvreService.deleteOeuvre(serieInseree.getId());
@@ -294,6 +302,7 @@ class OeuvreServiceImplTest {
 
     }
 */
+
 
 }
 

@@ -28,7 +28,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     public List<GenreDto> convertirListGenreEnDto(List<Genre> genres) {
-        return genres.stream().map(this::convertirGenreEnDto).collect(Collectors.toList());
+        return genres==null?null:genres.stream().map(this::convertirGenreEnDto).collect(Collectors.toList());
     }
 
 }

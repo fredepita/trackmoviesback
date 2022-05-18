@@ -10,8 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class GenreServiceImplTest {
@@ -51,7 +50,7 @@ public class GenreServiceImplTest {
     }
 
     @Test
-    void convertirListGenreEnDto_doit_convertir_et_collecter_une_ListGenre_en_dto() {
+    void convertirListGenreEnDto_doit_convertir_une_ListGenre_en_dto_et_gerer_null_ou_vide() {
         //Création d'une liste de Genres
         Genre genreComedie = new Genre();
         genreComedie.setId(1L);
@@ -64,6 +63,12 @@ public class GenreServiceImplTest {
         //Vérification sur la taille de la liste
         assertEquals(listGenreDto.size(), listeGenreTest.size());
 
+        listGenreDto = genreService.convertirListGenreEnDto(null);
+        assertNull(listGenreDto);
+
+        listGenreDto = genreService.convertirListGenreEnDto(new ArrayList<>());
+        assertNotNull(listGenreDto);
+        assertEquals(0,listGenreDto.size());
     }
 
 }

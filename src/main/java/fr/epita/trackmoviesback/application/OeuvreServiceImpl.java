@@ -51,15 +51,7 @@ public class OeuvreServiceImpl implements OeuvreService {
         return oeuvreCree.getId();
     }
 
-     /**
-     * sert juste pour test en attendant la version d'olivier
-     * @param id
-     * @return
-     */
-    @Override
-    public Oeuvre getOeuvre(Long id) {
-        return oeuvreRepository.findById(id).get();
-    }
+
 
 
     @Override

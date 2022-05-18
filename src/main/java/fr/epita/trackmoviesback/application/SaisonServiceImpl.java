@@ -15,16 +15,15 @@ public class SaisonServiceImpl implements SaisonService {
     @Autowired
     StatutVisionnageService statutVisionnageService;
 
-
+    @Override
     public SaisonDto convertirSaisonEnDto(Saison saison) {
-
+        if (saison==null) return null;
         StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(saison.getStatutVisionnage());
         return new SaisonDto(saison.getId(), saison.getNumero(), statutVisionnageDto, saison.getNbEpisodes());
     }
 
+    @Override
     public List<SaisonDto> convertirListSaisonEnDto(List<Saison> saisons){
-        return saisons.stream().map(this::convertirSaisonEnDto).collect(Collectors.toList());
-
-
+        return saisons==null?null:saisons.stream().map(this::convertirSaisonEnDto).collect(Collectors.toList());
     }
 }
