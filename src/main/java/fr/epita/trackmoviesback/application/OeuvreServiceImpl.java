@@ -2,7 +2,6 @@ package fr.epita.trackmoviesback.application;
 
 import fr.epita.trackmoviesback.domaine.Film;
 import fr.epita.trackmoviesback.domaine.Oeuvre;
-import fr.epita.trackmoviesback.domaine.Saison;
 import fr.epita.trackmoviesback.domaine.Serie;
 import fr.epita.trackmoviesback.dto.*;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
@@ -22,7 +21,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,18 +64,22 @@ public class OeuvreServiceImpl implements OeuvreService {
 
     @Override
     public OeuvreDto getOeuvreCompleteById(Long id) {
-        EnumTypeOeuvre oeuvre = oeuvreRepository.getTypeOeuvre(id);
-        if (oeuvre == EnumTypeOeuvre.FILM) {
-            Oeuvre oeuvreFilm = filmRepository.findById(id).get();
-            return convertirOeuvreEnOeuvreDto(oeuvreFilm);
+        if (id != null && id > 0) {
+            EnumTypeOeuvre oeuvre = oeuvreRepository.getTypeOeuvre(id);
+            if (oeuvre == EnumTypeOeuvre.FILM) {
+                Oeuvre oeuvreFilm = filmRepository.findById(id).get();
+                return convertirOeuvreEnDto(oeuvreFilm);
+            } else {
+                Oeuvre oeuvreSerie = serieRepository.getSerieComplete(id);
+                return convertirOeuvreEnDto(oeuvreSerie);
+            }
         } else {
-            Oeuvre oeuvreSerie = serieRepository.getSerieComplete(id);
-            return convertirOeuvreEnOeuvreDto(oeuvreSerie);
+            return null;
         }
     }
 
         @Override
-        public OeuvreDto convertirOeuvreEnOeuvreDto (Oeuvre oeuvre){
+        public OeuvreDto convertirOeuvreEnDto(Oeuvre oeuvre){
             if (oeuvre == null) return null;
             List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
             StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());

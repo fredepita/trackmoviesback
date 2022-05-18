@@ -5,6 +5,8 @@ import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,9 +43,13 @@ public class OeuvreController {
         return service.getOeuvres(parameters);
     }
 
-    @ApiOperation(value = "Recuperer une oeuvre"
-            , notes = "Permet de récupérer une oeuvre et son détail"
+    @ApiOperation(value = "Recuperer une oeuvre par son id"
+            , notes = "Permet de récupérer une oeuvre et son détail par son id"
     ) //info pour le swagger
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok"),
+            @ApiResponse(code = 403, message = "interdit"),
+            @ApiResponse(code = 404, message = "non trouvé"),
+            @ApiResponse(code = 500, message = "erreur du serveur") })
     @GetMapping("/mes_oeuvres/{id}")
     OeuvreDto getOeuvreById (
                              @ApiParam(value = "id de l'oeuvre")

@@ -1,5 +1,7 @@
 package fr.epita.trackmoviesback.domaine;
 
+import com.sun.org.apache.xpath.internal.operations.Equals;
+
 import javax.persistence.*;
 
 @Entity
@@ -67,4 +69,5 @@ public class Saison {
                 ", nbEpisodes=" + nbEpisodes +
                 '}';
     }
+
 }

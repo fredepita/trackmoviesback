@@ -2,9 +2,7 @@ package fr.epita.trackmoviesback.application;
 
 
 import fr.epita.trackmoviesback.domaine.*;
-import fr.epita.trackmoviesback.dto.OeuvreDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightDto;
-import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
+import fr.epita.trackmoviesback.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -26,7 +24,7 @@ class OeuvreServiceImplTest {
         OeuvreLightListDto oeuvreLightListDto = oeuvreService.getAllOeuvres();
         List<OeuvreLightDto> oeuvreLightDtoList = oeuvreLightListDto.getOeuvres();
 
-        assertEquals(oeuvreLightDtoList.size(), 4);
+        assertEquals(4, oeuvreLightDtoList.size());
 
         boolean foundShazam = false;
         for (OeuvreLightDto oeuvre : oeuvreLightDtoList) {
@@ -177,30 +175,108 @@ class OeuvreServiceImplTest {
         assertNotNull(oeuvreLightListDto.getOeuvres());
         assertEquals(1,oeuvreLightListDto.getOeuvres().size());
         assertEquals("Shazam!",oeuvreLightListDto.getOeuvres().get(0).getTitre());
-
-
     }
 
     @Test
     void getOeuvreCompleteById_doit_retourner_une_oeuvre_pour_un_id_donné() {
         OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
-        assertEquals(oeuvreTest.getTitre(), "Shazam!");
+        assertEquals("Shazam!", oeuvreTest.getTitre());
     }
 
     @Test
     void getOeuvreCompleteById_doit_tester_la_duree_du_film_shazam() {
         OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
-        assertEquals(oeuvreTest.getDuree(), 166);
+        assertEquals(166, oeuvreTest.getDuree());
     }
 
- //  @Test
-  //  void getOeuvreCompleteById_doit_tester_que_la_serie_friends_a_une_saisonList() {
-  //      OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(3L);
- //       System.out.println(oeuvreTest.getSaisons());
-  //  }
+    @Test
+    void getOeuvreCompleteById_doit_tester_que_la_serie_friends_a_une_saisonList() {
+        //Création d'un statut de visionnage
+        StatutVisionnageDto statutVu = new StatutVisionnageDto(2L,"En cours");
+        //Création d'une saison
+        SaisonDto saisonTest = new SaisonDto(1L,"S1", statutVu,1);
 
- //   @Test
-  //  void convertirOeuvreEnOeuvreDto() {
-  //  }
+        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(3L);
+        assertEquals(2, oeuvreTest.getSaisons().size());
+        assertEquals(saisonTest.getId(), oeuvreTest.getSaisons().get(0).getId());
+        assertEquals(saisonTest.getNumero(), oeuvreTest.getSaisons().get(0).getNumero());
+        assertEquals(saisonTest.getStatutVisionnage().getLibelle(), oeuvreTest.getSaisons().get(0).getStatutVisionnage().getLibelle());
+        assertEquals(saisonTest.getNbEpisodes(), oeuvreTest.getSaisons().get(0).getNbEpisodes());
+    }
+
+    @Test
+    void convertirOeuvreEnOeuvreDto_doit_convertir_une_serie_et_un_film_en_dto() {
+
+        //Création d'une liste de Genres
+        Genre genreComedie = new Genre();
+        genreComedie.setId(2L);
+        genreComedie.setLibelle("Action");
+        List<Genre> listeGenre = new ArrayList<>();
+        listeGenre.add(genreComedie);
+        //Création d'un statut de visionnage
+        StatutVisionnage statutVu = new StatutVisionnage();
+        statutVu.setId(3L);
+        statutVu.setLibelle("Vu");
+        //Création d'une saisonList
+        Saison saisonTest = new Saison(1L,"S1", statutVu,1);
+        List<Saison> saisonListTest = new ArrayList<>();
+        saisonListTest.add(saisonTest);
+
+        //Création d'un filmTest
+        Film filmTest = new Film();
+        filmTest.setTitre("titanic");
+        filmTest.setGenres(listeGenre);
+        filmTest.setStatutVisionnage(statutVu);
+        filmTest.setNote(1);
+        filmTest.setUrlAffiche("url...");
+        filmTest.setUrlBandeAnnonce("url...");
+        filmTest.setDuree(120);
+        //Création d'une serieTest
+        Serie serieTest = new Serie();
+        serieTest.setTitre("titanic");
+        serieTest.setGenres(listeGenre);
+        serieTest.setStatutVisionnage(statutVu);
+        serieTest.setNote(1);
+        serieTest.setUrlAffiche("url...");
+        serieTest.setUrlBandeAnnonce("url...");
+        serieTest.setSaisons(saisonListTest);
+
+        //création d'un oeuvreFilmDto et d'un oeuvreSerieDto à comparer avec filmTest et serieTest
+        OeuvreDto oeuvreFilmDto= oeuvreService.convertirOeuvreEnDto(filmTest);
+        OeuvreDto oeuvreSerieDto = oeuvreService.convertirOeuvreEnDto(serieTest);
+
+        //Tests sur le filmTest
+        assertEquals(oeuvreFilmDto.getId(), filmTest.getId());
+        assertEquals(oeuvreFilmDto.getTitre(), filmTest.getTitre());
+        assertEquals(oeuvreFilmDto.getGenres().size(), filmTest.getGenres().size() );
+        //La conversion de Genre en Dto est vérifiée dans GenreServiceImplTest
+        assertEquals(oeuvreFilmDto.getStatutVisionnage().getLibelle(), filmTest.getStatutVisionnage().getLibelle());
+        assertEquals(oeuvreFilmDto.getNote(), filmTest.getNote());
+        assertEquals(oeuvreFilmDto.getUrlAffiche(), filmTest.getUrlAffiche());
+        assertEquals(oeuvreFilmDto.getUrlBandeAnnonce(), filmTest.getUrlBandeAnnonce());
+        assertEquals(oeuvreFilmDto.getDuree(), filmTest.getDuree());
+
+        //Tests sur la serieTest
+        assertEquals(oeuvreSerieDto.getId(), serieTest.getId());
+        assertEquals(oeuvreSerieDto.getTitre(), serieTest.getTitre());
+        assertEquals(oeuvreSerieDto.getGenres().size(), serieTest.getGenres().size() );
+        //La conversion de Genre en Dto est vérifiée dans GenreServiceImplTest
+        assertEquals(oeuvreSerieDto.getStatutVisionnage().getLibelle(), serieTest.getStatutVisionnage().getLibelle());
+        assertEquals(oeuvreSerieDto.getNote(), serieTest.getNote());
+        assertEquals(oeuvreSerieDto.getUrlAffiche(), serieTest.getUrlAffiche());
+        assertEquals(oeuvreSerieDto.getUrlBandeAnnonce(), serieTest.getUrlBandeAnnonce());
+        //Test concernant la liste des saisons
+        List<SaisonDto> saisonDtoList = oeuvreSerieDto.getSaisons();
+        boolean foundS1 = false;
+        for (SaisonDto saison : saisonDtoList) {
+            if (saison.getNumero().equals("S1")) {
+                foundS1 = true;
+                break;
+            }
+        }
+        assertTrue(foundS1);
+    }
 
 }
+
+
