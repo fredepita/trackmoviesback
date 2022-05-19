@@ -50,7 +50,7 @@ public class OeuvreController {
     ) //info pour le swagger
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Ok"),
-            @ApiResponse(code = 403, message = "interdit"),
+            @ApiResponse(code = 401, message = "Non autorisé"),
             @ApiResponse(code = 404, message = "non trouvé"),
             @ApiResponse(code = 500, message = "erreur du serveur") })
     @GetMapping("/mes_oeuvres/{id}")
