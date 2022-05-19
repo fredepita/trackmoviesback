@@ -1,35 +1,23 @@
-package fr.epita.trackmoviesback.domaine;
+package fr.epita.trackmoviesback.dto;
 
-import com.sun.org.apache.xpath.internal.operations.Equals;
 
-import javax.persistence.*;
-
-@Entity
-public class Saison {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class SaisonDto {
     private Long id;
-
-    @Column(nullable = false)
     private String numero;
-
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private StatutVisionnage statutVisionnage;
-
+    private StatutVisionnageDto statutVisionnage;
     private Integer nbEpisodes;
 
-    public Saison() {
-    }
-
-    public Saison(Long id, String numero, StatutVisionnage statutVisionnage, Integer nbEpisodes) {
+    public SaisonDto(Long id, String numero, StatutVisionnageDto statutVisionnage, Integer nbEpisodes) {
         this.id = id;
         this.numero = numero;
         this.statutVisionnage = statutVisionnage;
         this.nbEpisodes = nbEpisodes;
     }
 
+
     public Long getId() {
         return id;
+
     }
 
     public void setId(Long id) {
@@ -44,11 +32,11 @@ public class Saison {
         this.numero = numero;
     }
 
-    public StatutVisionnage getStatutVisionnage() {
+    public StatutVisionnageDto getStatutVisionnage() {
         return statutVisionnage;
     }
 
-    public void setStatutVisionnage(StatutVisionnage statutVisionnage) {
+    public void setStatutVisionnage(StatutVisionnageDto statutVisionnage) {
         this.statutVisionnage = statutVisionnage;
     }
 
@@ -56,18 +44,17 @@ public class Saison {
         return nbEpisodes;
     }
 
-    public void setNbEpisodes(Integer nbEpisode) {
-        this.nbEpisodes = nbEpisode;
+    public void setNbEpisodes(Integer nbEpisodes) {
+        this.nbEpisodes = nbEpisodes;
     }
 
     @Override
     public String toString() {
-        return "Saison{" +
+        return "SaisonDto{" +
                 "id=" + id +
                 ", numero='" + numero + '\'' +
                 ", statutVisionnage=" + statutVisionnage +
                 ", nbEpisodes=" + nbEpisodes +
                 '}';
     }
-
 }
