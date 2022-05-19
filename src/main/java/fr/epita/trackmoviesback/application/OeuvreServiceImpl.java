@@ -19,7 +19,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,13 +87,17 @@ public class OeuvreServiceImpl implements OeuvreService {
 
     @Override
     public OeuvreDto getOeuvreCompleteById(Long id) {
-        EnumTypeOeuvre oeuvre = oeuvreRepository.getTypeOeuvre(id);
-        if (oeuvre == EnumTypeOeuvre.FILM) {
-            Oeuvre oeuvreFilm = filmRepository.findById(id).get();
-            return convertirOeuvreEnOeuvreDto(oeuvreFilm);
+        if (id != null && id > 0) {
+            EnumTypeOeuvre oeuvre = oeuvreRepository.getTypeOeuvre(id);
+            if (oeuvre == EnumTypeOeuvre.FILM) {
+                Oeuvre oeuvreFilm = filmRepository.findById(id).get();
+                return convertirOeuvreEnOeuvreDto(oeuvreFilm);
+            } else {
+                Oeuvre oeuvreSerie = serieRepository.getSerieComplete(id);
+                return convertirOeuvreEnOeuvreDto(oeuvreSerie);
+            }
         } else {
-            Oeuvre oeuvreSerie = serieRepository.getSerieComplete(id);
-            return convertirOeuvreEnOeuvreDto(oeuvreSerie);
+            return null;
         }
     }
 
