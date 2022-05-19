@@ -3,6 +3,7 @@ package fr.epita.trackmoviesback.exposition;
 import fr.epita.trackmoviesback.application.OeuvreService;
 import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
+import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -78,8 +79,12 @@ public class OeuvreController {
     public ResponseEntity<OeuvreDto> create(@RequestBody OeuvreDto oeuvreDto) {
 
         try {
-            OeuvreDto oeuvre = service.saveOeuvre(oeuvreDto);
-            return new ResponseEntity(oeuvre, HttpStatus.OK);
+            /*OeuvreDto oeuvreDtoTest = new OeuvreDto(null, EnumTypeOeuvre.FILM.getLibelle(), "test creation controller",
+                    null,null,null,null,null,null,null,null,null);
+            OeuvreDto oeuvreCree = service.saveOeuvre(oeuvreDtoTest);*/
+
+            OeuvreDto oeuvreCree = service.saveOeuvre(oeuvreDto);
+            return new ResponseEntity(oeuvreCree, HttpStatus.OK);
         } catch (MauvaisParamException e) {
             return new ResponseEntity("Mauvais parametre recu: "+e.getMessage(),HttpStatus.BAD_REQUEST);
         }

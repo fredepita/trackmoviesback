@@ -53,6 +53,7 @@ public class OeuvreServiceImpl implements OeuvreService {
      * @throws MauvaisParamException si un genre n'existe pas
      */
     private void checkGenrePresentEnBdd( Oeuvre oeuvreAControler) {
+        if (oeuvreAControler==null || oeuvreAControler.getGenres()==null) return;
         GenreListDto genreListDtoFromBDD = genreService.getAllGenres();
         for (Genre genre: oeuvreAControler.getGenres()) {
             boolean trouve=false;
@@ -66,26 +67,71 @@ public class OeuvreServiceImpl implements OeuvreService {
         }
     }
 
+
+    public boolean isStatutVisionnagePresentDansLaListe(StatutVisionnage statutVisionnageAControler,List<StatutVisionnageDto> statutVisionnageList){
+        for (StatutVisionnageDto statutVisionnageDto: statutVisionnageList) {
+            if (statutVisionnageDto.getId()==statutVisionnageAControler.getId()) return true;
+        }
+        return false;
+    }
+
+    /**
+     * verifie que les StatutVisionnage présents dans l'oeuvre existent en base de données
+     * @param oeuvreAControler
+     *
+     * @throws MauvaisParamException si un StatutVisionnage n'existe pas
+     */
+    private void checkStatutVisionnagePresentEnBdd( Oeuvre oeuvreAControler) {
+        if (oeuvreAControler==null || oeuvreAControler.getGenres()==null) return;
+        List<StatutVisionnageDto> statutVisionnageListDtoFromBdd = statutVisionnageService.getAllStatutVisionnage().getStatuts();
+
+        if (oeuvreAControler.getStatutVisionnage()!=null && !isStatutVisionnagePresentDansLaListe(oeuvreAControler.getStatutVisionnage(),statutVisionnageListDtoFromBdd))
+            throw new MauvaisParamException("Le statut de visionnage id="+oeuvreAControler.getStatutVisionnage().getId()+ "de l'oeuvre "+oeuvreAControler.getId()+" n'existe pas dans la base.");
+
+        if (oeuvreAControler instanceof Serie) {
+            //si c'est une serie on verifie les statut des saisons
+            Serie serie = (Serie) oeuvreAControler;
+            for (Saison saison: serie.getSaisons()) {
+                if (saison.getStatutVisionnage()!=null && !isStatutVisionnagePresentDansLaListe(saison.getStatutVisionnage(),statutVisionnageListDtoFromBdd))
+                    throw new MauvaisParamException("Le statut de visionnage id="+oeuvreAControler.getStatutVisionnage().getId()+" de la saison id="+saison.getId()+" n'existe pas dans la base");
+            }
+        }
+    }
+
     @Override
     public OeuvreDto saveOeuvre(OeuvreDto oeuvreDto) {
         Oeuvre oeuvreASauver=convertirOeuvreDtoEnOeuvre(oeuvreDto);
 
-        //on controle que les genres sont des genres existant sinon erreur
-        checkGenrePresentEnBdd(oeuvreASauver);
-
-
-        //si ce n'est pas une nouvelle oeuvre
         if (oeuvreASauver.getId()!=null) {
+            //si ce n'est pas une nouvelle oeuvre (un id est specifié)
+
             //on vérifie que son type n'a pas changé
             EnumTypeOeuvre typeOeuvreEnBdd= oeuvreRepository.getTypeOeuvre(oeuvreASauver.getId());
             if ((oeuvreASauver instanceof Film && typeOeuvreEnBdd!=EnumTypeOeuvre.FILM) ||
             (oeuvreASauver instanceof Serie && typeOeuvreEnBdd!=EnumTypeOeuvre.SERIE))
                 throw new MauvaisParamException("L'oeuvre avec l'id "+oeuvreASauver.getId()+" existe deja en base. Vous ne pouvez pas modifier son type. Type actuellement en base= "+ typeOeuvreEnBdd);
+
         }
+
+        //on controle que le titre n'existe pas dejà sauf pour lui meme
+        List<Oeuvre> oeuvre= oeuvreRepository.findByTitre(oeuvreASauver.getTitre());
+        if (oeuvre.size()>0) {
+            //on a trouvé une oeuvre avec le meme titre
+            if (oeuvre.get(0).getId()!=oeuvreASauver.getId()) {
+                //si ce n'est pas l'oeuvre en cours (cas d'une mise à jour) alors on jette une exception
+                throw new MauvaisParamException("L'oeuvre avec le titre '"+oeuvreASauver.getTitre()+"' existe deja en base avec l'id="+oeuvre.get(0).getId());
+            }
+        }
+
+        //on controle que les genres sont des genres existant sinon erreur
+        checkGenrePresentEnBdd(oeuvreASauver);
+
+        //on controle les statuts de visionnage
+        checkStatutVisionnagePresentEnBdd(oeuvreASauver);
 
         //on crée/modifie l'oeuvre
         Oeuvre oeuvreCree = oeuvreRepository.save(oeuvreASauver);
-        logger.info("Oeuvre {} ajoutée a la librairie avec l'id : {}",oeuvreCree.getTitre(),oeuvreCree.getId());
+        logger.info("Oeuvre {} mise a jour dans la librairie avec l'id : {}",oeuvreCree.getTitre(),oeuvreCree.getId());
 
         OeuvreDto oeuvreDtoCree=convertirOeuvreEnDto(oeuvreCree);
         return oeuvreDtoCree;
