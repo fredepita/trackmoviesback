@@ -212,7 +212,7 @@ public class OeuvreServiceImpl implements OeuvreService {
                     , oeuvreDto.getNote(), oeuvreDto.getCreateurs(), oeuvreDto.getActeurs()
                     ,oeuvreDto.getUrlAffiche(), oeuvreDto.getUrlBandeAnnonce(), oeuvreDto.getDuree());
         } else {
-            List<Saison> saisonList = saisonService.convertirListSaisonDtoEnListSaion(oeuvreDto.getSaisons());
+            List<Saison> saisonList = saisonService.convertirListSaisonDtoEnListSaison(oeuvreDto.getSaisons());
             return new Serie(oeuvreDto.getId(), oeuvreDto.getTitre(), genres,statutVisionnage
                     ,oeuvreDto.getNote(), oeuvreDto.getCreateurs(), oeuvreDto.getActeurs()
                     ,oeuvreDto.getUrlAffiche(), oeuvreDto.getUrlBandeAnnonce(), saisonList);

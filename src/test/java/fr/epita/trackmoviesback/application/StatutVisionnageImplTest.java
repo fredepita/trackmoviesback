@@ -50,4 +50,9 @@ public class StatutVisionnageImplTest {
         statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(null);
         assertNull(statutVisionnageDto);
     }
+
+    @Test
+    void convertirStatutVisionnageDtoEnStatutVisionnage_doit_gerer_null() {
+        assertNull(statutVisionnageService.convertirStatutVisionnageDtoEnStatutVisionnage(null));
+    }
 }

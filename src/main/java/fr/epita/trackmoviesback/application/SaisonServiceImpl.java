@@ -36,7 +36,7 @@ public class SaisonServiceImpl implements SaisonService {
     }
 
     @Override
-    public List<Saison> convertirListSaisonDtoEnListSaion(List<SaisonDto> saisonDtoList) {
+    public List<Saison> convertirListSaisonDtoEnListSaison(List<SaisonDto> saisonDtoList) {
         return saisonDtoList==null?null:saisonDtoList.stream().map(this::convertirSaisonDtoEnSaison).collect(Collectors.toList());
     }
 }

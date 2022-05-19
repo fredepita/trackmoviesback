@@ -71,4 +71,9 @@ public class GenreServiceImplTest {
         assertEquals(0,genreDtoList.size());
     }
 
+    @Test
+    void convertirListGenreDtoEnListGenre_doit_convertir_un_GenreDtoList_en_GenreList() {
+        assertNull(genreService.convertirListGenreDtoEnListGenre(null));
+    }
+
 }

@@ -316,6 +316,17 @@ class OeuvreServiceImplTest {
         oeuvreDto.setActeurs("Acteur1, Acteur2");
         oeuvreDto.setUrlAffiche("monAfficheTest");
         oeuvreDto.setUrlBandeAnnonce("maBOTest");
+
+        if (typeOeuvre.equals(EnumTypeOeuvre.FILM.getLibelle())) {
+            oeuvreDto.setDuree(120);
+        } else {
+            //on ajoute les saisons (on reutilise le statut visionnage de l'oeuvre pour les saisons)
+            List<SaisonDto> saisonDtoList = new ArrayList<>();
+            saisonDtoList.add(new SaisonDto ( null ,"S01_test",oeuvreDto.getStatutVisionnage(),5));
+            saisonDtoList.add(new SaisonDto(null,"S02_test",oeuvreDto.getStatutVisionnage(),5));
+            oeuvreDto.setSaisons(saisonDtoList);
+        }
+
         return oeuvreDto;
     }
 
@@ -444,11 +455,6 @@ class OeuvreServiceImplTest {
         //creation de la serie
         final String titreOeuvre= "serie de test";
         OeuvreDto newSerie =createOeuvreDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), titreOeuvre);
-        //on ajoute les saisons (on reutilise le statut visionnage de l'oeuvre pour les saisons)
-        List<SaisonDto> saisonDtoList = new ArrayList<>();
-        saisonDtoList.add(new SaisonDto ( null ,"S01_test",newSerie.getStatutVisionnage(),5));
-        saisonDtoList.add(new SaisonDto(null,"S02_test",newSerie.getStatutVisionnage(),5));
-        newSerie.setSaisons(saisonDtoList);
         //fin de la creation de la serie
 
         logger.debug("Debut insertion Serie test. Titre= {}",newSerie.getTitre());
@@ -514,6 +520,35 @@ class OeuvreServiceImplTest {
 
     }
 
+    @Test
+    void convertirOeuvreDtoEnOeuvre_doit_convertir_un_OeuvreDto_en_Oeuvre() {
 
+        //on check pour 1 film
+        OeuvreDto oeuvreDto = createOeuvreDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), "film test");
+        assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(null));
+
+        Oeuvre oeuvre=oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
+        assertTrue(oeuvre instanceof Film);
+        Film film=(Film) oeuvre;
+        assertEquals(oeuvreDto.getTitre(),film.getTitre());
+        assertEquals(oeuvreDto.getDuree(),film.getDuree());
+        assertEquals(oeuvreDto.getStatutVisionnage().getLibelle(),film.getStatutVisionnage().getLibelle());
+        assertEquals(oeuvreDto.getGenres().size(),film.getGenres().size());
+
+        //on check pour 1 serie
+        oeuvreDto = createOeuvreDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), "serie test");
+        assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(null));
+
+        oeuvre=oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
+        assertTrue(oeuvre instanceof Serie);
+        Serie serie=(Serie) oeuvre;
+        assertEquals(oeuvreDto.getTitre(),serie.getTitre());
+        assertNotNull(serie.getSaisons());
+        assertEquals(oeuvreDto.getSaisons().size(),serie.getSaisons().size());
+        assertEquals(oeuvreDto.getStatutVisionnage().getLibelle(),serie.getStatutVisionnage().getLibelle());
+        assertEquals(oeuvreDto.getGenres().size(),serie.getGenres().size());
+
+
+    }
 
 }
