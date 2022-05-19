@@ -14,6 +14,7 @@ public interface OeuvreService {
     OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre);
     // getOeuvreCompleteById retourne une oeuvre et ses saisons (pour les séries) ou sa durée (pour les films)
     OeuvreDto getOeuvreCompleteById(Long id);
+
     OeuvreDto convertirOeuvreEnDto(Oeuvre oeuvre);
 
     Oeuvre convertirOeuvreDtoEnOeuvre(OeuvreDto oeuvreDto);

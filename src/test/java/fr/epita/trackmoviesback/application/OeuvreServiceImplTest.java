@@ -206,17 +206,22 @@ class OeuvreServiceImplTest {
 
     @Test
     void getOeuvreCompleteById_doit_tester_que_la_serie_friends_a_une_saisonList() {
-        //Création d'un statut de visionnage
-        StatutVisionnageDto statutVu = new StatutVisionnageDto(2L,"En cours");
-        //Création d'une saison
-        SaisonDto saisonTest = new SaisonDto(1L,"S1", statutVu,1);
 
         OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(3L);
+        assertNotNull(oeuvreTest.getSaisons());
         assertEquals(2, oeuvreTest.getSaisons().size());
-        assertEquals(saisonTest.getId(), oeuvreTest.getSaisons().get(0).getId());
-        assertEquals(saisonTest.getNumero(), oeuvreTest.getSaisons().get(0).getNumero());
-        assertEquals(saisonTest.getStatutVisionnage().getLibelle(), oeuvreTest.getSaisons().get(0).getStatutVisionnage().getLibelle());
-        assertEquals(saisonTest.getNbEpisodes(), oeuvreTest.getSaisons().get(0).getNbEpisodes());
+        boolean saisonTrouvee=false;
+        for (SaisonDto saison: oeuvreTest.getSaisons()) {
+            if (saison.getNumero().equals("S1")) {
+                assertEquals(1, saison.getId());
+                assertNotNull(saison.getStatutVisionnage());
+                assertEquals("En cours", saison.getStatutVisionnage().getLibelle());
+                assertEquals(5, saison.getNbEpisodes());
+                saisonTrouvee=true;
+            }
+        }
+        assertTrue(saisonTrouvee);
+
     }
 
     @Test
@@ -257,8 +262,8 @@ class OeuvreServiceImplTest {
         serieTest.setSaisons(saisonListTest);
 
         //création d'un oeuvreFilmDto et d'un oeuvreSerieDto à comparer avec filmTest et serieTest
-        OeuvreDto oeuvreFilmDto= oeuvreService.convertirOeuvreEnOeuvreDto(filmTest);
-        OeuvreDto oeuvreSerieDto = oeuvreService.convertirOeuvreEnOeuvreDto(serieTest);
+        OeuvreDto oeuvreFilmDto= oeuvreService.convertirOeuvreEnDto(filmTest);
+        OeuvreDto oeuvreSerieDto = oeuvreService.convertirOeuvreEnDto(serieTest);
 
         //Tests sur le filmTest
         assertEquals(oeuvreFilmDto.getId(), filmTest.getId());

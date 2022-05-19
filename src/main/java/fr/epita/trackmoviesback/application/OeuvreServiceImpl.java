@@ -91,10 +91,10 @@ public class OeuvreServiceImpl implements OeuvreService {
             EnumTypeOeuvre oeuvre = oeuvreRepository.getTypeOeuvre(id);
             if (oeuvre == EnumTypeOeuvre.FILM) {
                 Oeuvre oeuvreFilm = filmRepository.findById(id).get();
-                return convertirOeuvreEnOeuvreDto(oeuvreFilm);
+                return convertirOeuvreEnDto(oeuvreFilm);
             } else {
                 Oeuvre oeuvreSerie = serieRepository.getSerieComplete(id);
-                return convertirOeuvreEnOeuvreDto(oeuvreSerie);
+                return convertirOeuvreEnDto(oeuvreSerie);
             }
         } else {
             return null;
@@ -102,7 +102,7 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
-    public OeuvreDto convertirOeuvreEnOeuvreDto (Oeuvre oeuvre){
+    public OeuvreDto convertirOeuvreEnDto (Oeuvre oeuvre){
         if (oeuvre == null) return null;
         List<GenreDto> genresDto = genreService.convertirListGenreEnDto(oeuvre.getGenres());
         StatutVisionnageDto statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(oeuvre.getStatutVisionnage());
