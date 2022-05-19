@@ -37,9 +37,9 @@ public interface OeuvreService {
      * Une oeuvre ne peut pas changer de type (passer de film à série et inversement)
      *
      * @param oeuvreDto oeuvre à ajouter
-     * @return l'id de l'oeuvre créée
+     * @return l'oeuvre créée
      */
-    Long saveOeuvre(OeuvreDto oeuvreDto);
+    OeuvreDto saveOeuvre(OeuvreDto oeuvreDto);
 
     void deleteOeuvre(Long id);
 

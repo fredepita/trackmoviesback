@@ -3,6 +3,7 @@ package fr.epita.trackmoviesback.exposition;
 import fr.epita.trackmoviesback.application.OeuvreService;
 import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
+import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -62,6 +63,27 @@ public class OeuvreController {
         }else {
             return new ResponseEntity("Aucune Oeuvre trouvée",HttpStatus.NOT_FOUND);
         }
+    }
+
+    @ApiOperation(value = "Sauver une oeuvre"
+            , notes = "Permet de creer ou mettre à jour une oeuvre. Pour les element Genre et Statut visionnage, seul les id sont pris en compte. "
+    ) //info pour le swagger
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Ok"),
+            @ApiResponse(code = 400, message = "Mauvais parametre recu"),
+            @ApiResponse(code = 401, message = "Non autorisé"),
+            @ApiResponse(code = 404, message = "non trouvé"),
+            @ApiResponse(code = 500, message = "erreur du serveur") })
+    @PostMapping("/oeuvre")
+    public ResponseEntity<OeuvreDto> create(@RequestBody OeuvreDto oeuvreDto) {
+
+        try {
+            OeuvreDto oeuvre = service.saveOeuvre(oeuvreDto);
+            return new ResponseEntity(oeuvre, HttpStatus.OK);
+        } catch (MauvaisParamException e) {
+            return new ResponseEntity("Mauvais parametre recu: "+e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+
     }
 }
 

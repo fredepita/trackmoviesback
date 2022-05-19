@@ -46,9 +46,33 @@ public class OeuvreServiceImpl implements OeuvreService {
         return new OeuvreLightListDto(1, 1, oeuvresLightDto);
     }
 
+    /**
+     * verifie que les genres présents dans l'oeuvre existent en base de données
+     * @param oeuvreAControler
+     *
+     * @throws MauvaisParamException si un genre n'existe pas
+     */
+    private void checkGenrePresentEnBdd( Oeuvre oeuvreAControler) {
+        GenreListDto genreListDtoFromBDD = genreService.getAllGenres();
+        for (Genre genre: oeuvreAControler.getGenres()) {
+            boolean trouve=false;
+            for (GenreDto genreDansBdd: genreListDtoFromBDD.getGenres()) {
+                if (genreDansBdd.getId() == genre.getId()) {
+                    trouve=true;
+                    break;
+                }
+            }
+            if (!trouve) throw new MauvaisParamException("Le genre avec id="+genre.getId()+ " n'existe pas dans la base");
+        }
+    }
+
     @Override
-    public Long saveOeuvre(OeuvreDto oeuvreDto) {
+    public OeuvreDto saveOeuvre(OeuvreDto oeuvreDto) {
         Oeuvre oeuvreASauver=convertirOeuvreDtoEnOeuvre(oeuvreDto);
+
+        //on controle que les genres sont des genres existant sinon erreur
+        checkGenrePresentEnBdd(oeuvreASauver);
+
 
         //si ce n'est pas une nouvelle oeuvre
         if (oeuvreASauver.getId()!=null) {
@@ -62,7 +86,9 @@ public class OeuvreServiceImpl implements OeuvreService {
         //on crée/modifie l'oeuvre
         Oeuvre oeuvreCree = oeuvreRepository.save(oeuvreASauver);
         logger.info("Oeuvre {} ajoutée a la librairie avec l'id : {}",oeuvreCree.getTitre(),oeuvreCree.getId());
-        return oeuvreCree.getId();
+
+        OeuvreDto oeuvreDtoCree=convertirOeuvreEnDto(oeuvreCree);
+        return oeuvreDtoCree;
     }
 
     @Override

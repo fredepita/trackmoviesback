@@ -339,13 +339,13 @@ class OeuvreServiceImplTest {
         //creation d'un film
         OeuvreDto newFilm=createOeuvreDtoMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
 
-        Long idFilmCree = oeuvreService.saveOeuvre(newFilm);
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
 
-        assertNotNull(idFilmCree);
-        assertTrue(idFilmCree>0);
+        assertNotNull(filmCree);
+        assertTrue(filmCree.getId()>0);
 
         //on verifie que le film insere est correcte en le rechargant
-        OeuvreDto filmInsere=oeuvreService.getOeuvreCompleteById(idFilmCree);
+        OeuvreDto filmInsere=oeuvreService.getOeuvreCompleteById(filmCree.getId());
         assertNotNull(filmInsere);
         assertEquals(EnumTypeOeuvre.FILM.getLibelle(),filmInsere.getTypeOeuvre());
         assertEquals(titreFilm,filmInsere.getTitre());
@@ -357,12 +357,12 @@ class OeuvreServiceImplTest {
         //creation d'une serie
         OeuvreDto newSerie=createOeuvreDtoMinimal(EnumTypeOeuvre.SERIE.getLibelle(), titreSerie);
 
-        Long idSerieCree = oeuvreService.saveOeuvre(newSerie);
+        OeuvreDto serieCree = oeuvreService.saveOeuvre(newSerie);
 
-        assertNotNull(idSerieCree);
-        assertTrue(idSerieCree>0);
+        assertNotNull(serieCree);
+        assertTrue(serieCree.getId()>0);
 
-        OeuvreDto serieInseree=oeuvreService.getOeuvreCompleteById(idSerieCree);
+        OeuvreDto serieInseree=oeuvreService.getOeuvreCompleteById(serieCree.getId());
         assertNotNull(serieInseree);
         assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),serieInseree.getTypeOeuvre());
         assertEquals(titreSerie,serieInseree.getTitre());
@@ -381,12 +381,12 @@ class OeuvreServiceImplTest {
         StatutVisionnageDto statutVisionnage= new StatutVisionnageDto(1L,null);
         newFilm.setStatutVisionnage(statutVisionnage);
 
-        Long idFilmCree = oeuvreService.saveOeuvre(newFilm);
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
 
-        assertNotNull(idFilmCree);
-        assertTrue(idFilmCree>0);
+        assertNotNull(filmCree);
+        assertTrue(filmCree.getId()>0);
 
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(idFilmCree);
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
         assertNotNull(oeuvreDtoInseree);
         assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
         assertEquals(1L,oeuvreDtoInseree.getStatutVisionnage().getId());
@@ -405,12 +405,12 @@ class OeuvreServiceImplTest {
         genreDtoList.add(new GenreDto(2L,null));
         newFilm.setGenres(genreDtoList);
 
-        Long idFilmCree = oeuvreService.saveOeuvre(newFilm);
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
 
-        assertNotNull(idFilmCree);
-        assertTrue(idFilmCree>0);
+        assertNotNull(filmCree);
+        assertTrue(filmCree.getId()>0);
 
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(idFilmCree);
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
         assertNotNull(oeuvreDtoInseree);
         assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
         assertEquals(2,oeuvreDtoInseree.getGenres().size());
@@ -428,12 +428,12 @@ class OeuvreServiceImplTest {
         newFilm.setDuree(155);
         //fin creation du film
 
-        Long idFilmCree = oeuvreService.saveOeuvre(newFilm);
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
 
-        assertNotNull(idFilmCree);
-        assertTrue(idFilmCree>0);
+        assertNotNull(filmCree);
+        assertTrue(filmCree.getId()>0);
 
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(idFilmCree);
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
         assertNotNull(oeuvreDtoInseree);
 
         assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
@@ -459,12 +459,12 @@ class OeuvreServiceImplTest {
 
         logger.debug("Debut insertion Serie test. Titre= {}",newSerie.getTitre());
         logger.debug("Detail de la serie: {}",newSerie);
-        Long idSerieCree = oeuvreService.saveOeuvre(newSerie);
+        OeuvreDto serieCree = oeuvreService.saveOeuvre(newSerie);
 
-        assertNotNull(idSerieCree);
-        assertTrue(idSerieCree>0);
+        assertNotNull(serieCree);
+        assertTrue(serieCree.getId()>0);
 
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(idSerieCree);
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(serieCree.getId());
         assertNotNull(oeuvreDtoInseree);
 
         assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
@@ -499,9 +499,9 @@ class OeuvreServiceImplTest {
         }
 
         //je sauve
-        Long id=oeuvreService.saveOeuvre(oeuvreFriends);
+        OeuvreDto serieFriends=oeuvreService.saveOeuvre(oeuvreFriends);
         //on check que l'id est le meme
-        assertEquals(oeuvreId,id);
+        assertEquals(oeuvreId,serieFriends.getId());
 
         //on verifie les données en base que la saison fait bien 99 episode maintenant
         oeuvreService.getOeuvreCompleteById(oeuvreId);
