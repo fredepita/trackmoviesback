@@ -2,6 +2,8 @@ package fr.epita.trackmoviesback.configuration.security;
 
 import fr.epita.trackmoviesback.configuration.security.jwt.JwtAuthenticationEntryPoint;
 import fr.epita.trackmoviesback.configuration.security.jwt.JwtRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,14 +20,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.sql.DataSource;
-
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, proxyTargetClass = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     private static final String UNAUTHENTICATED_WHITE_LIST[] = { "/trackmovies/v1/login", "/trackmovies/v1/utilisateur"};
 
@@ -40,27 +40,35 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(final AuthenticationManagerBuilder auth) throws Exception {
-        System.out.println("WebSecurityConfig - configure auth");
+
+        logger.debug("WebSecurityConfig::configure(auth : " + auth.toString());
+
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        System.out.println("WebSecurityConfig - passwordEncoder()");
+
+        logger.debug("WebSecurityConfig::passwordEncoder()");
+
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
-        System.out.println("WebSecurityConfig - authenticationManagerBean()");
+
+        logger.debug("WebSecurityConfig::authenticationManagerBean()");
+
         return super.authenticationManagerBean();
     }
 
     @Override
     protected void configure(final HttpSecurity httpSecurity) throws Exception {
         // Add a filter to validate the tokens with every request
-        System.out.println("WebSecurityConfig - configure http");
+
+        logger.debug("WebSecurityConfig::configure(httpSecurity : " + httpSecurity.toString());
+
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         httpSecurity
@@ -68,6 +76,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                     .antMatchers("/trackmovies/v1/login").permitAll()
                     .antMatchers(HttpMethod.POST, "/trackmovies/v1/utilisateur").permitAll()
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/genres").permitAll()
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/statuts_visionnage").permitAll()
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres").permitAll()
+                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 // dont authenticate this authentication request
                 //.authorizeRequests().antMatchers(UNAUTHENTICATED_WHITE_LIST).permitAll()
                 // and authorize everybody create a customer
