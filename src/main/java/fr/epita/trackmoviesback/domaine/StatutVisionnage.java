@@ -15,6 +15,11 @@ public class StatutVisionnage {
     public StatutVisionnage() {
     }
 
+    public StatutVisionnage(Long id, String libelle) {
+        this.id = id;
+        this.libelle = libelle;
+    }
+
     public Long getId() {
         return id;
     }

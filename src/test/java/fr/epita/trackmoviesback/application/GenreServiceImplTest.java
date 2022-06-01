@@ -10,8 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class GenreServiceImplTest {
@@ -51,7 +50,7 @@ public class GenreServiceImplTest {
     }
 
     @Test
-    void convertirListGenreEnDto_doit_convertir_et_collecter_une_ListGenre_en_dto() {
+    void convertirListGenreEnDto_doit_convertir_une_ListGenre_en_dto_et_gerer_null_ou_vide() {
         //Création d'une liste de Genres
         Genre genreComedie = new Genre();
         genreComedie.setId(1L);
@@ -60,10 +59,21 @@ public class GenreServiceImplTest {
         GenreListTest.add(genreComedie);
 
         //création d'une GenreListDto à comparer avec notre GenrelistTest
-        List<GenreDto> GenreListDto = genreService.convertirListGenreEnDto(GenreListTest);
+        List<GenreDto> genreDtoList = genreService.convertirListGenreEnDto(GenreListTest);
         //Vérification sur la taille de la liste
-        assertEquals(GenreListDto.size(), GenreListTest.size());
+        assertEquals(genreDtoList.size(), GenreListTest.size());
 
+        genreDtoList = genreService.convertirListGenreEnDto(null);
+        assertNull(genreDtoList);
+
+        genreDtoList = genreService.convertirListGenreEnDto(new ArrayList<>());
+        assertNotNull(genreDtoList);
+        assertEquals(0,genreDtoList.size());
+    }
+
+    @Test
+    void convertirListGenreDtoEnListGenre_doit_convertir_un_GenreDtoList_en_GenreList() {
+        assertNull(genreService.convertirListGenreDtoEnListGenre(null));
     }
 
 }

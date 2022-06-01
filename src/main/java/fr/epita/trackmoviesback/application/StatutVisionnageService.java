@@ -5,8 +5,8 @@ import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
 import fr.epita.trackmoviesback.dto.StatutVisionnageListDto;
 
 public interface StatutVisionnageService {
-
     StatutVisionnageListDto getAllStatutVisionnage();
-
     StatutVisionnageDto convertirStatutVisionnageEnDto(StatutVisionnage statutVisionnage);
+
+    StatutVisionnage convertirStatutVisionnageDtoEnStatutVisionnage(StatutVisionnageDto statutVisionnageDto);
 }

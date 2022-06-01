@@ -14,7 +14,10 @@ public interface OeuvreService {
     OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre);
     // getOeuvreCompleteById retourne une oeuvre et ses saisons (pour les séries) ou sa durée (pour les films)
     OeuvreDto getOeuvreCompleteById(Long id);
+
     OeuvreDto convertirOeuvreEnDto(Oeuvre oeuvre);
+
+    Oeuvre convertirOeuvreDtoEnOeuvre(OeuvreDto oeuvreDto);
 
     /**
      * Retourne une liste d'oeuvre (ordonnée par le titre) correspondant aux critères passés en paramètre.
@@ -26,5 +29,18 @@ public interface OeuvreService {
      * @return listes des oeuvres correspondant aux critères de recherches
      */
     OeuvreLightListDto getOeuvres(Map<String,String> criteres);
+
+    /**
+     * ajoute une oeuvre à notre liste dans la BDD
+     * Si l'id de l'oeuvre est positionné, on modifiera l'oeuvre en question
+     *
+     * Une oeuvre ne peut pas changer de type (passer de film à série et inversement)
+     *
+     * @param oeuvreDto oeuvre à ajouter
+     * @return l'oeuvre créée
+     */
+    OeuvreDto saveOeuvre(OeuvreDto oeuvreDto);
+
+    void deleteOeuvre(Long id);
 
 }

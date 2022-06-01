@@ -25,7 +25,9 @@ public abstract class Oeuvre {
     @Column(nullable = false, unique = true)
     private String titre;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    //genre etant une table de reference, oeuvre ne peut pas en creer de nouveau, il peut juste s'y rattacher
+    //@ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable( //sert à forcer les nommage de la table de liaison et les colonnes(evite de se retrouver avec des pluriels)
             name = "oeuvre_genre",
             joinColumns = @JoinColumn(name = "oeuvre_id"),
@@ -33,7 +35,8 @@ public abstract class Oeuvre {
     )
     private List<Genre> genres;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    //statut visionnage etant une table de reference, oeuvre ne peut pas en creer de nouveau, il peut juste s'y rattacher
+    @ManyToOne(fetch = FetchType.EAGER)
     private StatutVisionnage statutVisionnage;
     private Integer note;
 

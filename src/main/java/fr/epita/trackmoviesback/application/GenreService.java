@@ -11,6 +11,9 @@ public interface GenreService {
     GenreListDto getAllGenres();
 
     GenreDto convertirGenreEnDto(Genre genre);
-
     List<GenreDto> convertirListGenreEnDto(List<Genre> genres);
+
+    Genre convertirGenreDtoEnGenre(GenreDto genreDto);
+
+    List<Genre> convertirListGenreDtoEnListGenre(List<GenreDto> genreDtoList);
 }

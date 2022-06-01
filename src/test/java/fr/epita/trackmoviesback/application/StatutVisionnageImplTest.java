@@ -1,20 +1,16 @@
 package fr.epita.trackmoviesback.application;
 
-import fr.epita.trackmoviesback.domaine.Genre;
+
 import fr.epita.trackmoviesback.domaine.StatutVisionnage;
-import fr.epita.trackmoviesback.dto.GenreDto;
-import fr.epita.trackmoviesback.dto.GenreListDto;
 import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
 import fr.epita.trackmoviesback.dto.StatutVisionnageListDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class StatutVisionnageImplTest {
@@ -41,7 +37,7 @@ public class StatutVisionnageImplTest {
     }
 
     @Test
-    void convertirStatutVisionnageEnDto_doit_convertir_un_StatutVisionnage_en_dto() {
+    void convertirStatutVisionnageEnDto_doit_convertir_un_StatutVisionnage_en_dto_et_gerer_null() {
         //Création d'un statut de visionnage
         StatutVisionnage statutTest = new StatutVisionnage();
         statutTest.setId(1L);
@@ -51,5 +47,12 @@ public class StatutVisionnageImplTest {
 
         assertEquals(statutVisionnageDto.getLibelle(), statutTest.getLibelle());
 
+        statutVisionnageDto = statutVisionnageService.convertirStatutVisionnageEnDto(null);
+        assertNull(statutVisionnageDto);
+    }
+
+    @Test
+    void convertirStatutVisionnageDtoEnStatutVisionnage_doit_gerer_null() {
+        assertNull(statutVisionnageService.convertirStatutVisionnageDtoEnStatutVisionnage(null));
     }
 }
