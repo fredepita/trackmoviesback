@@ -44,4 +44,12 @@ public class GenreServiceImpl implements GenreService {
         return genreDtoList==null?null:genreDtoList.stream().map(this::convertirGenreDtoEnGenre).collect(Collectors.toList());
     }
 
+    private Genre convertirGenreIdEnGenre(Long id) {
+        return new Genre(id, "");
+    }
+
+    @Override
+    public List<Genre> convertirListIdsEnListGenre(List<Long> idList) {
+        return idList==null?null:idList.stream().map(this::convertirGenreIdEnGenre).collect(Collectors.toList());
+    }
 }

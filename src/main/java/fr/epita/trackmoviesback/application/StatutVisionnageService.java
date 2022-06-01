@@ -9,4 +9,6 @@ public interface StatutVisionnageService {
     StatutVisionnageDto convertirStatutVisionnageEnDto(StatutVisionnage statutVisionnage);
 
     StatutVisionnage convertirStatutVisionnageDtoEnStatutVisionnage(StatutVisionnageDto statutVisionnageDto);
+
+    StatutVisionnage convertirStatutVisionnageIdEnStatutVisionnage(Long statutVisionnageId);
 }

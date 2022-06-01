@@ -1,9 +1,11 @@
 package fr.epita.trackmoviesback.application;
 
+import fr.epita.trackmoviesback.domaine.Genre;
 import fr.epita.trackmoviesback.domaine.Saison;
 import fr.epita.trackmoviesback.domaine.StatutVisionnage;
 import fr.epita.trackmoviesback.dto.SaisonDto;
 import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
+import fr.epita.trackmoviesback.dto.formulaire.SaisonFormulaireDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,5 +40,17 @@ public class SaisonServiceImpl implements SaisonService {
     @Override
     public List<Saison> convertirListSaisonDtoEnListSaison(List<SaisonDto> saisonDtoList) {
         return saisonDtoList==null?null:saisonDtoList.stream().map(this::convertirSaisonDtoEnSaison).collect(Collectors.toList());
+    }
+
+    @Override
+    public Saison convertirSaisonFormulaireDtoEnSaison(SaisonFormulaireDto saisonFormulaireDto) {
+        return new Saison(saisonFormulaireDto.getId(), saisonFormulaireDto.getNumero(),
+                new StatutVisionnage(saisonFormulaireDto.getStatutVisionnageId(),""),
+                saisonFormulaireDto.getNbEpisodes());
+    }
+
+    @Override
+    public List<Saison> convertirListSaisonFormulaireDtoEnListSaison(List<SaisonFormulaireDto> saisonFormulaireDtoList) {
+        return saisonFormulaireDtoList==null?null:saisonFormulaireDtoList.stream().map(this::convertirSaisonFormulaireDtoEnSaison).collect(Collectors.toList());
     }
 }

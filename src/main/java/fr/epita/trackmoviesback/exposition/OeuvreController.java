@@ -3,17 +3,20 @@ package fr.epita.trackmoviesback.exposition;
 import fr.epita.trackmoviesback.application.OeuvreService;
 import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
-import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
+import fr.epita.trackmoviesback.dto.formulaire.OeuvreFormulaireDto;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +24,7 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/trackmovies/v1")
 public class OeuvreController {
+    private static final Logger logger = LoggerFactory.getLogger(OeuvreController.class);
 
     @Autowired
     OeuvreService service;
@@ -60,7 +64,6 @@ public class OeuvreController {
         OeuvreDto oeuvre = service.getOeuvreCompleteById(id);
         if (oeuvre !=null) {
             return new ResponseEntity(oeuvre, HttpStatus.OK);
-
         }else {
             return new ResponseEntity("Aucune Oeuvre trouvée",HttpStatus.NOT_FOUND);
         }
@@ -76,14 +79,16 @@ public class OeuvreController {
             @ApiResponse(code = 404, message = "non trouvé"),
             @ApiResponse(code = 500, message = "erreur du serveur") })
     @PostMapping("/oeuvre")
-    public ResponseEntity<OeuvreDto> create(@RequestBody OeuvreDto oeuvreDto) {
+    public ResponseEntity<OeuvreDto> create(@Valid @RequestBody OeuvreFormulaireDto oeuvreFormulaireDto) {
 
         try {
             /*OeuvreDto oeuvreDtoTest = new OeuvreDto(null, EnumTypeOeuvre.FILM.getLibelle(), "test creation controller",
                     null,null,null,null,null,null,null,null,null);
             OeuvreDto oeuvreCree = service.saveOeuvre(oeuvreDtoTest);*/
 
-            OeuvreDto oeuvreCree = service.saveOeuvre(oeuvreDto);
+            logger.debug("create : oeuvreFormulaireDto={}",oeuvreFormulaireDto);
+            OeuvreDto oeuvreCree = service.saveOeuvre(oeuvreFormulaireDto);
+
             return new ResponseEntity(oeuvreCree, HttpStatus.OK);
         } catch (MauvaisParamException e) {
             return new ResponseEntity("Mauvais parametre recu: "+e.getMessage(),HttpStatus.BAD_REQUEST);

@@ -4,6 +4,7 @@ import fr.epita.trackmoviesback.domaine.Oeuvre;
 import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
+import fr.epita.trackmoviesback.dto.formulaire.OeuvreFormulaireDto;
 
 
 import java.util.Map;
@@ -18,6 +19,8 @@ public interface OeuvreService {
     OeuvreDto convertirOeuvreEnDto(Oeuvre oeuvre);
 
     Oeuvre convertirOeuvreDtoEnOeuvre(OeuvreDto oeuvreDto);
+
+    Oeuvre convertirOeuvreFormulaireDtoEnOeuvre(OeuvreFormulaireDto oeuvreFormulaireDto);
 
     /**
      * Retourne une liste d'oeuvre (ordonnée par le titre) correspondant aux critères passés en paramètre.
@@ -39,7 +42,7 @@ public interface OeuvreService {
      * @param oeuvreDto oeuvre à ajouter
      * @return l'oeuvre créée
      */
-    OeuvreDto saveOeuvre(OeuvreDto oeuvreDto);
+    OeuvreDto saveOeuvre(OeuvreFormulaireDto oeuvreDto);
 
     void deleteOeuvre(Long id);
 

@@ -2,6 +2,7 @@ package fr.epita.trackmoviesback.application;
 
 import fr.epita.trackmoviesback.domaine.*;
 import fr.epita.trackmoviesback.dto.*;
+import fr.epita.trackmoviesback.dto.formulaire.OeuvreFormulaireDto;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
 import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchableSurOeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,7 +60,7 @@ public class OeuvreServiceImpl implements OeuvreService {
         for (Genre genre: oeuvreAControler.getGenres()) {
             boolean trouve=false;
             for (GenreDto genreDansBdd: genreListDtoFromBDD.getGenres()) {
-                if (genreDansBdd.getId() == genre.getId()) {
+                if (genreDansBdd.getId().equals(genre.getId())) {
                     trouve=true;
                     break;
                 }
@@ -70,7 +72,7 @@ public class OeuvreServiceImpl implements OeuvreService {
 
     public boolean isStatutVisionnagePresentDansLaListe(StatutVisionnage statutVisionnageAControler,List<StatutVisionnageDto> statutVisionnageList){
         for (StatutVisionnageDto statutVisionnageDto: statutVisionnageList) {
-            if (statutVisionnageDto.getId()==statutVisionnageAControler.getId()) return true;
+            if (statutVisionnageDto.getId().equals(statutVisionnageAControler.getId())) return true;
         }
         return false;
     }
@@ -99,8 +101,13 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
-    public OeuvreDto saveOeuvre(OeuvreDto oeuvreDto) {
-        Oeuvre oeuvreASauver=convertirOeuvreDtoEnOeuvre(oeuvreDto);
+    public OeuvreDto saveOeuvre(OeuvreFormulaireDto oeuvreFormulaireDto) {
+        Oeuvre oeuvreASauver=convertirOeuvreFormulaireDtoEnOeuvre(oeuvreFormulaireDto);
+
+        logger.debug("oeuvreASauver ={}",oeuvreASauver);
+
+        if (oeuvreASauver==null)
+            throw new MauvaisParamException("L'oeuvre recue est vide");
 
         if (oeuvreASauver.getId()!=null) {
             //si ce n'est pas une nouvelle oeuvre (un id est specifié)
@@ -115,12 +122,10 @@ public class OeuvreServiceImpl implements OeuvreService {
 
         //on controle que le titre n'existe pas dejà sauf pour lui meme
         List<Oeuvre> oeuvre= oeuvreRepository.findByTitre(oeuvreASauver.getTitre());
-        if (oeuvre.size()>0) {
-            //on a trouvé une oeuvre avec le meme titre
-            if (oeuvre.get(0).getId()!=oeuvreASauver.getId()) {
-                //si ce n'est pas l'oeuvre en cours (cas d'une mise à jour) alors on jette une exception
-                throw new MauvaisParamException("L'oeuvre avec le titre '"+oeuvreASauver.getTitre()+"' existe deja en base avec l'id="+oeuvre.get(0).getId());
-            }
+        if (!oeuvre.isEmpty() && !oeuvre.get(0).getId().equals(oeuvreASauver.getId())) {
+            //on a trouvé une oeuvre avec le meme titre et qui n'a pas le meme id. Donc on essaye de sauver en double une oeuvre
+            logger.info("Sauvegarde nouvelle oeuvre annulée. L'oeuvre avec le titre '{}' existe deja en base avec l'id={}",oeuvreASauver.getTitre(),oeuvre.get(0).getId());
+            throw new MauvaisParamException("L'oeuvre avec le titre '"+oeuvreASauver.getTitre()+"' existe deja.");
         }
 
         //on controle que les genres sont des genres existant sinon erreur
@@ -131,10 +136,9 @@ public class OeuvreServiceImpl implements OeuvreService {
 
         //on crée/modifie l'oeuvre
         Oeuvre oeuvreCree = oeuvreRepository.save(oeuvreASauver);
-        logger.info("Oeuvre {} mise a jour dans la librairie avec l'id : {}",oeuvreCree.getTitre(),oeuvreCree.getId());
+        logger.info("Oeuvre \"{}\" sauvee dans la BDD avec l'id : {}",oeuvreCree.getTitre(),oeuvreCree.getId());
 
-        OeuvreDto oeuvreDtoCree=convertirOeuvreEnDto(oeuvreCree);
-        return oeuvreDtoCree;
+        return convertirOeuvreEnDto(oeuvreCree);
     }
 
     @Override
@@ -154,16 +158,25 @@ public class OeuvreServiceImpl implements OeuvreService {
         } else if (oeuvre instanceof Serie) {
             typeOeuvre = EnumTypeOeuvre.SERIE.getLibelle();
         }
-        return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getCreateurs(), oeuvre.getActeurs(), oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce());
+        return new OeuvreLightDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(),
+                genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getCreateurs(),
+                oeuvre.getActeurs(), oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce(),
+                oeuvre.getDescription());
     }
 
     @Override
     public OeuvreDto getOeuvreCompleteById(Long id) {
         if (id != null && id > 0) {
-            EnumTypeOeuvre oeuvre = oeuvreRepository.getTypeOeuvre(id);
-            if (oeuvre == EnumTypeOeuvre.FILM) {
-                Oeuvre oeuvreFilm = filmRepository.findById(id).get();
-                return convertirOeuvreEnDto(oeuvreFilm);
+            EnumTypeOeuvre typeOeuvre = oeuvreRepository.getTypeOeuvre(id);
+            if (typeOeuvre == EnumTypeOeuvre.FILM) {
+                Optional<Film> optionalOeuvre = filmRepository.findById(id);
+                if (optionalOeuvre.isPresent()) {
+                    Oeuvre oeuvreFilm = optionalOeuvre.get();
+                    logger.debug("Oeuvre pour id={} trouvée={}",id,oeuvreFilm);
+                    return convertirOeuvreEnDto(oeuvreFilm);
+                } else {
+                    return null;
+                }
             } else {
                 Oeuvre oeuvreSerie = serieRepository.getSerieComplete(id);
                 return convertirOeuvreEnDto(oeuvreSerie);
@@ -191,7 +204,10 @@ public class OeuvreServiceImpl implements OeuvreService {
             typeOeuvre = EnumTypeOeuvre.SERIE.getLibelle();
         }
 
-        return new OeuvreDto(oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto, oeuvre.getNote(), oeuvre.getCreateurs(), oeuvre.getActeurs(), oeuvre.getUrlAffiche(), oeuvre.getUrlBandeAnnonce(), saisonDtoList, duree);
+        return new OeuvreDto(
+                oeuvre.getId(), typeOeuvre, oeuvre.getTitre(), genresDto, statutVisionnageDto,
+                oeuvre.getNote(), oeuvre.getCreateurs(), oeuvre.getActeurs(), oeuvre.getUrlAffiche(),
+                oeuvre.getUrlBandeAnnonce(), oeuvre.getDescription(), saisonDtoList, duree);
     }
 
     @Override
@@ -202,7 +218,7 @@ public class OeuvreServiceImpl implements OeuvreService {
 
         //on récupère la liste
         List<Oeuvre> oeuvres = oeuvreRepository.findAll(criteresDeRecherche);
-        logger.info("fin recherche en BDD. Nb oeuvres trouvees=", oeuvres.size());
+        logger.info("fin recherche en BDD. Nb oeuvres trouvees= {}", oeuvres.size());
         List<OeuvreLightDto> oeuvresLightDto = oeuvres.stream().map(this::convertirOeuvreEnLightDto).collect(Collectors.toList());
         return new OeuvreLightListDto(1, 1, oeuvresLightDto);
     }
@@ -282,12 +298,36 @@ public class OeuvreServiceImpl implements OeuvreService {
         if (oeuvreDto.getTypeOeuvre().equals(EnumTypeOeuvre.FILM.getLibelle())) {
             return new Film(oeuvreDto.getId(), oeuvreDto.getTitre(), genres,statutVisionnage
                     , oeuvreDto.getNote(), oeuvreDto.getCreateurs(), oeuvreDto.getActeurs()
-                    ,oeuvreDto.getUrlAffiche(), oeuvreDto.getUrlBandeAnnonce(), oeuvreDto.getDuree());
+                    ,oeuvreDto.getUrlAffiche(), oeuvreDto.getUrlBandeAnnonce(),
+                    oeuvreDto.getDescription(), oeuvreDto.getDuree());
         } else {
             List<Saison> saisonList = saisonService.convertirListSaisonDtoEnListSaison(oeuvreDto.getSaisons());
             return new Serie(oeuvreDto.getId(), oeuvreDto.getTitre(), genres,statutVisionnage
                     ,oeuvreDto.getNote(), oeuvreDto.getCreateurs(), oeuvreDto.getActeurs()
-                    ,oeuvreDto.getUrlAffiche(), oeuvreDto.getUrlBandeAnnonce(), saisonList);
+                    ,oeuvreDto.getUrlAffiche(), oeuvreDto.getUrlBandeAnnonce(),
+                    oeuvreDto.getDescription(), saisonList);
+        }
+
+    }
+
+    @Override
+    public Oeuvre convertirOeuvreFormulaireDtoEnOeuvre(OeuvreFormulaireDto oeuvreFormulaireDto) {
+        if (oeuvreFormulaireDto == null) return null;
+        List<Genre> genres = genreService.convertirListIdsEnListGenre(oeuvreFormulaireDto.getGenreIds());
+
+        StatutVisionnage statutVisionnage = statutVisionnageService.convertirStatutVisionnageIdEnStatutVisionnage(oeuvreFormulaireDto.getStatutVisionnageId());
+
+        if (oeuvreFormulaireDto.getTypeOeuvre().equals(EnumTypeOeuvre.FILM.getLibelle())) {
+            return new Film(oeuvreFormulaireDto.getId(), oeuvreFormulaireDto.getTitre(), genres,statutVisionnage
+                    , oeuvreFormulaireDto.getNote(), oeuvreFormulaireDto.getCreateurs(), oeuvreFormulaireDto.getActeurs()
+                    ,oeuvreFormulaireDto.getUrlAffiche(), oeuvreFormulaireDto.getUrlBandeAnnonce(),
+                    oeuvreFormulaireDto.getDescription(), oeuvreFormulaireDto.getDuree());
+        } else {
+            List<Saison> saisonList = saisonService.convertirListSaisonFormulaireDtoEnListSaison(oeuvreFormulaireDto.getSaisons());
+            return new Serie(oeuvreFormulaireDto.getId(), oeuvreFormulaireDto.getTitre(), genres,statutVisionnage
+                    ,oeuvreFormulaireDto.getNote(), oeuvreFormulaireDto.getCreateurs(), oeuvreFormulaireDto.getActeurs()
+                    ,oeuvreFormulaireDto.getUrlAffiche(), oeuvreFormulaireDto.getUrlBandeAnnonce(),
+                    oeuvreFormulaireDto.getDescription(), saisonList);
         }
 
     }

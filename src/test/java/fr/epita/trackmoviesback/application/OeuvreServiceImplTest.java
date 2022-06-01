@@ -3,6 +3,8 @@ package fr.epita.trackmoviesback.application;
 
 import fr.epita.trackmoviesback.domaine.*;
 import fr.epita.trackmoviesback.dto.*;
+import fr.epita.trackmoviesback.dto.formulaire.OeuvreFormulaireDto;
+import fr.epita.trackmoviesback.dto.formulaire.SaisonFormulaireDto;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import org.slf4j.Logger;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -298,9 +302,268 @@ class OeuvreServiceImplTest {
     }
 
 
+    private OeuvreFormulaireDto createOeuvreDtoFormulaireMinimal(String typeOeuvre, String titreFilm) {
+        return new OeuvreFormulaireDto(null,typeOeuvre, titreFilm,
+                null,null,null,null,null,
+                null,null,null,null,null);
+    }
+
+    private OeuvreFormulaireDto createOeuvreFormulaireDtoComplete(String typeOeuvre,String titreFilm) {
+        OeuvreFormulaireDto oeuvreFormulaireDto= createOeuvreDtoFormulaireMinimal(typeOeuvre,titreFilm);
+        List<Long> genreIdsList = new ArrayList<>();
+        genreIdsList.add(1L);
+        genreIdsList.add(2L);
+        oeuvreFormulaireDto.setGenreIds(genreIdsList);
+        Long statutVisionnageId= 1L;
+        oeuvreFormulaireDto.setStatutVisionnageId(statutVisionnageId);
+        oeuvreFormulaireDto.setNote(2);
+        oeuvreFormulaireDto.setCreateurs("createur1");
+        oeuvreFormulaireDto.setActeurs("Acteur1, Acteur2");
+        oeuvreFormulaireDto.setUrlAffiche("monAfficheTest");
+        oeuvreFormulaireDto.setUrlBandeAnnonce("maBOTest");
+
+        if (typeOeuvre.equals(EnumTypeOeuvre.FILM.getLibelle())) {
+            oeuvreFormulaireDto.setDuree(120);
+        } else {
+            //on ajoute les saisons (on reutilise le statut visionnage de l'oeuvre pour les saisons)
+            List<SaisonFormulaireDto> saisonDtoList = new ArrayList<>();
+            saisonDtoList.add(new SaisonFormulaireDto ( null ,"S01_test",oeuvreFormulaireDto.getStatutVisionnageId(),5));
+            saisonDtoList.add(new SaisonFormulaireDto(null,"S02_test",oeuvreFormulaireDto.getStatutVisionnageId(),5));
+            oeuvreFormulaireDto.setSaisons(saisonDtoList);
+        }
+
+        return oeuvreFormulaireDto;
+    }
+
+
+    @Test
+    void createOeuvre_la_creation_du_film_et_de_la_serie_doit_fonctionner_avec_les_champs_minimum() {
+        final String titreFilm= "film de test";
+        final String titreSerie= "série de test";
+
+        //creation d'un film
+        OeuvreFormulaireDto newFilm= createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
+
+        assertNotNull(filmCree);
+        assertTrue(filmCree.getId()>0);
+
+        //on verifie que le film insere est correcte en le rechargant
+        OeuvreDto filmInsere=oeuvreService.getOeuvreCompleteById(filmCree.getId());
+        assertNotNull(filmInsere);
+        assertEquals(EnumTypeOeuvre.FILM.getLibelle(),filmInsere.getTypeOeuvre());
+        assertEquals(titreFilm,filmInsere.getTitre());
+
+        //on supprime le film de la base test
+        oeuvreService.deleteOeuvre(filmInsere.getId());
+
+
+        //creation d'une serie
+        OeuvreFormulaireDto newSerie= createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.SERIE.getLibelle(), titreSerie);
+
+        OeuvreDto serieCree = oeuvreService.saveOeuvre(newSerie);
+
+        assertNotNull(serieCree);
+        assertTrue(serieCree.getId()>0);
+
+        OeuvreDto serieInseree=oeuvreService.getOeuvreCompleteById(serieCree.getId());
+        assertNotNull(serieInseree);
+        assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),serieInseree.getTypeOeuvre());
+        assertEquals(titreSerie,serieInseree.getTitre());
+
+        oeuvreService.deleteOeuvre(serieInseree.getId());
+
+    }
+
+
+    @Test
+    void createOeuvre_la_creation_avec_un_statut_visionnage_doit_fonctionner() {
+        final String titreFilm= "film de test";
+
+        OeuvreFormulaireDto newFilm= createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+        newFilm.setStatutVisionnageId(1L);
+
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
+
+        assertNotNull(filmCree);
+        assertTrue(filmCree.getId()>0);
+
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
+        assertNotNull(oeuvreDtoInseree);
+        assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
+        assertEquals(1L,oeuvreDtoInseree.getStatutVisionnage().getId());
+
+        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
+    }
+
+    @Test
+    void createOeuvre_la_creation_avec_un_ou_plusieurs_genre_doit_fonctionner() {
+        final String titreFilm= "film de test";
+
+        OeuvreFormulaireDto newFilm= createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+
+        List<Long> genreIdsList = new ArrayList<>();
+        genreIdsList.add(1L);
+        genreIdsList.add(2L);
+        newFilm.setGenreIds(genreIdsList);
+
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
+
+        assertNotNull(filmCree);
+        assertTrue(filmCree.getId()>0);
+
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
+        assertNotNull(oeuvreDtoInseree);
+        assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
+        assertEquals(2,oeuvreDtoInseree.getGenres().size());
+        for (GenreDto genre:oeuvreDtoInseree.getGenres()) {
+            if (genre.getId()==1L) {
+                assertEquals("Action",genre.getLibelle());
+                break;
+            }
+        }
+
+        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
+    }
+
+    @Test
+    void createOeuvre_testCreation_film() {
+        //creation du film
+        final String titreFilm= "film de test";
+        OeuvreFormulaireDto newFilm=createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+        newFilm.setDuree(155);
+        //fin creation du film
+
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
+
+        assertNotNull(filmCree);
+        assertTrue(filmCree.getId()>0);
+
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
+        assertNotNull(oeuvreDtoInseree);
+
+        assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
+        assertEquals(newFilm.getTitre(),oeuvreDtoInseree.getTitre());
+        assertEquals(newFilm.getGenreIds().size(),oeuvreDtoInseree.getGenres().size());
+        assertEquals(newFilm.getStatutVisionnageId(),oeuvreDtoInseree.getStatutVisionnage().getId());
+        assertEquals(newFilm.getNote(),oeuvreDtoInseree.getNote());
+        assertEquals(newFilm.getCreateurs(),oeuvreDtoInseree.getCreateurs());
+        assertEquals(newFilm.getActeurs(),oeuvreDtoInseree.getActeurs());
+        assertEquals(newFilm.getUrlAffiche(),oeuvreDtoInseree.getUrlAffiche());
+        assertEquals(newFilm.getUrlBandeAnnonce(),oeuvreDtoInseree.getUrlBandeAnnonce());
+        assertEquals(newFilm.getDuree(),oeuvreDtoInseree.getDuree());
+
+        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
+    }
+    @Test
+    void createOeuvre_testCreation_serie() {
+
+        //creation de la serie
+        final String titreOeuvre= "serie de test";
+        OeuvreFormulaireDto newSerie =createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), titreOeuvre);
+        //fin de la creation de la serie
+
+        logger.debug("Debut insertion Serie test. Titre= {}",newSerie.getTitre());
+        logger.debug("Detail de la serie: {}",newSerie);
+        OeuvreDto serieCree = oeuvreService.saveOeuvre(newSerie);
+
+        assertNotNull(serieCree);
+        assertTrue(serieCree.getId()>0);
+
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(serieCree.getId());
+        assertNotNull(oeuvreDtoInseree);
+
+        assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
+        assertEquals(newSerie.getTitre(),oeuvreDtoInseree.getTitre());
+        assertEquals(newSerie.getGenreIds().size(),oeuvreDtoInseree.getGenres().size());
+        assertEquals(newSerie.getStatutVisionnageId(),oeuvreDtoInseree.getStatutVisionnage().getId());
+        assertEquals(newSerie.getNote(),oeuvreDtoInseree.getNote());
+        assertEquals(newSerie.getCreateurs(),oeuvreDtoInseree.getCreateurs());
+        assertEquals(newSerie.getActeurs(),oeuvreDtoInseree.getActeurs());
+        assertEquals(newSerie.getUrlAffiche(),oeuvreDtoInseree.getUrlAffiche());
+        assertEquals(newSerie.getUrlBandeAnnonce(),oeuvreDtoInseree.getUrlBandeAnnonce());
+        assertEquals(newSerie.getSaisons().size(),oeuvreDtoInseree.getSaisons().size());
+
+        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
+
+    }
+
+    private SaisonFormulaireDto convertSaisonDtoToFormulaire(SaisonDto saisonDto) {
+        return new SaisonFormulaireDto(
+                saisonDto.getId(),
+                saisonDto.getNumero(),
+                saisonDto.getStatutVisionnage().getId(),
+                saisonDto.getNbEpisodes()
+        );
+    }
+
+
+    private OeuvreFormulaireDto convertOeuvreDtoToFormulaire(OeuvreDto oeuvreDto) {
+        return new OeuvreFormulaireDto(
+                oeuvreDto.getId(),
+                oeuvreDto.getTypeOeuvre(),
+                oeuvreDto.getTitre(),
+                oeuvreDto.getGenres().stream().map(g -> g.getId()).collect(Collectors.toList()),
+                oeuvreDto.getStatutVisionnage().getId(),
+                oeuvreDto.getNote(),
+                oeuvreDto.getCreateurs(),
+                oeuvreDto.getActeurs(),
+                oeuvreDto.getUrlAffiche(),
+                oeuvreDto.getUrlBandeAnnonce(),
+                oeuvreDto.getDescription(),
+                oeuvreDto.getSaisons().stream().map(this::convertSaisonDtoToFormulaire).collect(Collectors.toList()),
+                oeuvreDto.getDuree()
+        );
+    }
+
+    @Test
+    void createOeuvre_modification_dune_saison_doit_fonctionner() {
+        //je recupere une serie existante
+        //friends
+        Long oeuvreId=3L;
+
+        OeuvreDto oeuvreFriends= oeuvreService.getOeuvreCompleteById(oeuvreId);
+
+        //je modifie sa saison S2 en mettant nb episode = 99
+        for (SaisonDto saison: oeuvreFriends.getSaisons()) {
+            if (saison.getNumero().equals("S2")) {
+                assertEquals(10,saison.getNbEpisodes());
+                saison.setNbEpisodes(99);
+            }
+        }
+
+        OeuvreFormulaireDto oeuvreFormulaireDto= convertOeuvreDtoToFormulaire(oeuvreFriends);
+
+        //je sauve
+        OeuvreDto serieFriends=oeuvreService.saveOeuvre(oeuvreFormulaireDto);
+        //on check que l'id est le meme
+        assertEquals(oeuvreId,serieFriends.getId());
+
+        //on verifie les données en base que la saison fait bien 99 episode maintenant
+        oeuvreFriends=  oeuvreService.getOeuvreCompleteById(oeuvreId);
+        for (SaisonDto saison: oeuvreFriends.getSaisons()) {
+            if (saison.getNumero().equals("S2")) {
+                assertEquals(99,saison.getNbEpisodes());
+            }
+        }
+
+        //on vérifie que si on essaye de changer le type d'une oeuvre existante, on a une exception
+
+        assertThrows(MauvaisParamException.class, () -> {
+            OeuvreDto oeuvreFriends2=  oeuvreService.getOeuvreCompleteById(oeuvreId);
+            oeuvreFriends2.setTypeOeuvre(EnumTypeOeuvre.FILM.getLibelle());
+            OeuvreFormulaireDto oeuvreFormulaireDto2= convertOeuvreDtoToFormulaire(oeuvreFriends2);
+            oeuvreService.saveOeuvre(oeuvreFormulaireDto2);
+        });
+
+
+    }
+
     private OeuvreDto createOeuvreDtoMinimal(String typeOeuvre,String titreFilm) {
         return new OeuvreDto(null,typeOeuvre, titreFilm,
-                null,null,null,null,null,null,null,null,null);
+                null,null,null,null,null,
+                null,null,null,null,null);
     }
 
     private OeuvreDto createOeuvreDtoComplete(String typeOeuvre,String titreFilm) {
@@ -332,223 +595,99 @@ class OeuvreServiceImplTest {
 
 
     @Test
-    void createOeuvre_la_creation_du_film_et_de_la_serie_doit_fonctionner_avec_les_champs_minimum() {
-        final String titreFilm= "film de test";
-        final String titreSerie= "série de test";
-
-        //creation d'un film
-        OeuvreDto newFilm=createOeuvreDtoMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
-
-        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
-
-        assertNotNull(filmCree);
-        assertTrue(filmCree.getId()>0);
-
-        //on verifie que le film insere est correcte en le rechargant
-        OeuvreDto filmInsere=oeuvreService.getOeuvreCompleteById(filmCree.getId());
-        assertNotNull(filmInsere);
-        assertEquals(EnumTypeOeuvre.FILM.getLibelle(),filmInsere.getTypeOeuvre());
-        assertEquals(titreFilm,filmInsere.getTitre());
-
-        //on supprime le film de la base test
-        oeuvreService.deleteOeuvre(filmInsere.getId());
-
-
-        //creation d'une serie
-        OeuvreDto newSerie=createOeuvreDtoMinimal(EnumTypeOeuvre.SERIE.getLibelle(), titreSerie);
-
-        OeuvreDto serieCree = oeuvreService.saveOeuvre(newSerie);
-
-        assertNotNull(serieCree);
-        assertTrue(serieCree.getId()>0);
-
-        OeuvreDto serieInseree=oeuvreService.getOeuvreCompleteById(serieCree.getId());
-        assertNotNull(serieInseree);
-        assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),serieInseree.getTypeOeuvre());
-        assertEquals(titreSerie,serieInseree.getTitre());
-
-        oeuvreService.deleteOeuvre(serieInseree.getId());
-
-    }
-
-
-    @Test
-    void createOeuvre_la_creation_avec_un_statut_visionnage_doit_fonctionner() {
-        final String titreFilm= "film de test";
-
-        OeuvreDto newFilm=createOeuvreDtoMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
-
-        StatutVisionnageDto statutVisionnage= new StatutVisionnageDto(1L,null);
-        newFilm.setStatutVisionnage(statutVisionnage);
-
-        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
-
-        assertNotNull(filmCree);
-        assertTrue(filmCree.getId()>0);
-
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
-        assertNotNull(oeuvreDtoInseree);
-        assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
-        assertEquals(1L,oeuvreDtoInseree.getStatutVisionnage().getId());
-
-        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
-    }
-
-    @Test
-    void createOeuvre_la_creation_avec_un_ou_plusieurs_genre_doit_fonctionner() {
-        final String titreFilm= "film de test";
-
-        OeuvreDto newFilm=createOeuvreDtoMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
-
-        List<GenreDto> genreDtoList = new ArrayList<>();
-        genreDtoList.add(new GenreDto(1L,null));
-        genreDtoList.add(new GenreDto(2L,null));
-        newFilm.setGenres(genreDtoList);
-
-        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
-
-        assertNotNull(filmCree);
-        assertTrue(filmCree.getId()>0);
-
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
-        assertNotNull(oeuvreDtoInseree);
-        assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
-        assertEquals(2,oeuvreDtoInseree.getGenres().size());
-
-        System.out.println(oeuvreDtoInseree);
-
-        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
-    }
-
-    @Test
-    void createOeuvre_testCreation_film() {
-        //creation du film
-        final String titreFilm= "film de test";
-        OeuvreDto newFilm=createOeuvreDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
-        newFilm.setDuree(155);
-        //fin creation du film
-
-        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
-
-        assertNotNull(filmCree);
-        assertTrue(filmCree.getId()>0);
-
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
-        assertNotNull(oeuvreDtoInseree);
-
-        assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
-        assertEquals(newFilm.getTitre(),oeuvreDtoInseree.getTitre());
-        assertEquals(newFilm.getGenres().size(),oeuvreDtoInseree.getGenres().size());
-        assertEquals(newFilm.getStatutVisionnage().getLibelle(),oeuvreDtoInseree.getStatutVisionnage().getLibelle());
-        assertEquals(newFilm.getNote(),oeuvreDtoInseree.getNote());
-        assertEquals(newFilm.getCreateurs(),oeuvreDtoInseree.getCreateurs());
-        assertEquals(newFilm.getActeurs(),oeuvreDtoInseree.getActeurs());
-        assertEquals(newFilm.getUrlAffiche(),oeuvreDtoInseree.getUrlAffiche());
-        assertEquals(newFilm.getUrlBandeAnnonce(),oeuvreDtoInseree.getUrlBandeAnnonce());
-        assertEquals(newFilm.getDuree(),oeuvreDtoInseree.getDuree());
-
-        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
-    }
-    @Test
-    void createOeuvre_testCreation_serie() {
-
-        //creation de la serie
-        final String titreOeuvre= "serie de test";
-        OeuvreDto newSerie =createOeuvreDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), titreOeuvre);
-        //fin de la creation de la serie
-
-        logger.debug("Debut insertion Serie test. Titre= {}",newSerie.getTitre());
-        logger.debug("Detail de la serie: {}",newSerie);
-        OeuvreDto serieCree = oeuvreService.saveOeuvre(newSerie);
-
-        assertNotNull(serieCree);
-        assertTrue(serieCree.getId()>0);
-
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(serieCree.getId());
-        assertNotNull(oeuvreDtoInseree);
-
-        assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
-        assertEquals(newSerie.getTitre(),oeuvreDtoInseree.getTitre());
-        assertEquals(newSerie.getGenres().size(),oeuvreDtoInseree.getGenres().size());
-        assertEquals(newSerie.getStatutVisionnage().getLibelle(),oeuvreDtoInseree.getStatutVisionnage().getLibelle());
-        assertEquals(newSerie.getNote(),oeuvreDtoInseree.getNote());
-        assertEquals(newSerie.getCreateurs(),oeuvreDtoInseree.getCreateurs());
-        assertEquals(newSerie.getActeurs(),oeuvreDtoInseree.getActeurs());
-        assertEquals(newSerie.getUrlAffiche(),oeuvreDtoInseree.getUrlAffiche());
-        assertEquals(newSerie.getUrlBandeAnnonce(),oeuvreDtoInseree.getUrlBandeAnnonce());
-        assertEquals(newSerie.getSaisons().size(),oeuvreDtoInseree.getSaisons().size());
-
-        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
-
-    }
-
-    @Test
-    void createOeuvre_modification_dune_saison_doit_fonctionner() {
-        //je recupere une serie existante
-        //friends
-        Long oeuvreId=3L;
-
-        OeuvreDto oeuvreFriends= oeuvreService.getOeuvreCompleteById(oeuvreId);
-
-        //je modifie sa saison S2 en mettant nb episode = 99
-        for (SaisonDto saison: oeuvreFriends.getSaisons()) {
-            if (saison.getNumero().equals("S2")) {
-                assertEquals(10,saison.getNbEpisodes());
-                saison.setNbEpisodes(99);
-            }
-        }
-
-        //je sauve
-        OeuvreDto serieFriends=oeuvreService.saveOeuvre(oeuvreFriends);
-        //on check que l'id est le meme
-        assertEquals(oeuvreId,serieFriends.getId());
-
-        //on verifie les données en base que la saison fait bien 99 episode maintenant
-        oeuvreService.getOeuvreCompleteById(oeuvreId);
-        for (SaisonDto saison: oeuvreFriends.getSaisons()) {
-            if (saison.getNumero().equals("S2")) {
-                assertEquals(99,saison.getNbEpisodes());
-            }
-        }
-
-        //on vérifie que si on essaye de changer le type d'une oeuvre existante, on a une exception
-        assertThrows(MauvaisParamException.class, () -> {
-            oeuvreFriends.setTypeOeuvre(EnumTypeOeuvre.FILM.getLibelle());
-            oeuvreService.saveOeuvre(oeuvreFriends);
-        });
-
-
-    }
-
-    @Test
     void convertirOeuvreDtoEnOeuvre_doit_convertir_un_OeuvreDto_en_Oeuvre() {
 
         //on check pour 1 film
         OeuvreDto oeuvreDto = createOeuvreDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), "film test");
         assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(null));
 
-        Oeuvre oeuvre=oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
+        Oeuvre oeuvre = oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
         assertTrue(oeuvre instanceof Film);
-        Film film=(Film) oeuvre;
-        assertEquals(oeuvreDto.getTitre(),film.getTitre());
-        assertEquals(oeuvreDto.getDuree(),film.getDuree());
-        assertEquals(oeuvreDto.getStatutVisionnage().getLibelle(),film.getStatutVisionnage().getLibelle());
-        assertEquals(oeuvreDto.getGenres().size(),film.getGenres().size());
+        Film film = (Film) oeuvre;
+        assertEquals(oeuvreDto.getTitre(), film.getTitre());
+        assertEquals(oeuvreDto.getDuree(), film.getDuree());
+        assertEquals(oeuvreDto.getStatutVisionnage().getLibelle(), film.getStatutVisionnage().getLibelle());
+        assertEquals(oeuvreDto.getGenres().size(), film.getGenres().size());
+
+        GenreDto firstGenreDto = oeuvreDto.getGenres().get(0);
+        for (Genre genre : oeuvre.getGenres()) {
+            if (genre.getId() == firstGenreDto.getId()) {
+                assertEquals(firstGenreDto.getLibelle(), genre.getLibelle());
+            }
+        }
+
 
         //on check pour 1 serie
         oeuvreDto = createOeuvreDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), "serie test");
         assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(null));
 
-        oeuvre=oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
+        oeuvre = oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
         assertTrue(oeuvre instanceof Serie);
-        Serie serie=(Serie) oeuvre;
-        assertEquals(oeuvreDto.getTitre(),serie.getTitre());
+        Serie serie = (Serie) oeuvre;
+        assertEquals(oeuvreDto.getTitre(), serie.getTitre());
         assertNotNull(serie.getSaisons());
-        assertEquals(oeuvreDto.getSaisons().size(),serie.getSaisons().size());
-        assertEquals(oeuvreDto.getStatutVisionnage().getLibelle(),serie.getStatutVisionnage().getLibelle());
-        assertEquals(oeuvreDto.getGenres().size(),serie.getGenres().size());
+        assertEquals(oeuvreDto.getSaisons().size(), serie.getSaisons().size());
+        assertEquals(oeuvreDto.getStatutVisionnage().getLibelle(), serie.getStatutVisionnage().getLibelle());
+        assertEquals(oeuvreDto.getGenres().size(), serie.getGenres().size());
 
+        firstGenreDto = oeuvreDto.getGenres().get(0);
+        for (Genre genre : oeuvre.getGenres()) {
+            if (genre.getId() == firstGenreDto.getId()) {
+                assertEquals(firstGenreDto.getLibelle(), genre.getLibelle());
+            }
+        }
 
     }
 
+    @Test
+    void convertirOeuvreFormulaireDtoEnOeuvre_doit_convertir_un_OeuvreFormulaireDto_en_Oeuvre() {
+
+        //on check pour 1 film
+        OeuvreFormulaireDto oeuvreFormulaireDto = createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), "film test");
+        assertNull(oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(null));
+
+        Oeuvre oeuvre=oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(oeuvreFormulaireDto);
+        assertTrue(oeuvre instanceof Film);
+        Film film=(Film) oeuvre;
+        assertEquals(oeuvreFormulaireDto.getTitre(),film.getTitre());
+        assertEquals(oeuvreFormulaireDto.getDuree(),film.getDuree());
+        assertEquals(oeuvreFormulaireDto.getStatutVisionnageId(),film.getStatutVisionnage().getId());
+        assertEquals("",film.getStatutVisionnage().getLibelle());
+        assertEquals(oeuvreFormulaireDto.getGenreIds().size(),film.getGenres().size());
+        //ts les libelle genre doivent etre vides
+        //et je dois trouver au moins un de mes genres du formulaire
+        Long firstGenreId=oeuvreFormulaireDto.getGenreIds().get(0);
+        boolean found=false;
+        for(Genre genre: film.getGenres()) {
+            assertEquals("",genre.getLibelle());
+            if (genre.getId()==firstGenreId) {
+                found=true;
+            }
+        }
+        assertTrue(found);
+
+        //on check pour 1 serie
+        oeuvreFormulaireDto = createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), "serie test");
+        assertNull(oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(null));
+
+        oeuvre=oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(oeuvreFormulaireDto);
+        assertTrue(oeuvre instanceof Serie);
+        Serie serie=(Serie) oeuvre;
+        assertEquals(oeuvreFormulaireDto.getTitre(),serie.getTitre());
+        assertNotNull(serie.getSaisons());
+        assertEquals(oeuvreFormulaireDto.getSaisons().size(),serie.getSaisons().size());
+        assertEquals(oeuvreFormulaireDto.getStatutVisionnageId(),film.getStatutVisionnage().getId());
+        assertEquals("",film.getStatutVisionnage().getLibelle());
+        assertEquals(oeuvreFormulaireDto.getGenreIds().size(),film.getGenres().size());
+        //ts les libelle genre doivent etre vides
+        //et je dois trouver au moins un de mes genres du formulaire
+        firstGenreId=oeuvreFormulaireDto.getGenreIds().get(0);
+        found=false;
+        for(Genre genre: film.getGenres()) {
+            assertEquals("",genre.getLibelle());
+            if (genre.getId()==firstGenreId) {
+                found=true;
+            }
+        }
+    }
 }

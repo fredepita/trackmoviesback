@@ -79,6 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers(HttpMethod.GET, "/trackmovies/v1/genres").permitAll()
                     .antMatchers(HttpMethod.GET, "/trackmovies/v1/statuts_visionnage").permitAll()
                     .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres").permitAll()
+                    .antMatchers(HttpMethod.POST, "/trackmovies/v1/oeuvre").permitAll()
                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // dont authenticate this authentication request
