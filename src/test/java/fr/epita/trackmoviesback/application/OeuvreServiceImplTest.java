@@ -1,6 +1,7 @@
 package fr.epita.trackmoviesback.application;
 
 
+import fr.epita.trackmoviesback.Utilitaire.GenerateurObjetTest;
 import fr.epita.trackmoviesback.domaine.*;
 import fr.epita.trackmoviesback.dto.*;
 import fr.epita.trackmoviesback.dto.formulaire.OeuvreFormulaireDto;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class OeuvreServiceImplTest {
     private static int NB_OEUVRE_TOTAL_EN_BDD = 5;
 
-    private static final Logger logger = LoggerFactory.getLogger(OeuvreServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(OeuvreServiceImplTest.class);
 
     @Autowired
     OeuvreService oeuvreService;
@@ -302,47 +303,13 @@ class OeuvreServiceImplTest {
     }
 
 
-    private OeuvreFormulaireDto createOeuvreDtoFormulaireMinimal(String typeOeuvre, String titreFilm) {
-        return new OeuvreFormulaireDto(null,typeOeuvre, titreFilm,
-                null,null,null,null,null,
-                null,null,null,null,null);
-    }
-
-    private OeuvreFormulaireDto createOeuvreFormulaireDtoComplete(String typeOeuvre,String titreFilm) {
-        OeuvreFormulaireDto oeuvreFormulaireDto= createOeuvreDtoFormulaireMinimal(typeOeuvre,titreFilm);
-        List<Long> genreIdsList = new ArrayList<>();
-        genreIdsList.add(1L);
-        genreIdsList.add(2L);
-        oeuvreFormulaireDto.setGenreIds(genreIdsList);
-        Long statutVisionnageId= 1L;
-        oeuvreFormulaireDto.setStatutVisionnageId(statutVisionnageId);
-        oeuvreFormulaireDto.setNote(2);
-        oeuvreFormulaireDto.setCreateurs("createur1");
-        oeuvreFormulaireDto.setActeurs("Acteur1, Acteur2");
-        oeuvreFormulaireDto.setUrlAffiche("monAfficheTest");
-        oeuvreFormulaireDto.setUrlBandeAnnonce("maBOTest");
-
-        if (typeOeuvre.equals(EnumTypeOeuvre.FILM.getLibelle())) {
-            oeuvreFormulaireDto.setDuree(120);
-        } else {
-            //on ajoute les saisons (on reutilise le statut visionnage de l'oeuvre pour les saisons)
-            List<SaisonFormulaireDto> saisonDtoList = new ArrayList<>();
-            saisonDtoList.add(new SaisonFormulaireDto ( null ,"S01_test",oeuvreFormulaireDto.getStatutVisionnageId(),5));
-            saisonDtoList.add(new SaisonFormulaireDto(null,"S02_test",oeuvreFormulaireDto.getStatutVisionnageId(),5));
-            oeuvreFormulaireDto.setSaisons(saisonDtoList);
-        }
-
-        return oeuvreFormulaireDto;
-    }
-
-
     @Test
     void createOeuvre_la_creation_du_film_et_de_la_serie_doit_fonctionner_avec_les_champs_minimum() {
         final String titreFilm= "film de test";
         final String titreSerie= "série de test";
 
         //creation d'un film
-        OeuvreFormulaireDto newFilm= createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+        OeuvreFormulaireDto newFilm= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
 
         OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
 
@@ -360,7 +327,7 @@ class OeuvreServiceImplTest {
 
 
         //creation d'une serie
-        OeuvreFormulaireDto newSerie= createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.SERIE.getLibelle(), titreSerie);
+        OeuvreFormulaireDto newSerie= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.SERIE.getLibelle(), titreSerie);
 
         OeuvreDto serieCree = oeuvreService.saveOeuvre(newSerie);
 
@@ -381,7 +348,7 @@ class OeuvreServiceImplTest {
     void createOeuvre_la_creation_avec_un_statut_visionnage_doit_fonctionner() {
         final String titreFilm= "film de test";
 
-        OeuvreFormulaireDto newFilm= createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+        OeuvreFormulaireDto newFilm= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
         newFilm.setStatutVisionnageId(1L);
 
         OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
@@ -401,7 +368,7 @@ class OeuvreServiceImplTest {
     void createOeuvre_la_creation_avec_un_ou_plusieurs_genre_doit_fonctionner() {
         final String titreFilm= "film de test";
 
-        OeuvreFormulaireDto newFilm= createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+        OeuvreFormulaireDto newFilm= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
 
         List<Long> genreIdsList = new ArrayList<>();
         genreIdsList.add(1L);
@@ -431,7 +398,7 @@ class OeuvreServiceImplTest {
     void createOeuvre_testCreation_film() {
         //creation du film
         final String titreFilm= "film de test";
-        OeuvreFormulaireDto newFilm=createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+        OeuvreFormulaireDto newFilm=GenerateurObjetTest.createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
         newFilm.setDuree(155);
         //fin creation du film
 
@@ -461,7 +428,7 @@ class OeuvreServiceImplTest {
 
         //creation de la serie
         final String titreOeuvre= "serie de test";
-        OeuvreFormulaireDto newSerie =createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), titreOeuvre);
+        OeuvreFormulaireDto newSerie =GenerateurObjetTest.createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), titreOeuvre);
         //fin de la creation de la serie
 
         logger.debug("Debut insertion Serie test. Titre= {}",newSerie.getTitre());
@@ -560,45 +527,12 @@ class OeuvreServiceImplTest {
 
     }
 
-    private OeuvreDto createOeuvreDtoMinimal(String typeOeuvre,String titreFilm) {
-        return new OeuvreDto(null,typeOeuvre, titreFilm,
-                null,null,null,null,null,
-                null,null,null,null,null);
-    }
-
-    private OeuvreDto createOeuvreDtoComplete(String typeOeuvre,String titreFilm) {
-        OeuvreDto oeuvreDto=createOeuvreDtoMinimal(typeOeuvre,titreFilm);
-        List<GenreDto> genreDtoList = new ArrayList<>();
-        genreDtoList.add(new GenreDto(1L,"Action"));
-        genreDtoList.add(new GenreDto(2L,"Comédie"));
-        oeuvreDto.setGenres(genreDtoList);
-        StatutVisionnageDto statutVisionnageDto= new StatutVisionnageDto(1L,"A voir");
-        oeuvreDto.setStatutVisionnage(statutVisionnageDto);
-        oeuvreDto.setNote(2);
-        oeuvreDto.setCreateurs("createur1");
-        oeuvreDto.setActeurs("Acteur1, Acteur2");
-        oeuvreDto.setUrlAffiche("monAfficheTest");
-        oeuvreDto.setUrlBandeAnnonce("maBOTest");
-
-        if (typeOeuvre.equals(EnumTypeOeuvre.FILM.getLibelle())) {
-            oeuvreDto.setDuree(120);
-        } else {
-            //on ajoute les saisons (on reutilise le statut visionnage de l'oeuvre pour les saisons)
-            List<SaisonDto> saisonDtoList = new ArrayList<>();
-            saisonDtoList.add(new SaisonDto ( null ,"S01_test",oeuvreDto.getStatutVisionnage(),5));
-            saisonDtoList.add(new SaisonDto(null,"S02_test",oeuvreDto.getStatutVisionnage(),5));
-            oeuvreDto.setSaisons(saisonDtoList);
-        }
-
-        return oeuvreDto;
-    }
-
 
     @Test
     void convertirOeuvreDtoEnOeuvre_doit_convertir_un_OeuvreDto_en_Oeuvre() {
 
         //on check pour 1 film
-        OeuvreDto oeuvreDto = createOeuvreDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), "film test");
+        OeuvreDto oeuvreDto = GenerateurObjetTest.createOeuvreDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), "film test");
         assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(null));
 
         Oeuvre oeuvre = oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
@@ -618,7 +552,7 @@ class OeuvreServiceImplTest {
 
 
         //on check pour 1 serie
-        oeuvreDto = createOeuvreDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), "serie test");
+        oeuvreDto = GenerateurObjetTest.createOeuvreDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), "serie test");
         assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(null));
 
         oeuvre = oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
@@ -643,7 +577,7 @@ class OeuvreServiceImplTest {
     void convertirOeuvreFormulaireDtoEnOeuvre_doit_convertir_un_OeuvreFormulaireDto_en_Oeuvre() {
 
         //on check pour 1 film
-        OeuvreFormulaireDto oeuvreFormulaireDto = createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), "film test");
+        OeuvreFormulaireDto oeuvreFormulaireDto = GenerateurObjetTest.createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), "film test");
         assertNull(oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(null));
 
         Oeuvre oeuvre=oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(oeuvreFormulaireDto);
@@ -667,7 +601,7 @@ class OeuvreServiceImplTest {
         assertTrue(found);
 
         //on check pour 1 serie
-        oeuvreFormulaireDto = createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), "serie test");
+        oeuvreFormulaireDto = GenerateurObjetTest.createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), "serie test");
         assertNull(oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(null));
 
         oeuvre=oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(oeuvreFormulaireDto);

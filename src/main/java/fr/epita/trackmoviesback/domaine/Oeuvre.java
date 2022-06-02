@@ -50,20 +50,21 @@ public abstract class Oeuvre {
 
     private String description;
 
-    public Oeuvre() {
+    protected Oeuvre() {
     }
 
-    public Oeuvre(Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description) {
+    protected Oeuvre(Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description) {
         this.id = id;
         this.titre = titre;
         this.genres = genres;
         this.statutVisionnage = statutVisionnage;
         this.note = note;
-        this.createurs = createurs;
-        this.acteurs = acteurs;
-        this.urlAffiche = urlAffiche;
-        this.urlBandeAnnonce = urlBandeAnnonce;
-        this.description = description;
+        //on positionne a null les champs string si on a des chaine vide ou null en parametres
+        this.createurs = StringUtils.hasText(createurs)?createurs:null;
+        this.acteurs = StringUtils.hasText(acteurs)?acteurs:null;
+        this.urlAffiche = StringUtils.hasText(urlAffiche)?urlAffiche:null;
+        this.urlBandeAnnonce = StringUtils.hasText(urlBandeAnnonce)?urlBandeAnnonce:null;
+        this.description = StringUtils.hasText(description)?description:null;
     }
 
     public Long getId() {

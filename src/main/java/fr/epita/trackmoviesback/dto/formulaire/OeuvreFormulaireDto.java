@@ -1,12 +1,19 @@
 package fr.epita.trackmoviesback.dto.formulaire;
 
 
-import fr.epita.trackmoviesback.dto.SaisonDto;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
+
+/*permet d'ignorer les champs non fourni ou fourni avec ""
+qui sont mappés vers des liste comme genreIds par exemple. Cela va de paire avec l'objet ObjectMapperConfig
+sinon ca genere des erreurs HttpMessageNotReadableException: JSON parse error: Cannot coerce empty String ("")
+*/
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OeuvreFormulaireDto {
     private Long id;
     @NotNull
@@ -14,6 +21,7 @@ public class OeuvreFormulaireDto {
     @NotNull
     @Size(min = 1)
     private String titre;
+
     private List<Long> genreIds;
     private Long statutVisionnageId;
     private Integer note;
@@ -29,6 +37,9 @@ public class OeuvreFormulaireDto {
     private Integer duree;
 
     private String description;
+
+    public OeuvreFormulaireDto() {
+    }
 
     public OeuvreFormulaireDto(Long id, String typeOeuvre, String titre, List<Long> genreIds, Long statutVisionnageId, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description, List<SaisonFormulaireDto> saisons, Integer duree) {
         this.id = id;
