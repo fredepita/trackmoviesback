@@ -8,9 +8,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -31,22 +37,46 @@ public class JwtAuthenticationController {
     public ResponseEntity<?> createAuthenticationToken(@RequestBody final JwtRequest authenticationRequest)
             throws Exception {
 
-        logger.debug("createAuthenticationToken(authenticationRequest : " + authenticationRequest.toString());
-
+        logger.info("createAuthenticationToken(authenticationRequest : " + authenticationRequest.toString());
+        // Authentification avec les données en entrée
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+
+        logger.info("après authenticate");
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
-
-        logger.debug("token : " + token);
+        jwtTokenUtil.setStatutUtilisateur(true);
+        logger.info("token : " + token);
 
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
+
+    @GetMapping(value = "/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        logger.info("request : "    + request.getAuthType()
+                                    + request.getContextPath()
+                                    + request.getQueryString()
+        );
+        logger.info("response : "   + response.getHeaderNames()
+                                    + response.getStatus());
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null) {
+            //logger.info("auth avant : " + auth.getName() + auth.getAuthorities() + auth.getCredentials() + auth.getDetails() + auth.getPrincipal() + auth.isAuthenticated());
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+            jwtTokenUtil.setStatutUtilisateur(false);
+            //logger.info("auth après : " + auth.getName() + auth.getAuthorities() + auth.getCredentials() + auth.getDetails() + auth.getPrincipal() + auth.isAuthenticated());
+        }
+        return ResponseEntity.ok("logout OK");
+    }
+
+
     private void authenticate(final String username, final String password) throws Exception {
         try {
-            logger.debug("authenticate(username : " + username + ", password : " + password);
+            logger.info("authenticate(username : " + username + ", password : " + password + ")");
 
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         }

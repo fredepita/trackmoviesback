@@ -5,14 +5,18 @@ import fr.epita.trackmoviesback.dto.UtilisateurDto;
 
 public interface UtilisateurService {
 
-    public void creerUtilisateur (UtilisateurDto utilisateurDto);
+    void creerUtilisateur (UtilisateurDto utilisateurDto);
 
-    public void modifierUtilisateur (Long id, Utilisateur utilisateur);
+    void modifierUtilisateur (Long id, Utilisateur utilisateur);
 
-    public Utilisateur rechercherUtilisateurParId (Long id);
+    Utilisateur rechercherUtilisateurParId (Long id);
 
-    public Utilisateur rechercherUtilisateurParIdentifiant (String Identifiant);
+    Utilisateur rechercherUtilisateurParIdentifiant (String Identifiant);
 
-    public void supprimerUtilisateur (Long id);
+    void supprimerUtilisateur (Long id);
+
+    Utilisateur convertirUtilisateurEnEntity(UtilisateurDto utilisateurDto);
+
+    Boolean verifierExistenceUtilisateur(UtilisateurDto utilisateurDto);
 
 }

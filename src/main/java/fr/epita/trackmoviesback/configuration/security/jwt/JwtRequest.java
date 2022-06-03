@@ -20,31 +20,37 @@ public class JwtRequest implements Serializable {
     }
 
     public JwtRequest(final String username, final String password) {
-        logger.debug("JwtRequest(username : " + username + ", password : " + password);
-
         setUsername(username);
         setPassword(password);
     }
 
     public String getUsername() {
-        logger.debug("getUsername()");
+        logger.info("getUsername()");
         return this.username;
     }
 
     public void setUsername(final String username) {
 
-        logger.debug("setUsername(username : " + username);
+        logger.info("setUsername(username : " + username + ")");
         this.username = username;
     }
 
     public String getPassword() {
-        logger.debug("getPassword()");
+        logger.info("getPassword()");
         return this.password;
     }
 
     public void setPassword(final String password) {
 
-        logger.debug("setPassword(password : " + password);
+        logger.info("setPassword(password : " + password + ")");
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "JwtRequest{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }
