@@ -82,13 +82,8 @@ public class OeuvreController {
     public ResponseEntity<OeuvreDto> create(@Valid @RequestBody OeuvreFormulaireDto oeuvreFormulaireDto) {
 
         try {
-            /*OeuvreDto oeuvreDtoTest = new OeuvreDto(null, EnumTypeOeuvre.FILM.getLibelle(), "test creation controller",
-                    null,null,null,null,null,null,null,null,null);
-            OeuvreDto oeuvreCree = service.saveOeuvre(oeuvreDtoTest);*/
-
             logger.debug("create : oeuvreFormulaireDto={}",oeuvreFormulaireDto);
             OeuvreDto oeuvreCree = service.saveOeuvre(oeuvreFormulaireDto);
-
             return new ResponseEntity(oeuvreCree, HttpStatus.OK);
         } catch (MauvaisParamException e) {
             logger.error(e.toString());

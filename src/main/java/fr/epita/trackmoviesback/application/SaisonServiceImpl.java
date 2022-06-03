@@ -1,6 +1,5 @@
 package fr.epita.trackmoviesback.application;
 
-import fr.epita.trackmoviesback.domaine.Genre;
 import fr.epita.trackmoviesback.domaine.Saison;
 import fr.epita.trackmoviesback.domaine.StatutVisionnage;
 import fr.epita.trackmoviesback.dto.SaisonDto;
