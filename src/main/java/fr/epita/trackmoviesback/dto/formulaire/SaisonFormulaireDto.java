@@ -1,14 +1,22 @@
 package fr.epita.trackmoviesback.dto.formulaire;
 
-import fr.epita.trackmoviesback.dto.StatutVisionnageDto;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SaisonFormulaireDto {
 
     private Long id;
-    private String numero;
+    @NotNull
+    @Size(min = 1)
+    private String numero;//identifiant fonctionnel de la saison
     private Long statutVisionnageId;
     private Integer nbEpisodes;
 
+    SaisonFormulaireDto() {}
 
     public SaisonFormulaireDto(Long id, String numero, Long statutVisionnageId, Integer nbEpisodes) {
         this.id = id;

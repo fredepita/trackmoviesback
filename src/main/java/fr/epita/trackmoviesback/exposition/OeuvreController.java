@@ -91,7 +91,12 @@ public class OeuvreController {
 
             return new ResponseEntity(oeuvreCree, HttpStatus.OK);
         } catch (MauvaisParamException e) {
+            logger.error(e.toString());
             return new ResponseEntity("Mauvais parametre recu: "+e.getMessage(),HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            logger.error(e.toString());
+            e.printStackTrace();
+            return new ResponseEntity("Erreur technique",HttpStatus.BAD_REQUEST);
         }
 
     }

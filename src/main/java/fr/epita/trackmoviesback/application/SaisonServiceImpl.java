@@ -44,8 +44,9 @@ public class SaisonServiceImpl implements SaisonService {
 
     @Override
     public Saison convertirSaisonFormulaireDtoEnSaison(SaisonFormulaireDto saisonFormulaireDto) {
+        if (saisonFormulaireDto==null) return null;
         return new Saison(saisonFormulaireDto.getId(), saisonFormulaireDto.getNumero(),
-                new StatutVisionnage(saisonFormulaireDto.getStatutVisionnageId(),""),
+                statutVisionnageService.convertirStatutVisionnageIdEnStatutVisionnage(saisonFormulaireDto.getStatutVisionnageId()),
                 saisonFormulaireDto.getNbEpisodes());
     }
 
