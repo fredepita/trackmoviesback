@@ -308,6 +308,11 @@ class OeuvreServiceImplTest {
         final String titreFilm= "film de test";
         final String titreSerie= "série de test";
 
+        //creation d'un film vide doit échouer
+        assertThrows(MauvaisParamException.class, () -> {
+            OeuvreDto filmCreeVide = oeuvreService.saveOeuvre(null);
+        });
+
         //creation d'un film
         OeuvreFormulaireDto newFilm= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
 
@@ -421,6 +426,12 @@ class OeuvreServiceImplTest {
         assertEquals(newFilm.getUrlBandeAnnonce(),oeuvreDtoInseree.getUrlBandeAnnonce());
         assertEquals(newFilm.getDuree(),oeuvreDtoInseree.getDuree());
 
+        //je ne dois pas pouvoir sauver une oeuvre avec le meme titre mais un id different
+        newFilm.setTitre("film de test");
+        assertThrows(MauvaisParamException.class, () -> {
+            oeuvreService.saveOeuvre(newFilm);
+        });
+
         oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
     }
     @Test
@@ -488,7 +499,7 @@ class OeuvreServiceImplTest {
     void createOeuvre_modification_dune_saison_doit_fonctionner() {
         //je recupere une serie existante
         //friends
-        Long oeuvreId=3L;
+        final Long oeuvreId=3L;
 
         OeuvreDto oeuvreFriends= oeuvreService.getOeuvreCompleteById(oeuvreId);
 
@@ -521,6 +532,18 @@ class OeuvreServiceImplTest {
             OeuvreDto oeuvreFriends2=  oeuvreService.getOeuvreCompleteById(oeuvreId);
             oeuvreFriends2.setTypeOeuvre(EnumTypeOeuvre.FILM.getLibelle());
             OeuvreFormulaireDto oeuvreFormulaireDto2= convertOeuvreDtoToFormulaire(oeuvreFriends2);
+            oeuvreService.saveOeuvre(oeuvreFormulaireDto2);
+        });
+
+        //je modifie sa saison S2 pour la nommer S1 comme la premiere. La sauvegarde doit echouer car on ne peut avoir 2 saisons avec le meme numero
+        assertThrows(MauvaisParamException.class, () -> {
+            OeuvreDto oeuvreFriends3=  oeuvreService.getOeuvreCompleteById(oeuvreId);
+            for (SaisonDto saison: oeuvreFriends3.getSaisons()) {
+                if (saison.getNumero().equals("S2")) {
+                    saison.setNumero("S1");
+                }
+            }
+            OeuvreFormulaireDto oeuvreFormulaireDto2= convertOeuvreDtoToFormulaire(oeuvreFriends3);
             oeuvreService.saveOeuvre(oeuvreFormulaireDto2);
         });
 

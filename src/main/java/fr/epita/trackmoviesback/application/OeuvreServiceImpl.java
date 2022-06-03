@@ -3,6 +3,7 @@ package fr.epita.trackmoviesback.application;
 import fr.epita.trackmoviesback.domaine.*;
 import fr.epita.trackmoviesback.dto.*;
 import fr.epita.trackmoviesback.dto.formulaire.OeuvreFormulaireDto;
+import fr.epita.trackmoviesback.dto.formulaire.SaisonFormulaireDto;
 import fr.epita.trackmoviesback.enumerate.EnumOperationDeRecherche;
 import fr.epita.trackmoviesback.enumerate.EnumProprieteRecherchableSurOeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -323,6 +325,19 @@ public class OeuvreServiceImpl implements OeuvreService {
                     ,oeuvreFormulaireDto.getUrlAffiche(), oeuvreFormulaireDto.getUrlBandeAnnonce(),
                     oeuvreFormulaireDto.getDescription(), oeuvreFormulaireDto.getDuree());
         } else {
+            //regle metier
+            if (oeuvreFormulaireDto.getSaisons()!=null) {
+                //on controle qu'on n'a pas 2 saisons avec le meme numero
+                List<String> saisonNumeroList = new ArrayList<>();
+                for (SaisonFormulaireDto saisonFormulaireDto : oeuvreFormulaireDto.getSaisons()) {
+                    if (saisonNumeroList.contains(saisonFormulaireDto.getNumero())) {
+                        throw new MauvaisParamException("On ne peux pas avoir deux saisons avec le meme numero: " + saisonFormulaireDto.getNumero());
+                    } else {
+                        saisonNumeroList.add(saisonFormulaireDto.getNumero());
+                    }
+                }
+            }
+
             List<Saison> saisonList = saisonService.convertirListSaisonFormulaireDtoEnListSaison(oeuvreFormulaireDto.getSaisons());
             return new Serie(oeuvreFormulaireDto.getId(), oeuvreFormulaireDto.getTitre(), genres,statutVisionnage
                     ,oeuvreFormulaireDto.getNote(), oeuvreFormulaireDto.getCreateurs(), oeuvreFormulaireDto.getActeurs()
