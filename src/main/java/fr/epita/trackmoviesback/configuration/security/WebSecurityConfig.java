@@ -41,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(final AuthenticationManagerBuilder auth) throws Exception {
 
-        logger.debug("WebSecurityConfig::configure(auth : " + auth.toString());
+        logger.info("configure(auth : " + auth.toString());
 
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
@@ -49,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
 
-        logger.debug("WebSecurityConfig::passwordEncoder()");
+        logger.info("passwordEncoder()");
 
         return new BCryptPasswordEncoder();
     }
@@ -58,7 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
 
-        logger.debug("WebSecurityConfig::authenticationManagerBean()");
+        logger.info("authenticationManagerBean()");
 
         return super.authenticationManagerBean();
     }
@@ -67,31 +67,35 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity httpSecurity) throws Exception {
         // Add a filter to validate the tokens with every request
 
-        logger.debug("WebSecurityConfig::configure(httpSecurity : " + httpSecurity.toString());
+        logger.info("configure(httpSecurity : " + httpSecurity.toString());
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         httpSecurity
                 .csrf().disable()
+                //-->  Autorisation login
                 .authorizeRequests()
                     .antMatchers("/trackmovies/v1/login").permitAll()
-                    .antMatchers(HttpMethod.POST, "/trackmovies/v1/utilisateur").permitAll()
-                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/genres").permitAll()
-                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/statuts_visionnage").permitAll()
-                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres").permitAll()
+                    .antMatchers("/trackmovies/v1/utilisateur").permitAll()
+                //-->  Autorisation requêtes HTTP Options
                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // dont authenticate this authentication request
-                //.authorizeRequests().antMatchers(UNAUTHENTICATED_WHITE_LIST).permitAll()
-                // and authorize everybody create a customer
-                //.antMatchers(HttpMethod.POST, "/customers").permitAll()
-                // and authorize swagger-ui
+                //-->  Autorisation swagger-ui
                     .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
-                // all other requests need to be authenticated
+                //--> Autorisations en fonction du rôle
+                    .antMatchers(HttpMethod.POST, "/trackmovies/v1/utilisateur").hasRole("USER")
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/genres").hasRole("USER")
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/statuts_visionnage").hasRole("USER")
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres").hasRole("USER")
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres/{id}").hasRole("USER")
+
                     .anyRequest().authenticated()
                     .and()
                     .formLogin()
-                    .and()
+                //  .and()
+                //.logout()
+                //.logoutUrl("/trackmovies/v1/logout")
+                //.logoutSuccessUrl("/trackmovies/v1/login")
+                .and()
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
                     .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint) //

@@ -25,7 +25,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     public void creerUtilisateur(UtilisateurDto utilisateurDto) {
 
         if (utilisateurDto != null) {
-            if (verifierExistanceUtilisateur(utilisateurDto)) {
+            if (verifierExistenceUtilisateur(utilisateurDto)) {
                 throw new MauvaisParamException("l'identifiant " + utilisateurDto.getIdentifiant() + " existe déjà !");
             } else {
                 //--> Conversion des données issues du Front (Dto) en données pour la Base de données (Entity)
@@ -60,15 +60,15 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     public void supprimerUtilisateur(Long id) {
 
     }
-
+    @Override
     public Utilisateur convertirUtilisateurEnEntity(UtilisateurDto utilisateurDto){
         Utilisateur utilisateur = new Utilisateur();
         utilisateur.setIdentifiant(utilisateurDto.getIdentifiant());
         utilisateur.setMotDePasse(utilisateurDto.getMotDePasse());
         return utilisateur;
     }
-
-    private Boolean verifierExistanceUtilisateur(UtilisateurDto utilisateurDto){
+    @Override
+    public Boolean verifierExistenceUtilisateur(UtilisateurDto utilisateurDto){
         Utilisateur utilisateur = rechercherUtilisateurParIdentifiant(utilisateurDto.getIdentifiant());
         if (utilisateur != null) {
             return true;

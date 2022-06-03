@@ -15,14 +15,14 @@ public class JwtResponse implements Serializable {
 
     public JwtResponse(final String jwtToken) {
 
-        logger.debug("JwtResponse(jwtToken : " + jwtToken);
+        logger.info("JwtResponse(jwtToken : " + jwtToken);
 
         this.jwtToken = jwtToken;
     }
 
     public String getToken() {
 
-        logger.debug("getToken()");
+        logger.info("getToken()");
 
         return jwtToken;
     }

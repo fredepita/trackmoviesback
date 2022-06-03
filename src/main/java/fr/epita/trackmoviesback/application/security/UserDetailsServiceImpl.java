@@ -27,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String identifiant) throws UsernameNotFoundException {
 
-        logger.debug("loadUserByUsername(identifiant : " + identifiant + ")");
+        logger.info("loadUserByUsername(identifiant : " + identifiant + ")");
 
         final Utilisateur utilisateur = utilisateurRepository.findByIdentifiant(identifiant);
 
@@ -40,22 +40,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         User user = new User(utilisateur.getIdentifiant(), utilisateur.getMotDePasse(), getAuthorities(utilisateur));
 
-        logger.debug("User : " + user.toString() + user.getPassword());
+        logger.info("User : " + user.toString() + user.getPassword());
 
         return user;
     }
 
     private static Collection<? extends GrantedAuthority> getAuthorities(final Utilisateur utilisateur) {
 
-        logger.debug("getAuthorities(Utilisateur : " + utilisateur.toString());
+        logger.info("getAuthorities(Utilisateur : " + utilisateur.toString());
 
         final String[] userRoles = utilisateur.getRoles().stream().map((role) -> role.name()).toArray(String[]::new);
-
-        logger.debug("Roles {}" + userRoles);
-
         final Collection<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(userRoles);
 
-        logger.debug("authorities : " + authorities.toString());
+        logger.info("authorities : " + authorities.toString());
 
         return authorities;
     }

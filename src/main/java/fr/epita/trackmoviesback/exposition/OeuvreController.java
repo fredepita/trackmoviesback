@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -56,6 +57,7 @@ public class OeuvreController {
             @ApiResponse(code = 404, message = "non trouvé"),
             @ApiResponse(code = 500, message = "erreur du serveur") })
     @GetMapping("/mes_oeuvres/{id}")
+    //@Secured("ROLE_USER")
     ResponseEntity<OeuvreDto> getOeuvreCompleteById (@PathVariable("id") Long id) {
         OeuvreDto oeuvre = service.getOeuvreCompleteById(id);
         if (oeuvre !=null) {
