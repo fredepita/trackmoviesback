@@ -17,8 +17,9 @@ public class OeuvreLightDto {
     private String acteurs;
     private String urlAffiche;
     private String urlBandeAnnonce;
+    private String description;
 
-    public OeuvreLightDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce) {
+    public OeuvreLightDto(Long id, String typeOeuvre, String titre, List<GenreDto> genres, StatutVisionnageDto statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description) {
         this.id = id;
         this.typeOeuvre = typeOeuvre;
         this.titre = titre;
@@ -29,7 +30,10 @@ public class OeuvreLightDto {
         this.acteurs = acteurs;
         this.urlAffiche = urlAffiche;
         this.urlBandeAnnonce = urlBandeAnnonce;
+        this.description = description;
     }
+
+
 
     public Long getId() {
         return id;
@@ -111,6 +115,14 @@ public class OeuvreLightDto {
         this.acteurs = acteurs;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "OeuvreLightDto{" +
@@ -124,6 +136,7 @@ public class OeuvreLightDto {
                 ", acteurs='" + acteurs + '\'' +
                 ", urlAffiche='" + urlAffiche + '\'' +
                 ", urlBandeAnnonce='" + urlBandeAnnonce + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

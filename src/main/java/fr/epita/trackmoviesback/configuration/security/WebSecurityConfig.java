@@ -76,8 +76,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //-->  Autorisation login
                 .authorizeRequests()
                     .antMatchers("/trackmovies/v1/login").permitAll()
+<<<<<<< HEAD
                     .antMatchers("/trackmovies/v1/utilisateur").permitAll()
                 //-->  Autorisation requêtes HTTP Options
+=======
+                    .antMatchers(HttpMethod.POST, "/trackmovies/v1/utilisateur").permitAll()
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/genres").permitAll()
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/statuts_visionnage").permitAll()
+                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres").permitAll()
+                    .antMatchers(HttpMethod.POST, "/trackmovies/v1/oeuvre").permitAll()
+>>>>>>> develop
                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 //-->  Autorisation swagger-ui
                     .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()

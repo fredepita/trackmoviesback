@@ -48,19 +48,23 @@ public abstract class Oeuvre {
     //lien url vers la Bande Annonce de l'oeuvre
     private String urlBandeAnnonce;
 
-    public Oeuvre() {
+    private String description;
+
+    protected Oeuvre() {
     }
 
-    public Oeuvre(Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce) {
+    protected Oeuvre(Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description) {
         this.id = id;
         this.titre = titre;
         this.genres = genres;
         this.statutVisionnage = statutVisionnage;
         this.note = note;
-        this.createurs = createurs;
-        this.acteurs = acteurs;
-        this.urlAffiche = urlAffiche;
-        this.urlBandeAnnonce = urlBandeAnnonce;
+        //on positionne a null les champs string si on a des chaine vide ou null en parametres
+        this.createurs = StringUtils.hasText(createurs)?createurs:null;
+        this.acteurs = StringUtils.hasText(acteurs)?acteurs:null;
+        this.urlAffiche = StringUtils.hasText(urlAffiche)?urlAffiche:null;
+        this.urlBandeAnnonce = StringUtils.hasText(urlBandeAnnonce)?urlBandeAnnonce:null;
+        this.description = StringUtils.hasText(description)?description:null;
     }
 
     public Long getId() {
@@ -143,10 +147,23 @@ public abstract class Oeuvre {
         return type_oeuvre;
     }
 
+    public void setType_oeuvre(EnumTypeOeuvre type_oeuvre) {
+        this.type_oeuvre = type_oeuvre;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "Oeuvre{" +
                 "id=" + id +
+                ", type_oeuvre=" + type_oeuvre +
                 ", titre='" + titre + '\'' +
                 ", genres=" + genres +
                 ", statutVisionnage=" + statutVisionnage +
@@ -155,6 +172,7 @@ public abstract class Oeuvre {
                 ", acteurs='" + acteurs + '\'' +
                 ", urlAffiche='" + urlAffiche + '\'' +
                 ", urlBandeAnnonce='" + urlBandeAnnonce + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }
