@@ -13,10 +13,10 @@ public class Utilisateur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String identifiant;
+    private String login;
     private String motDePasse;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     Set<EnumTypeRole> roles = new HashSet<>();
 
@@ -39,12 +39,12 @@ public class Utilisateur {
         this.id = id;
     }
 
-    public String getIdentifiant() {
-        return identifiant;
+    public String getLogin() {
+        return login;
     }
 
-    public void setIdentifiant(String nom) {
-        this.identifiant = nom;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getMotDePasse() {
@@ -71,8 +71,8 @@ public class Utilisateur {
     public String toString() {
         return "Utilisateur{" +
                 "id=" + id +
-                ", identifiant='" + identifiant + '\'' +
-                ", motDePasse='" + motDePasse + '\'' +
+                ", login='" + login + '\'' +
+                //", motDePasse='" + motDePasse + '\'' +
                 ", roles=" + roles +
                 '}';
     }

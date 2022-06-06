@@ -1,19 +1,25 @@
 package fr.epita.trackmoviesback.application;
 
-import fr.epita.trackmoviesback.domaine.Film;
-import fr.epita.trackmoviesback.domaine.Serie;
+
 import fr.epita.trackmoviesback.domaine.Utilisateur;
 import fr.epita.trackmoviesback.dto.UtilisateurDto;
-import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.enumerate.EnumTypeRole;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
+import fr.epita.trackmoviesback.exception.UtilisateurNonLoggeException;
 import fr.epita.trackmoviesback.infrastructure.utilisateur.UtilisateurRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UtilisateurServiceImpl implements UtilisateurService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UtilisateurServiceImpl.class);
 
     @Autowired
     UtilisateurRepository utilisateurRepository;
@@ -23,7 +29,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
     @Override
     public void creerUtilisateur(UtilisateurDto utilisateurDto) {
-
         if (utilisateurDto != null) {
             if (verifierExistenceUtilisateur(utilisateurDto)) {
                 throw new MauvaisParamException("l'identifiant " + utilisateurDto.getIdentifiant() + " existe déjà !");
@@ -40,7 +45,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
             }
         }
     }
-
     @Override
     public void modifierUtilisateur(Long id, Utilisateur utilisateur) {
 
@@ -52,8 +56,12 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     }
 
     @Override
-    public Utilisateur rechercherUtilisateurParIdentifiant(String identifiant) {
-        return (utilisateurRepository.findByIdentifiant(identifiant));
+    public Utilisateur rechercherUtilisateurParLogin(String login) {
+        Utilisateur utilisateur= utilisateurRepository.findByLogin(login);
+        if (utilisateur==null) {
+            logger.debug("utilisateur non trouvee en BDD login={}",login);
+        }
+        return utilisateur;
     }
 
     @Override
@@ -63,16 +71,26 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     @Override
     public Utilisateur convertirUtilisateurEnEntity(UtilisateurDto utilisateurDto){
         Utilisateur utilisateur = new Utilisateur();
-        utilisateur.setIdentifiant(utilisateurDto.getIdentifiant());
+        utilisateur.setLogin(utilisateurDto.getIdentifiant());
         utilisateur.setMotDePasse(utilisateurDto.getMotDePasse());
         return utilisateur;
     }
     @Override
-    public Boolean verifierExistenceUtilisateur(UtilisateurDto utilisateurDto){
-        Utilisateur utilisateur = rechercherUtilisateurParIdentifiant(utilisateurDto.getIdentifiant());
-        if (utilisateur != null) {
-            return true;
+    public boolean verifierExistenceUtilisateur(UtilisateurDto utilisateurDto){
+        Utilisateur utilisateur = rechercherUtilisateurParLogin(utilisateurDto.getIdentifiant());
+        return utilisateur != null;
+    }
+
+
+    @Override
+    public String getCurrentUserLoginFromSecurityContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user=null;
+        if (authentication!=null) {
+            user = (User) authentication.getPrincipal();
+            return user.getUsername();
+        } else {
+            throw new UtilisateurNonLoggeException("utilisateur non loggé");
         }
-        return false;
     }
 }

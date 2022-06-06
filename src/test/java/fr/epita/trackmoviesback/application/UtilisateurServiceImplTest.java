@@ -41,7 +41,7 @@ public class UtilisateurServiceImplTest {
 
         Utilisateur utilisateur = utilisateurService.convertirUtilisateurEnEntity(utilisateurDto);
 
-        assertEquals(utilisateurDto.getIdentifiant(),utilisateur.getIdentifiant());
+        assertEquals(utilisateurDto.getIdentifiant(),utilisateur.getLogin());
         assertEquals(utilisateurDto.getMotDePasse(),utilisateur.getMotDePasse());
     }
 }

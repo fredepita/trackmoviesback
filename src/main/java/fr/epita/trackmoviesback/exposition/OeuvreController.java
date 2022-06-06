@@ -1,6 +1,7 @@
 package fr.epita.trackmoviesback.exposition;
 
 import fr.epita.trackmoviesback.application.OeuvreService;
+import fr.epita.trackmoviesback.application.UtilisateurService;
 import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
 import fr.epita.trackmoviesback.dto.formulaire.OeuvreFormulaireDto;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,11 +30,14 @@ public class OeuvreController {
     @Autowired
     OeuvreService service;
 
+    @Autowired
+    UtilisateurService utilisateurService;
+
     @ApiOperation(value = "Recuperer les oeuvres"
             , notes = "Permet de récupérer le liste des oeuvres correspondant aux critères"
     ) //info pour le swagger
     @GetMapping(value = "/mes_oeuvres", produces = {"application/json"})
-    OeuvreLightListDto getOeuvres(
+    ResponseEntity<OeuvreLightListDto> getOeuvres(
             @ApiParam(value = "type d'oeuvre (film ou serie)")
             @RequestParam(name = "type", required = false) String typeOeuvre
             , @ApiParam(value = "id du genre d'oeuvre")
@@ -44,12 +47,16 @@ public class OeuvreController {
             , @ApiParam(value = "chaine correspondant au debut du titre")
             @RequestParam(name = "titre", required = false) String titre
     ) {
+        //on recupère le user login de l'utilisateur en cours dans le context
+        String userLogin= utilisateurService.getCurrentUserLoginFromSecurityContext();
+
         Map<String, String> parameters = new HashMap<>();
         if (typeOeuvre != null) parameters.put("type", typeOeuvre);
         if (genreId != null) parameters.put("genre", String.valueOf(genreId));
         if (statutVisionnageId != null) parameters.put("statut", String.valueOf(statutVisionnageId));
         if (titre != null) parameters.put("titre", titre);
-        return service.getOeuvres(parameters);
+
+        return new ResponseEntity(service.getOeuvres(userLogin,parameters), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Recuperer une oeuvre par son id"
@@ -63,7 +70,10 @@ public class OeuvreController {
     @GetMapping("/mes_oeuvres/{id}")
     //@Secured("ROLE_USER")
     ResponseEntity<OeuvreDto> getOeuvreCompleteById (@PathVariable("id") Long id) {
-        OeuvreDto oeuvre = service.getOeuvreCompleteById(id);
+        //on recupère le user login de l'utilisateur en cours dans le context
+        String userLogin= utilisateurService.getCurrentUserLoginFromSecurityContext();
+
+        OeuvreDto oeuvre = service.getOeuvreCompleteById(userLogin,id);
         if (oeuvre !=null) {
             return new ResponseEntity(oeuvre, HttpStatus.OK);
         }else {
@@ -85,8 +95,11 @@ public class OeuvreController {
 
         try {
             logger.debug("create : oeuvreFormulaireDto={}",oeuvreFormulaireDto);
-            OeuvreDto oeuvreCree = service.saveOeuvre(oeuvreFormulaireDto);
+
+            String userLogin= utilisateurService.getCurrentUserLoginFromSecurityContext();
+            OeuvreDto oeuvreCree = service.saveOeuvre(userLogin,oeuvreFormulaireDto);
             return new ResponseEntity(oeuvreCree, HttpStatus.OK);
+
         } catch (MauvaisParamException e) {
             logger.error(e.toString());
             return new ResponseEntity("Mauvais parametre recu: "+e.getMessage(),HttpStatus.BAD_REQUEST);

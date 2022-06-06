@@ -43,9 +43,15 @@ public class OeuvreServiceImpl implements OeuvreService {
     @Autowired
     SaisonService saisonService;
 
+    @Autowired
+    UtilisateurService utilisateurService;
+
     @Override
-    public OeuvreLightListDto getAllOeuvres() {
-        List<Oeuvre> oeuvres = oeuvreRepository.findAll();
+    public OeuvreLightListDto getAllOeuvres(String userLogin) {
+        //on recupere l'utilisateur a partir du login
+        Utilisateur utilisateur=utilisateurService.rechercherUtilisateurParLogin(userLogin);
+
+        List<Oeuvre> oeuvres = oeuvreRepository.findAllByUtilisateur(utilisateur);
         List<OeuvreLightDto> oeuvresLightDto = oeuvres.stream().map(this::convertirOeuvreEnLightDto).collect(Collectors.toList());
         return new OeuvreLightListDto(1, 1, oeuvresLightDto);
     }
@@ -103,8 +109,8 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
-    public OeuvreDto saveOeuvre(OeuvreFormulaireDto oeuvreFormulaireDto) {
-        Oeuvre oeuvreASauver=convertirOeuvreFormulaireDtoEnOeuvre(oeuvreFormulaireDto);
+    public OeuvreDto saveOeuvre(String userLogin, OeuvreFormulaireDto oeuvreFormulaireDto) {
+        Oeuvre oeuvreASauver=convertirOeuvreFormulaireDtoEnOeuvre(userLogin,oeuvreFormulaireDto);
 
         logger.debug("oeuvreASauver ={}",oeuvreASauver);
 
@@ -115,15 +121,15 @@ public class OeuvreServiceImpl implements OeuvreService {
             //si ce n'est pas une nouvelle oeuvre (un id est specifié)
 
             //on vérifie que son type n'a pas changé
-            EnumTypeOeuvre typeOeuvreEnBdd= oeuvreRepository.getTypeOeuvre(oeuvreASauver.getId());
+            EnumTypeOeuvre typeOeuvreEnBdd= oeuvreRepository.getTypeOeuvre(oeuvreASauver.getId(),oeuvreASauver.getUtilisateur());
             if ((oeuvreASauver instanceof Film && typeOeuvreEnBdd!=EnumTypeOeuvre.FILM) ||
             (oeuvreASauver instanceof Serie && typeOeuvreEnBdd!=EnumTypeOeuvre.SERIE))
                 throw new MauvaisParamException("L'oeuvre avec l'id "+oeuvreASauver.getId()+" existe deja en base. Vous ne pouvez pas modifier son type. Type actuellement en base= "+ typeOeuvreEnBdd);
 
         }
 
-        //on controle que le titre n'existe pas dejà sauf pour lui meme
-        List<Oeuvre> oeuvre= oeuvreRepository.findByTitre(oeuvreASauver.getTitre());
+        //on controle que le titre n'existe pas dejà pour le user en cours sauf pour lui meme (dans le cas d'un update)
+        List<Oeuvre> oeuvre= oeuvreRepository.findByTitreAndByUtilisateur(oeuvreASauver.getTitre(),oeuvreASauver.getUtilisateur());
         if (!oeuvre.isEmpty() && !oeuvre.get(0).getId().equals(oeuvreASauver.getId())) {
             //on a trouvé une oeuvre avec le meme titre et qui n'a pas le meme id. Donc on essaye de sauver en double une oeuvre
             logger.info("Sauvegarde nouvelle oeuvre annulée. L'oeuvre avec le titre '{}' existe deja en base avec l'id={}",oeuvreASauver.getTitre(),oeuvre.get(0).getId());
@@ -144,9 +150,11 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
-    public void deleteOeuvre(Long id) {
+    public void deleteOeuvre(String userLogin,Long id) {
         logger.info("Suppression de l'oeuvre avec id = {} ",id);
-        oeuvreRepository.deleteById(id);
+        //on recupere l'utilisateur a partir du login
+        Utilisateur utilisateur=utilisateurService.rechercherUtilisateurParLogin(userLogin);
+        long nbOeuvreSupprimee=oeuvreRepository.deleteByIdAndByUtilisateur(id,utilisateur);
     }
 
     @Override
@@ -167,9 +175,12 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
-    public OeuvreDto getOeuvreCompleteById(Long id) {
+    public OeuvreDto getOeuvreCompleteById(String userLogin,Long id) {
+        //on recupere l'utilisateur a partir du login
+        Utilisateur utilisateur=utilisateurService.rechercherUtilisateurParLogin(userLogin);
+
         if (id != null && id > 0) {
-            EnumTypeOeuvre typeOeuvre = oeuvreRepository.getTypeOeuvre(id);
+            EnumTypeOeuvre typeOeuvre = oeuvreRepository.getTypeOeuvre(id,utilisateur);
             if (typeOeuvre == EnumTypeOeuvre.FILM) {
                 Optional<Film> optionalOeuvre = filmRepository.findById(id);
                 if (optionalOeuvre.isPresent()) {
@@ -213,10 +224,14 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
-    public OeuvreLightListDto getOeuvres (Map < String, String > criteres){
+    public OeuvreLightListDto getOeuvres (String userLogin,Map < String, String > criteres){
         logger.info("debut recherche avec criteres {}", criteres);
+
+        //on recupere l'utilisateur a partir du login
+        Utilisateur utilisateur=utilisateurService.rechercherUtilisateurParLogin(userLogin);
+
         //on construit les critères
-        OeuvreSpecification criteresDeRecherche = buildOeuvreSpecification(criteres);
+        OeuvreSpecification criteresDeRecherche = buildOeuvreSpecification(utilisateur,criteres);
 
         //on récupère la liste
         List<Oeuvre> oeuvres = oeuvreRepository.findAll(criteresDeRecherche);
@@ -233,10 +248,10 @@ public class OeuvreServiceImpl implements OeuvreService {
      * @param criteres map avec la liste des criteres
      * @return oeuvreSpecification avec la liste des criteres de recherches dedans
      */
-    private OeuvreSpecification buildOeuvreSpecification (Map < String, String > criteres){
+    private OeuvreSpecification buildOeuvreSpecification (Utilisateur utilisateur, Map < String, String > criteres){
         OeuvreSpecification oeuvreSpecification = new OeuvreSpecification();
 
-        //pour cahque critere en paramettre
+        //pour chaque critere en paramettre
         criteres.keySet().forEach(proprieteRecherchee -> {
             //on recupère la valeur recherchee correspondant dans la map
             String valeurRecherchee = criteres.get(proprieteRecherchee);
@@ -244,6 +259,11 @@ public class OeuvreServiceImpl implements OeuvreService {
             if (critereDeRecherche != null)
                 oeuvreSpecification.add(critereDeRecherche);
         });
+
+        //on ajoute le filtre sur le user
+        CritereDeRecherche critereDeRechercheUser= new CritereDeRecherche(EnumProprieteRecherchableSurOeuvre.UTILISATEUR,utilisateur, EnumOperationDeRecherche.EGAL);
+        oeuvreSpecification.add(critereDeRechercheUser);
+
         return oeuvreSpecification;
     }
 
@@ -276,7 +296,7 @@ public class OeuvreServiceImpl implements OeuvreService {
         //cas particulier du type d'oeuvre qui est un enumere, dans ce cas, la valeurRecherchee (initialement en string) doit etre convertie dans son enumeree correspondant
         Object valeurRechercheeFinale = valeurRecherchee;
 
-        //Warning fab gere type oeuvre
+        //gere type oeuvre
         if (enumProprieteRecherchee == EnumProprieteRecherchableSurOeuvre.TYPE_OEUVRE)
             valeurRechercheeFinale = EnumTypeOeuvre.getEnumFromlabel(valeurRecherchee);
 
@@ -291,20 +311,23 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
-    public Oeuvre convertirOeuvreDtoEnOeuvre(OeuvreDto oeuvreDto) {
+    public Oeuvre convertirOeuvreDtoEnOeuvre(String userLogin, OeuvreDto oeuvreDto) {
         if (oeuvreDto == null) return null;
         List<Genre> genres = genreService.convertirListGenreDtoEnListGenre(oeuvreDto.getGenres());
 
         StatutVisionnage statutVisionnage = statutVisionnageService.convertirStatutVisionnageDtoEnStatutVisionnage(oeuvreDto.getStatutVisionnage());
 
+        //on recupere l'utilisateur a partir du login
+        Utilisateur utilisateur=utilisateurService.rechercherUtilisateurParLogin(userLogin);
+
         if (oeuvreDto.getTypeOeuvre().equals(EnumTypeOeuvre.FILM.getLibelle())) {
-            return new Film(oeuvreDto.getId(), oeuvreDto.getTitre(), genres,statutVisionnage
+            return new Film(utilisateur, oeuvreDto.getId(), oeuvreDto.getTitre(), genres,statutVisionnage
                     , oeuvreDto.getNote(), oeuvreDto.getCreateurs(), oeuvreDto.getActeurs()
                     ,oeuvreDto.getUrlAffiche(), oeuvreDto.getUrlBandeAnnonce(),
                     oeuvreDto.getDescription(), oeuvreDto.getDuree());
         } else {
             List<Saison> saisonList = saisonService.convertirListSaisonDtoEnListSaison(oeuvreDto.getSaisons());
-            return new Serie(oeuvreDto.getId(), oeuvreDto.getTitre(), genres,statutVisionnage
+            return new Serie(utilisateur,oeuvreDto.getId(), oeuvreDto.getTitre(), genres,statutVisionnage
                     ,oeuvreDto.getNote(), oeuvreDto.getCreateurs(), oeuvreDto.getActeurs()
                     ,oeuvreDto.getUrlAffiche(), oeuvreDto.getUrlBandeAnnonce(),
                     oeuvreDto.getDescription(), saisonList);
@@ -313,14 +336,17 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
     @Override
-    public Oeuvre convertirOeuvreFormulaireDtoEnOeuvre(OeuvreFormulaireDto oeuvreFormulaireDto) {
+    public Oeuvre convertirOeuvreFormulaireDtoEnOeuvre(String userLogin, OeuvreFormulaireDto oeuvreFormulaireDto) {
         if (oeuvreFormulaireDto == null) return null;
         List<Genre> genres = genreService.convertirListIdsEnListGenre(oeuvreFormulaireDto.getGenreIds());
 
         StatutVisionnage statutVisionnage = statutVisionnageService.convertirStatutVisionnageIdEnStatutVisionnage(oeuvreFormulaireDto.getStatutVisionnageId());
 
+        //on recupere l'utilisateur a partir du login
+        Utilisateur utilisateur=utilisateurService.rechercherUtilisateurParLogin(userLogin);
+
         if (oeuvreFormulaireDto.getTypeOeuvre().equals(EnumTypeOeuvre.FILM.getLibelle())) {
-            return new Film(oeuvreFormulaireDto.getId(), oeuvreFormulaireDto.getTitre(), genres,statutVisionnage
+            return new Film(utilisateur, oeuvreFormulaireDto.getId(), oeuvreFormulaireDto.getTitre(), genres,statutVisionnage
                     , oeuvreFormulaireDto.getNote(), oeuvreFormulaireDto.getCreateurs(), oeuvreFormulaireDto.getActeurs()
                     ,oeuvreFormulaireDto.getUrlAffiche(), oeuvreFormulaireDto.getUrlBandeAnnonce(),
                     oeuvreFormulaireDto.getDescription(), oeuvreFormulaireDto.getDuree());
@@ -339,7 +365,7 @@ public class OeuvreServiceImpl implements OeuvreService {
             }
 
             List<Saison> saisonList = saisonService.convertirListSaisonFormulaireDtoEnListSaison(oeuvreFormulaireDto.getSaisons());
-            return new Serie(oeuvreFormulaireDto.getId(), oeuvreFormulaireDto.getTitre(), genres,statutVisionnage
+            return new Serie(utilisateur, oeuvreFormulaireDto.getId(), oeuvreFormulaireDto.getTitre(), genres,statutVisionnage
                     ,oeuvreFormulaireDto.getNote(), oeuvreFormulaireDto.getCreateurs(), oeuvreFormulaireDto.getActeurs()
                     ,oeuvreFormulaireDto.getUrlAffiche(), oeuvreFormulaireDto.getUrlBandeAnnonce(),
                     oeuvreFormulaireDto.getDescription(), saisonList);

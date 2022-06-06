@@ -8,6 +8,7 @@ import fr.epita.trackmoviesback.dto.formulaire.OeuvreFormulaireDto;
 import fr.epita.trackmoviesback.dto.formulaire.SaisonFormulaireDto;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
+import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +32,17 @@ class OeuvreServiceImplTest {
     @Autowired
     OeuvreService oeuvreService;
 
+    @Autowired
+    UtilisateurService utilisateurService;
+
     @Test
     void getAllOeuvres_doit_retourner_toutes_les_oeuvres_d_un_utilisateur() {
-        OeuvreLightListDto oeuvreLightListDto = oeuvreService.getAllOeuvres();
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+
+        OeuvreLightListDto oeuvreLightListDto = oeuvreService.getAllOeuvres(utilisateurTest.getLogin());
         List<OeuvreLightDto> oeuvreLightDtoList = oeuvreLightListDto.getOeuvres();
 
         assertEquals(oeuvreLightDtoList.size(), NB_OEUVRE_TOTAL_EN_BDD);
-
 
         boolean foundShazam = false;
         for (OeuvreLightDto oeuvre : oeuvreLightDtoList) {
@@ -47,6 +52,10 @@ class OeuvreServiceImplTest {
             }
         }
         assertTrue(foundShazam);
+
+        //je dois recupérer 0 oeuvre si le user n'en n'a pas
+        oeuvreLightDtoList = oeuvreService.getAllOeuvres("user_sans_oeuvre").getOeuvres();
+        assertEquals(0,oeuvreLightDtoList.size());
 
     }
 
@@ -87,13 +96,14 @@ class OeuvreServiceImplTest {
 
     @Test
     void getOeuvres_doit_me_retourner_les_oeuvres_correspondant_aux_criteres() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
 
         //je dois recuperer 2 series de ma base test
         Map<String, String> criteresHttp = new HashMap<>();
         OeuvreLightListDto oeuvreLightDto;
 
         criteresHttp.put("type","serie");
-        oeuvreLightDto= oeuvreService.getOeuvres(criteresHttp);
+        oeuvreLightDto= oeuvreService.getOeuvres(utilisateurTest.getLogin(), criteresHttp);
 
         assertNotNull(oeuvreLightDto);
         assertNotNull(oeuvreLightDto.getOeuvres());
@@ -102,7 +112,7 @@ class OeuvreServiceImplTest {
         //je dois avoir 3 oeuvres d'action
         criteresHttp = new HashMap<>();
         criteresHttp.put("genre","1");
-        oeuvreLightDto= oeuvreService.getOeuvres(criteresHttp);
+        oeuvreLightDto= oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp);
         assertNotNull(oeuvreLightDto);
         assertNotNull(oeuvreLightDto.getOeuvres());
         assertEquals(3,oeuvreLightDto.getOeuvres().size());
@@ -111,7 +121,7 @@ class OeuvreServiceImplTest {
         criteresHttp = new HashMap<>();
         criteresHttp.put("type","serie");
         criteresHttp.put("genre","2");
-        oeuvreLightDto= oeuvreService.getOeuvres(criteresHttp);
+        oeuvreLightDto= oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp);
         assertNotNull(oeuvreLightDto);
         assertNotNull(oeuvreLightDto.getOeuvres());
         assertEquals(1,oeuvreLightDto.getOeuvres().size());
@@ -120,7 +130,7 @@ class OeuvreServiceImplTest {
         //je dois avoir 2 oeuvres vues
         criteresHttp = new HashMap<>();
         criteresHttp.put("statut","3");
-        oeuvreLightDto= oeuvreService.getOeuvres(criteresHttp);
+        oeuvreLightDto= oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp);
         assertNotNull(oeuvreLightDto);
         assertNotNull(oeuvreLightDto.getOeuvres());
         assertEquals(2,oeuvreLightDto.getOeuvres().size());
@@ -130,46 +140,51 @@ class OeuvreServiceImplTest {
 
     @Test
     void getOeuvres_mauvais_critere_doit_etre_ignore_et_on_retourne_toutes_les_oeuvres() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+
+        /*
         logger.debug("getOeuvres_mauvais_critere_doit_etre_ignore_et_on_retourne_toutes_les_oeuvres");
-        OeuvreLightListDto oeuvreLightListDto=oeuvreService.getAllOeuvres();
+        OeuvreLightListDto oeuvreLightListDto=oeuvreService.getAllOeuvres(utilisateurTest.getLogin());
         logger.debug("oeuvreLightListDto:" +oeuvreLightListDto);
-        oeuvreService.getAllOeuvres().getOeuvres().forEach(System.out::println);
+        oeuvreService.getAllOeuvres(utilisateurTest.getLogin()).getOeuvres().forEach(System.out::println);*/
 
         //test mauvais critere de recherche
         Map<String, String> criteresHttp = new HashMap<>();
         criteresHttp.put("sta","shAzA");
-        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp).getOeuvres().size());
 
         criteresHttp = new HashMap<>();
         criteresHttp.put("statut",null);
-        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp).getOeuvres().size());
 
         criteresHttp = new HashMap<>();
         criteresHttp.put("statut","");
-        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp).getOeuvres().size());
 
         criteresHttp = new HashMap<>();
         criteresHttp.put("statut"," ");
-        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp).getOeuvres().size());
 
         //test avec 2 critères
         criteresHttp = new HashMap<>();
         criteresHttp.put("statut"," ");
         criteresHttp.put("testMauvaisCritere","aez");
-        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(criteresHttp).getOeuvres().size());
+        assertEquals(NB_OEUVRE_TOTAL_EN_BDD,oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp).getOeuvres().size());
 
 
     }
 
     @Test
     void getOeuvres_test_critere_titre_qui_doit_me_retourner_film_shazam() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+
         Map<String, String> criteresHttp ;
         OeuvreLightListDto oeuvreLightListDto;
 
         //test titre complet
         criteresHttp = new HashMap<>();
         criteresHttp.put("titre","Shazam!");
-        oeuvreLightListDto= oeuvreService.getOeuvres(criteresHttp);
+        oeuvreLightListDto= oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp);
         assertNotNull(oeuvreLightListDto);
         assertNotNull(oeuvreLightListDto.getOeuvres());
         assertEquals(1,oeuvreLightListDto.getOeuvres().size());
@@ -179,7 +194,7 @@ class OeuvreServiceImplTest {
         //test recherche partielle
         criteresHttp = new HashMap<>();
         criteresHttp.put("titre","Sh");
-        oeuvreLightListDto= oeuvreService.getOeuvres(criteresHttp);
+        oeuvreLightListDto= oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp);
         assertNotNull(oeuvreLightListDto);
         assertNotNull(oeuvreLightListDto.getOeuvres());
         assertEquals(1,oeuvreLightListDto.getOeuvres().size());
@@ -188,7 +203,7 @@ class OeuvreServiceImplTest {
         //test recherche casse differente. On doit retourner l'oeuvre sans tenir compte de la casse
         criteresHttp = new HashMap<>();
         criteresHttp.put("titre","shAzA");
-        oeuvreLightListDto= oeuvreService.getOeuvres(criteresHttp);
+        oeuvreLightListDto= oeuvreService.getOeuvres(utilisateurTest.getLogin(),criteresHttp);
         assertNotNull(oeuvreLightListDto);
         assertNotNull(oeuvreLightListDto.getOeuvres());
         assertEquals(1,oeuvreLightListDto.getOeuvres().size());
@@ -305,18 +320,20 @@ class OeuvreServiceImplTest {
 
     @Test
     void createOeuvre_la_creation_du_film_et_de_la_serie_doit_fonctionner_avec_les_champs_minimum() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+
         final String titreFilm= "film de test";
         final String titreSerie= "série de test";
 
         //creation d'un film vide doit échouer
         assertThrows(MauvaisParamException.class, () -> {
-            OeuvreDto filmCreeVide = oeuvreService.saveOeuvre(null);
+            OeuvreDto filmCreeVide = oeuvreService.saveOeuvre(utilisateurTest.getLogin(),null);
         });
 
         //creation d'un film
         OeuvreFormulaireDto newFilm= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
 
-        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(utilisateurTest.getLogin(),newFilm);
 
         assertNotNull(filmCree);
         assertTrue(filmCree.getId()>0);
@@ -334,7 +351,7 @@ class OeuvreServiceImplTest {
         //creation d'une serie
         OeuvreFormulaireDto newSerie= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.SERIE.getLibelle(), titreSerie);
 
-        OeuvreDto serieCree = oeuvreService.saveOeuvre(newSerie);
+        OeuvreDto serieCree = oeuvreService.saveOeuvre(utilisateurTest.getLogin(),newSerie);
 
         assertNotNull(serieCree);
         assertTrue(serieCree.getId()>0);
@@ -351,12 +368,14 @@ class OeuvreServiceImplTest {
 
     @Test
     void createOeuvre_la_creation_avec_un_statut_visionnage_doit_fonctionner() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+
         final String titreFilm= "film de test";
 
         OeuvreFormulaireDto newFilm= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
         newFilm.setStatutVisionnageId(1L);
 
-        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(utilisateurTest.getLogin(),newFilm);
 
         assertNotNull(filmCree);
         assertTrue(filmCree.getId()>0);
@@ -371,6 +390,8 @@ class OeuvreServiceImplTest {
 
     @Test
     void createOeuvre_la_creation_avec_un_ou_plusieurs_genre_doit_fonctionner() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+
         final String titreFilm= "film de test";
 
         OeuvreFormulaireDto newFilm= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
@@ -380,7 +401,7 @@ class OeuvreServiceImplTest {
         genreIdsList.add(2L);
         newFilm.setGenreIds(genreIdsList);
 
-        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(utilisateurTest.getLogin(), newFilm);
 
         assertNotNull(filmCree);
         assertTrue(filmCree.getId()>0);
@@ -401,13 +422,15 @@ class OeuvreServiceImplTest {
 
     @Test
     void createOeuvre_testCreation_film() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+
         //creation du film
         final String titreFilm= "film de test";
         OeuvreFormulaireDto newFilm=GenerateurObjetTest.createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
         newFilm.setDuree(155);
         //fin creation du film
 
-        OeuvreDto filmCree = oeuvreService.saveOeuvre(newFilm);
+        OeuvreDto filmCree = oeuvreService.saveOeuvre(utilisateurTest.getLogin(),newFilm);
 
         assertNotNull(filmCree);
         assertTrue(filmCree.getId()>0);
@@ -429,13 +452,14 @@ class OeuvreServiceImplTest {
         //je ne dois pas pouvoir sauver une oeuvre avec le meme titre mais un id different
         newFilm.setTitre("film de test");
         assertThrows(MauvaisParamException.class, () -> {
-            oeuvreService.saveOeuvre(newFilm);
+            oeuvreService.saveOeuvre(utilisateurTest.getLogin(),newFilm);
         });
 
         oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
     }
     @Test
     void createOeuvre_testCreation_serie() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
 
         //creation de la serie
         final String titreOeuvre= "serie de test";
@@ -444,7 +468,7 @@ class OeuvreServiceImplTest {
 
         logger.debug("Debut insertion Serie test. Titre= {}",newSerie.getTitre());
         logger.debug("Detail de la serie: {}",newSerie);
-        OeuvreDto serieCree = oeuvreService.saveOeuvre(newSerie);
+        OeuvreDto serieCree = oeuvreService.saveOeuvre(utilisateurTest.getLogin(),newSerie);
 
         assertNotNull(serieCree);
         assertTrue(serieCree.getId()>0);
@@ -497,6 +521,8 @@ class OeuvreServiceImplTest {
 
     @Test
     void createOeuvre_modification_dune_saison_doit_fonctionner() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+
         //je recupere une serie existante
         //friends
         final Long oeuvreId=3L;
@@ -514,7 +540,7 @@ class OeuvreServiceImplTest {
         OeuvreFormulaireDto oeuvreFormulaireDto= convertOeuvreDtoToFormulaire(oeuvreFriends);
 
         //je sauve
-        OeuvreDto serieFriends=oeuvreService.saveOeuvre(oeuvreFormulaireDto);
+        OeuvreDto serieFriends=oeuvreService.saveOeuvre(utilisateurTest.getLogin(),oeuvreFormulaireDto);
         //on check que l'id est le meme
         assertEquals(oeuvreId,serieFriends.getId());
 
@@ -532,7 +558,7 @@ class OeuvreServiceImplTest {
             OeuvreDto oeuvreFriends2=  oeuvreService.getOeuvreCompleteById(oeuvreId);
             oeuvreFriends2.setTypeOeuvre(EnumTypeOeuvre.FILM.getLibelle());
             OeuvreFormulaireDto oeuvreFormulaireDto2= convertOeuvreDtoToFormulaire(oeuvreFriends2);
-            oeuvreService.saveOeuvre(oeuvreFormulaireDto2);
+            oeuvreService.saveOeuvre(utilisateurTest.getLogin(),oeuvreFormulaireDto2);
         });
 
         //je modifie sa saison S2 pour la nommer S1 comme la premiere. La sauvegarde doit echouer car on ne peut avoir 2 saisons avec le meme numero
@@ -544,7 +570,7 @@ class OeuvreServiceImplTest {
                 }
             }
             OeuvreFormulaireDto oeuvreFormulaireDto2= convertOeuvreDtoToFormulaire(oeuvreFriends3);
-            oeuvreService.saveOeuvre(oeuvreFormulaireDto2);
+            oeuvreService.saveOeuvre(utilisateurTest.getLogin(),oeuvreFormulaireDto2);
         });
 
 
@@ -553,12 +579,13 @@ class OeuvreServiceImplTest {
 
     @Test
     void convertirOeuvreDtoEnOeuvre_doit_convertir_un_OeuvreDto_en_Oeuvre() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
 
         //on check pour 1 film
         OeuvreDto oeuvreDto = GenerateurObjetTest.createOeuvreDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), "film test");
-        assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(null));
+        assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(null,null));
 
-        Oeuvre oeuvre = oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
+        Oeuvre oeuvre = oeuvreService.convertirOeuvreDtoEnOeuvre(utilisateurTest.getLogin(),oeuvreDto);
         assertTrue(oeuvre instanceof Film);
         Film film = (Film) oeuvre;
         assertEquals(oeuvreDto.getTitre(), film.getTitre());
@@ -576,9 +603,9 @@ class OeuvreServiceImplTest {
 
         //on check pour 1 serie
         oeuvreDto = GenerateurObjetTest.createOeuvreDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), "serie test");
-        assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(null));
+        assertNull(oeuvreService.convertirOeuvreDtoEnOeuvre(utilisateurTest.getLogin(),null));
 
-        oeuvre = oeuvreService.convertirOeuvreDtoEnOeuvre(oeuvreDto);
+        oeuvre = oeuvreService.convertirOeuvreDtoEnOeuvre(utilisateurTest.getLogin(),oeuvreDto);
         assertTrue(oeuvre instanceof Serie);
         Serie serie = (Serie) oeuvre;
         assertEquals(oeuvreDto.getTitre(), serie.getTitre());
@@ -598,12 +625,13 @@ class OeuvreServiceImplTest {
 
     @Test
     void convertirOeuvreFormulaireDtoEnOeuvre_doit_convertir_un_OeuvreFormulaireDto_en_Oeuvre() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
 
         //on check pour 1 film
         OeuvreFormulaireDto oeuvreFormulaireDto = GenerateurObjetTest.createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.FILM.getLibelle(), "film test");
-        assertNull(oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(null));
+        assertNull(oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(utilisateurTest.getLogin(),null));
 
-        Oeuvre oeuvre=oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(oeuvreFormulaireDto);
+        Oeuvre oeuvre=oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(utilisateurTest.getLogin(),oeuvreFormulaireDto);
         assertTrue(oeuvre instanceof Film);
         Film film=(Film) oeuvre;
         assertEquals(oeuvreFormulaireDto.getTitre(),film.getTitre());
@@ -625,9 +653,9 @@ class OeuvreServiceImplTest {
 
         //on check pour 1 serie
         oeuvreFormulaireDto = GenerateurObjetTest.createOeuvreFormulaireDtoComplete(EnumTypeOeuvre.SERIE.getLibelle(), "serie test");
-        assertNull(oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(null));
+        assertNull(oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(utilisateurTest.getLogin(),null));
 
-        oeuvre=oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(oeuvreFormulaireDto);
+        oeuvre=oeuvreService.convertirOeuvreFormulaireDtoEnOeuvre(utilisateurTest.getLogin(),oeuvreFormulaireDto);
         assertTrue(oeuvre instanceof Serie);
         Serie serie=(Serie) oeuvre;
         assertEquals(oeuvreFormulaireDto.getTitre(),serie.getTitre());
@@ -647,4 +675,6 @@ class OeuvreServiceImplTest {
             }
         }
     }
+
+
 }

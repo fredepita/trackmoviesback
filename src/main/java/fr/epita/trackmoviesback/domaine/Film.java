@@ -19,8 +19,8 @@ public class Film extends Oeuvre{
         super();
     }
 
-    public Film(Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description, Integer duree) {
-        super(id, titre, genres, statutVisionnage, note, createurs, acteurs, urlAffiche, urlBandeAnnonce, description);
+    public Film(Utilisateur utilisateur,Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description, Integer duree) {
+        super(utilisateur, id, titre, genres, statutVisionnage, note, createurs, acteurs, urlAffiche, urlBandeAnnonce, description);
         this.duree = duree;
     }
 

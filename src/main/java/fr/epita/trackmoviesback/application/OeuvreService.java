@@ -1,6 +1,7 @@
 package fr.epita.trackmoviesback.application;
 
 import fr.epita.trackmoviesback.domaine.Oeuvre;
+import fr.epita.trackmoviesback.domaine.Utilisateur;
 import fr.epita.trackmoviesback.dto.OeuvreDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightDto;
 import fr.epita.trackmoviesback.dto.OeuvreLightListDto;
@@ -11,16 +12,16 @@ import java.util.Map;
 
 public interface OeuvreService {
 
-    OeuvreLightListDto getAllOeuvres();
+    OeuvreLightListDto getAllOeuvres(String userLogin);
     OeuvreLightDto convertirOeuvreEnLightDto(Oeuvre oeuvre);
     // getOeuvreCompleteById retourne une oeuvre et ses saisons (pour les séries) ou sa durée (pour les films)
-    OeuvreDto getOeuvreCompleteById(Long id);
+    OeuvreDto getOeuvreCompleteById(String userLogin,Long id);
 
     OeuvreDto convertirOeuvreEnDto(Oeuvre oeuvre);
 
-    Oeuvre convertirOeuvreDtoEnOeuvre(OeuvreDto oeuvreDto);
+    Oeuvre convertirOeuvreDtoEnOeuvre(String userLogin, OeuvreDto oeuvreDto);
 
-    Oeuvre convertirOeuvreFormulaireDtoEnOeuvre(OeuvreFormulaireDto oeuvreFormulaireDto);
+    Oeuvre convertirOeuvreFormulaireDtoEnOeuvre(String userLogin, OeuvreFormulaireDto oeuvreFormulaireDto);
 
     /**
      * Retourne une liste d'oeuvre (ordonnée par le titre) correspondant aux critères passés en paramètre.
@@ -31,7 +32,7 @@ public interface OeuvreService {
      * @param criteres Map avec la liste des critères (Clé = nom propriete recherchee / Valeur = valeur recherchee)
      * @return listes des oeuvres correspondant aux critères de recherches
      */
-    OeuvreLightListDto getOeuvres(Map<String,String> criteres);
+    OeuvreLightListDto getOeuvres(String userLogin, Map<String,String> criteres);
 
     /**
      * ajoute une oeuvre à notre liste dans la BDD
@@ -42,8 +43,8 @@ public interface OeuvreService {
      * @param oeuvreDto oeuvre à ajouter
      * @return l'oeuvre créée
      */
-    OeuvreDto saveOeuvre(OeuvreFormulaireDto oeuvreDto);
+    OeuvreDto saveOeuvre(String userLogin,OeuvreFormulaireDto oeuvreDto);
 
-    void deleteOeuvre(Long id);
+    void deleteOeuvre(String userLogin,Long id);
 
 }

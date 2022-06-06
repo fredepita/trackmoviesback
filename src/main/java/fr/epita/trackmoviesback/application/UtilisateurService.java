@@ -2,6 +2,7 @@ package fr.epita.trackmoviesback.application;
 
 import fr.epita.trackmoviesback.domaine.Utilisateur;
 import fr.epita.trackmoviesback.dto.UtilisateurDto;
+import fr.epita.trackmoviesback.exception.UtilisateurNonTrouveException;
 
 public interface UtilisateurService {
 
@@ -11,12 +12,23 @@ public interface UtilisateurService {
 
     Utilisateur rechercherUtilisateurParId (Long id);
 
-    Utilisateur rechercherUtilisateurParIdentifiant (String Identifiant);
+    /**
+     * recherche l'utilisateur dans la BDD
+     * @param login du user
+     * @return le user
+     */
+    Utilisateur rechercherUtilisateurParLogin (String login) throws UtilisateurNonTrouveException;
 
     void supprimerUtilisateur (Long id);
 
     Utilisateur convertirUtilisateurEnEntity(UtilisateurDto utilisateurDto);
 
-    Boolean verifierExistenceUtilisateur(UtilisateurDto utilisateurDto);
+    boolean verifierExistenceUtilisateur(UtilisateurDto utilisateurDto);
+
+    /**
+     * recupere l'identifiant du user loggé dans le contexte securite
+     * @return identifiant
+     */
+    String getCurrentUserLoginFromSecurityContext();
 
 }

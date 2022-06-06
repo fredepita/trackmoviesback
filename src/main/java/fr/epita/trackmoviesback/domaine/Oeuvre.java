@@ -1,5 +1,6 @@
 package fr.epita.trackmoviesback.domaine;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
 import fr.epita.trackmoviesback.infrastructure.converter.TypeOeuvreAttributeConverter;
@@ -22,7 +23,7 @@ public abstract class Oeuvre {
     @Convert(converter = TypeOeuvreAttributeConverter.class) //permet de convertir en string l'enum pour le stocker en base de donnée. On utilise son libelle
     protected EnumTypeOeuvre type_oeuvre;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String titre;
 
     //genre etant une table de reference, oeuvre ne peut pas en creer de nouveau, il peut juste s'y rattacher
@@ -50,10 +51,16 @@ public abstract class Oeuvre {
 
     private String description;
 
+    @JsonIgnore
+    @ManyToOne
+   // @Column(nullable = false)
+    private Utilisateur utilisateur;
+
     protected Oeuvre() {
     }
 
-    protected Oeuvre(Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description) {
+    protected Oeuvre(Utilisateur utilisateur, Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description) {
+        this.utilisateur=utilisateur;
         this.id = id;
         this.titre = titre;
         this.genres = genres;
@@ -65,6 +72,7 @@ public abstract class Oeuvre {
         this.urlAffiche = StringUtils.hasText(urlAffiche)?urlAffiche:null;
         this.urlBandeAnnonce = StringUtils.hasText(urlBandeAnnonce)?urlBandeAnnonce:null;
         this.description = StringUtils.hasText(description)?description:null;
+
     }
 
     public Long getId() {
@@ -159,9 +167,18 @@ public abstract class Oeuvre {
         this.description = description;
     }
 
+    public Utilisateur getUtilisateur() {
+        return utilisateur;
+    }
+
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
     @Override
     public String toString() {
         return "Oeuvre{" +
+                "utilisateur=" + utilisateur.getLogin() +
                 "id=" + id +
                 ", type_oeuvre=" + type_oeuvre +
                 ", titre='" + titre + '\'' +

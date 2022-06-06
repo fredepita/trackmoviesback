@@ -17,8 +17,8 @@ public class Serie extends Oeuvre{
         super();
     }
 
-    public Serie(Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description, List<Saison> saisons) {
-        super(id, titre, genres, statutVisionnage, note, createurs, acteurs, urlAffiche, urlBandeAnnonce, description);
+    public Serie(Utilisateur utilisateur, Long id, String titre, List<Genre> genres, StatutVisionnage statutVisionnage, Integer note, String createurs, String acteurs, String urlAffiche, String urlBandeAnnonce, String description, List<Saison> saisons) {
+        super(utilisateur, id, titre, genres, statutVisionnage, note, createurs, acteurs, urlAffiche, urlBandeAnnonce, description);
         this.saisons = saisons;
     }
 
