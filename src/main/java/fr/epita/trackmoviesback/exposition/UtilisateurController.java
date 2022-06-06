@@ -24,6 +24,7 @@ public class UtilisateurController {
     public ResponseEntity<UtilisateurDto> creerUtilisateur(@RequestBody UtilisateurDto utilisateurDto){
         try {
             utilisateurService.creerUtilisateur(utilisateurDto);
+            logger.info("User cree");
             return new ResponseEntity(utilisateurDto, HttpStatus.CREATED);
         }
         catch (MauvaisParamException exception){

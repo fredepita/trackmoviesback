@@ -18,7 +18,7 @@ import java.util.function.Function;
 public class JwtTokenUtil {
 
     private static Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+    public static final long JWT_TOKEN_VALIDITY_IN_SECOND = 60 * 60;// =1h
 
     private Boolean connectionUtilisateur = false;
 
@@ -46,18 +46,14 @@ public class JwtTokenUtil {
     }
 */
     public <T> T getClaimFromToken(final String token, final Function<Claims, T> claimsResolver) {
-
-        logger.info("getClaimFromToken(token : " + token + ", claimsResolver : " + claimsResolver.toString());
-
+        logger.info("getClaimFromToken(token : {}, claimsResolver : {}",token ,claimsResolver);
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
 
     // for retrieveing any information from token we will need the secret key
     private Claims getAllClaimsFromToken(final String token) {
-
-        logger.info("getAllClaimsFromToken(token : " + token);
-
+        logger.info("getAllClaimsFromToken(token : {}" , token);
         return Jwts.parser() //
                 .setSigningKey(jwtSecret) //
                 .parseClaimsJws(token) //
@@ -76,24 +72,32 @@ public class JwtTokenUtil {
         return expiration.before(new Date());
     }
 */
-    // generate token for user
+
+    /**
+     * genere le token pour le user
+     * @param userDetails user pour lequel on genere le token
+     * @return token
+     */
     public String generateToken(final UserDetails userDetails) {
 
-        logger.info("generateToken() :"
-                + "  username : " + userDetails.getUsername()
-                + ", password : " + userDetails.getPassword()
-                + ", authorities : " + userDetails.getAuthorities()
-                + ", account non expired : " + userDetails.isAccountNonExpired()
-                + ", account not locked : " + userDetails.isAccountNonLocked()
-                + ", credentials not expired : " + userDetails.isCredentialsNonExpired()
-                + ", enabled : " + userDetails.isEnabled()
+        logger.info("generateToken() : "
+                + "  username : {}"
+                + ", authorities : {}"
+                + ", account non expired {}: "
+                + ", account not locked {}: "
+                + ", credentials not expired {}: "
+                + ", enabled : {}",
+                userDetails.getUsername(),userDetails.getAuthorities(),
+                userDetails.isAccountNonExpired(),userDetails.isAccountNonLocked(),
+                userDetails.isCredentialsNonExpired(),userDetails.isEnabled()
         );
 
         final Map<String, Object> claims = new HashMap<>();
 
+        long now =System.currentTimeMillis();
         return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername()) //
-                .setIssuedAt(new Date(System.currentTimeMillis())) //
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .setIssuedAt(new Date(now)) //
+                .setExpiration(new Date(now + JWT_TOKEN_VALIDITY_IN_SECOND * 1000))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret) //
                 .compact();
     }
@@ -115,27 +119,33 @@ public class JwtTokenUtil {
                 .compact();
     }*/
 
-    // validate token
+
+
+    /**
+     * valide le token : il appartient bien au user et est encore valide
+     * @param token in the request
+     * @param userDetails user of the DB
+     * @return vrai si token valide, sinon faux
+     */
     public Boolean validateToken(final String token, final UserDetails userDetails) {
-
-        logger.info("validateToken(token : " + token + ", userDetails : " + userDetails.toString());
-
-        logger.info("validateToken() :"
-                + "  token : " + token.substring(0,20)
-                + "  username : " + userDetails.getUsername()
-                + ", password : " + userDetails.getPassword()
-                + ", authorities : " + userDetails.getAuthorities()
-                + ", account non expired : " + userDetails.isAccountNonExpired()
-                + ", account not locked : " + userDetails.isAccountNonLocked()
-                + ", credentials not expired : " + userDetails.isCredentialsNonExpired()
-                + ", enabled : " + userDetails.isEnabled()
+        String beginTokenForLog=token.substring(0,20);
+        logger.info("generateToken() : "
+                        + "  token : {}"
+                        + "  username : {}"
+                        + ", authorities : {}"
+                        + ", account non expired {}: "
+                        + ", account not locked {}: "
+                        + ", credentials not expired {}: "
+                        + ", enabled : {}",
+                beginTokenForLog,
+                userDetails.getUsername(),userDetails.getAuthorities(),
+                userDetails.isAccountNonExpired(),userDetails.isAccountNonLocked(),
+                userDetails.isCredentialsNonExpired(),userDetails.isEnabled()
         );
+
         final String username = getUsernameFromToken(token);
-
         Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
-
-        Boolean isTokenExpired = claims.getExpiration().before(new Date());
-
+        boolean isTokenExpired = claims.getExpiration().before(new Date());
         return (username.equals(userDetails.getUsername()) && !isTokenExpired);
     }
 

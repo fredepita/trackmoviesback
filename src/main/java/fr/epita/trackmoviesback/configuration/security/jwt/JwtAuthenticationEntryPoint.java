@@ -14,12 +14,10 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private static Logger logger = LoggerFactory.getLogger(JwtAuthenticationEntryPoint.class);
+    private final static Logger logger = LoggerFactory.getLogger(JwtAuthenticationEntryPoint.class);
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-
-        logger.info("commence(request : " + request.toString() + ", response : " + response.toString() + ", authException : " + authException.toString());
-
+        logger.info("commence(request : {}, response : {}, authException : {}",request,response,authException);
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
     }
 }

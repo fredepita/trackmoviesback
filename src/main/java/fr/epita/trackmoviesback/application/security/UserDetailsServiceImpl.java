@@ -24,36 +24,31 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
+    /**
+     * Recupere le user de la BDD avec ses roles
+     * @param identifiant identifiant du user
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(final String identifiant) throws UsernameNotFoundException {
-
         logger.info("loadUserByUsername(identifiant : " + identifiant + ")");
-
         final Utilisateur utilisateur = utilisateurRepository.findByIdentifiant(identifiant);
-
-
         if (utilisateur == null) {
             throw new UsernameNotFoundException("Identifiant " + identifiant + " non trouvé");
         }
-
-        logger.info("Utilisateur trouvé : " + utilisateur.toString());
-
+        logger.info("Utilisateur trouvé en BDD : " + utilisateur.getIdentifiant());
         User user = new User(utilisateur.getIdentifiant(), utilisateur.getMotDePasse(), getAuthorities(utilisateur));
-
-        logger.info("User : " + user.toString() + user.getPassword());
+        //logger.info("User : " + user.toString() + user.getPassword());
 
         return user;
     }
 
     private static Collection<? extends GrantedAuthority> getAuthorities(final Utilisateur utilisateur) {
-
         logger.info("getAuthorities(Utilisateur : " + utilisateur.toString());
-
         final String[] userRoles = utilisateur.getRoles().stream().map((role) -> role.name()).toArray(String[]::new);
         final Collection<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(userRoles);
-
         logger.info("authorities : " + authorities.toString());
-
         return authorities;
     }
 

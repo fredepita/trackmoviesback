@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, proxyTargetClass = true)
@@ -27,7 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
-    private static final String UNAUTHENTICATED_WHITE_LIST[] = { "/trackmovies/v1/login", "/trackmovies/v1/utilisateur"};
+    private static final String UNAUTHENTICATED_WHITE_LIST[] = {"/trackmovies/v1/login", "/trackmovies/v1/utilisateur"};
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -38,21 +39,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+
+
     @Override
     public void configure(final AuthenticationManagerBuilder auth) throws Exception {
-
-        logger.info("configure(auth : " + auth.toString());
-
+        logger.info("configure(auth : {}" , auth.toString());
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
-        logger.info("passwordEncoder()");
-
+        logger.debug("passwordEncoder()");
         return new BCryptPasswordEncoder();
     }
+
 
     @Bean
     @Override
@@ -69,36 +69,42 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         logger.info("configure(httpSecurity : " + httpSecurity.toString());
 
+        //ajout d'un filtre qui valide le token pour toutes les requetes
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         httpSecurity
-                .csrf().disable()
+                .csrf().disable()//on peut desactivé car on utilise une authentification par token et le token sera pas accessible depuis un autre domaine
                 //-->  Autorisation login
                 .authorizeRequests()
-                    .antMatchers("/trackmovies/v1/login").permitAll()
-                    .antMatchers("/trackmovies/v1/utilisateur").permitAll()
+                .antMatchers("/trackmovies/v1/login").permitAll()
+                .antMatchers("/trackmovies/v1/utilisateur").permitAll()
                 //-->  Autorisation requêtes HTTP Options
-                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 //-->  Autorisation swagger-ui
-                    .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
+                .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
                 //--> Autorisations en fonction du rôle
-                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/genres").hasRole("USER")
-                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/statuts_visionnage").hasRole("USER")
-                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres").hasRole("USER")
-                    .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres/{id}").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/trackmovies/v1/genres").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/trackmovies/v1/statuts_visionnage").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres/{id}").hasRole("USER")
 
-                    .anyRequest().authenticated()
-                    .and()
-                    .formLogin()
-                //  .and()
-                //.logout()
-                //.logoutUrl("/trackmovies/v1/logout")
-                //.logoutSuccessUrl("/trackmovies/v1/login")
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .and()
+                .logout()
+                .logoutUrl("/trackmovies/v1/logout")
+                .logoutSuccessUrl("/trackmovies/v1/")
+                //.invalidateHttpSession(true)
+                //.deleteCookies("JSESSIONID")
+                // Call the URL invalidate_session after logout...
+                //.logoutSuccessUrl("/trackmovies/v1/invalidate_session")
+                //.addLogoutHandler(new SecurityContextLogoutHandler())
                 .and()
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
-                    .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint) //
-                    .and()
-                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint) //
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }

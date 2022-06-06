@@ -1,5 +1,8 @@
-package fr.epita.trackmoviesback.configuration.security.jwt;
+package fr.epita.trackmoviesback.exposition;
 
+import fr.epita.trackmoviesback.dto.JwtRequestDto;
+import fr.epita.trackmoviesback.configuration.security.jwt.JwtResponse;
+import fr.epita.trackmoviesback.configuration.security.jwt.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,20 +37,19 @@ public class JwtAuthenticationController {
     private UserDetailsService userDetailsService;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody final JwtRequest authenticationRequest)
+    public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody final JwtRequestDto authenticationRequest)
             throws Exception {
 
         logger.info("createAuthenticationToken(authenticationRequest : " + authenticationRequest.toString());
         // Authentification avec les données en entrée
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-
         logger.info("après authenticate");
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
         jwtTokenUtil.setStatutUtilisateur(true);
-        logger.info("token : " + token);
+        logger.info("token : {}",token);
 
         return ResponseEntity.ok(new JwtResponse(token));
     }
@@ -55,12 +57,8 @@ public class JwtAuthenticationController {
 
     @GetMapping(value = "/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        logger.info("request : "    + request.getAuthType()
-                                    + request.getContextPath()
-                                    + request.getQueryString()
-        );
-        logger.info("response : "   + response.getHeaderNames()
-                                    + response.getStatus());
+        logger.info("request : {} - {} - {}",request.getAuthType(),request.getContextPath(),request.getQueryString());
+        logger.info("response : {} - {} ",response.getHeaderNames(),response.getStatus());
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -77,7 +75,6 @@ public class JwtAuthenticationController {
     private void authenticate(final String username, final String password) throws Exception {
         try {
             logger.info("authenticate(username : " + username + ", password : " + password + ")");
-
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         }
         catch (final DisabledException e) {
