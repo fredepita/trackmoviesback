@@ -16,6 +16,7 @@ import fr.epita.trackmoviesback.infrastructure.specs.OeuvreSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -51,7 +52,7 @@ public class OeuvreServiceImpl implements OeuvreService {
         //on recupere l'utilisateur a partir du login
         Utilisateur utilisateur=utilisateurService.rechercherUtilisateurParLogin(userLogin);
 
-        List<Oeuvre> oeuvres = oeuvreRepository.findAllByUtilisateur(utilisateur);
+        List<Oeuvre> oeuvres = oeuvreRepository.findAllByUtilisateurOrderByTitre(utilisateur);
         List<OeuvreLightDto> oeuvresLightDto = oeuvres.stream().map(this::convertirOeuvreEnLightDto).collect(Collectors.toList());
         return new OeuvreLightListDto(1, 1, oeuvresLightDto);
     }
@@ -242,7 +243,7 @@ public class OeuvreServiceImpl implements OeuvreService {
         OeuvreSpecification criteresDeRecherche = buildOeuvreSpecification(utilisateur,criteres);
 
         //on récupère la liste
-        List<Oeuvre> oeuvres = oeuvreRepository.findAll(criteresDeRecherche);
+        List<Oeuvre> oeuvres = oeuvreRepository.findAll(criteresDeRecherche, Sort.by(Sort.Direction.ASC, "titre"));
         logger.info("fin recherche en BDD. Nb oeuvres trouvees= {}", oeuvres.size());
         List<OeuvreLightDto> oeuvresLightDto = oeuvres.stream().map(this::convertirOeuvreEnLightDto).collect(Collectors.toList());
         return new OeuvreLightListDto(1, 1, oeuvresLightDto);

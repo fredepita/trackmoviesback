@@ -22,6 +22,6 @@ public interface OeuvreRepository extends JpaRepository<Oeuvre,Long> , JpaSpecif
     @Query(value = "select o from Oeuvre AS o WHERE o.titre=:titre and o.utilisateur=:utilisateur ")
     List<Oeuvre> findByTitreAndByUtilisateur(String titre,Utilisateur utilisateur);
 
-    List<Oeuvre> findAllByUtilisateur(Utilisateur utilisateur);
+    List<Oeuvre> findAllByUtilisateurOrderByTitre(Utilisateur utilisateur);
 
 }
