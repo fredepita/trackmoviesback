@@ -2,7 +2,7 @@ package fr.epita.trackmoviesback.application;
 
 import fr.epita.trackmoviesback.domaine.Utilisateur;
 import fr.epita.trackmoviesback.dto.UtilisateurDto;
-import fr.epita.trackmoviesback.exception.UtilisateurNonTrouveException;
+
 
 public interface UtilisateurService {
 
@@ -17,7 +17,7 @@ public interface UtilisateurService {
      * @param login du user
      * @return le user
      */
-    Utilisateur rechercherUtilisateurParLogin (String login) throws UtilisateurNonTrouveException;
+    Utilisateur rechercherUtilisateurParLogin (String login);
 
     void supprimerUtilisateur (Long id);
 

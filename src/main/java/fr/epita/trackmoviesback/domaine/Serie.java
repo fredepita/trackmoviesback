@@ -33,6 +33,7 @@ public class Serie extends Oeuvre{
     @Override
     public String toString() {
         return "Serie{" +
+                "utilisateur=" + getUtilisateur().getLogin() +
                 "id=" + getId() +
                 ", titre='" + getTitre() + '\'' +
                 ", genres=" + getGenres() +

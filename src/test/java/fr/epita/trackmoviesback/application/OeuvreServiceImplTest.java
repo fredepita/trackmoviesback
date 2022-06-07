@@ -8,7 +8,6 @@ import fr.epita.trackmoviesback.dto.formulaire.OeuvreFormulaireDto;
 import fr.epita.trackmoviesback.dto.formulaire.SaisonFormulaireDto;
 import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
 import fr.epita.trackmoviesback.exception.MauvaisParamException;
-import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -34,6 +34,9 @@ class OeuvreServiceImplTest {
 
     @Autowired
     UtilisateurService utilisateurService;
+
+    @Autowired
+    GenreService genreService;
 
     @Test
     void getAllOeuvres_doit_retourner_toutes_les_oeuvres_d_un_utilisateur() {
@@ -214,20 +217,32 @@ class OeuvreServiceImplTest {
 
     @Test
     void getOeuvreCompleteById_doit_retourner_une_oeuvre_pour_un_id_donné() {
-        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(), 1L);
         assertEquals("Shazam!", oeuvreTest.getTitre());
+        //et que l'oeuvre a 2 genre dont 1 genre Action
+        assertEquals(2,oeuvreTest.getGenres().size());
+        for (GenreDto genre:oeuvreTest.getGenres()) {
+            if (genre.getId()==1L) {
+                assertEquals("Action",genre.getLibelle());
+                break;
+            }
+        }
+
     }
 
     @Test
     void getOeuvreCompleteById_doit_tester_la_duree_du_film_shazam() {
-        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(1L);
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
+        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),1L);
         assertEquals(166, oeuvreTest.getDuree());
     }
 
     @Test
     void getOeuvreCompleteById_doit_tester_que_la_serie_friends_a_une_saisonList() {
+        Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
 
-        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(3L);
+        OeuvreDto oeuvreTest= oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),3L);
         assertNotNull(oeuvreTest.getSaisons());
         assertEquals(2, oeuvreTest.getSaisons().size());
         boolean saisonTrouvee=false;
@@ -246,6 +261,7 @@ class OeuvreServiceImplTest {
 
     @Test
     void convertirOeuvreEnOeuvreDto_doit_convertir_une_serie_et_un_film_en_dto() {
+
 
         //Création d'une liste de Genres
         Genre genreComedie = new Genre();
@@ -339,13 +355,13 @@ class OeuvreServiceImplTest {
         assertTrue(filmCree.getId()>0);
 
         //on verifie que le film insere est correcte en le rechargant
-        OeuvreDto filmInsere=oeuvreService.getOeuvreCompleteById(filmCree.getId());
+        OeuvreDto filmInsere=oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),filmCree.getId());
         assertNotNull(filmInsere);
         assertEquals(EnumTypeOeuvre.FILM.getLibelle(),filmInsere.getTypeOeuvre());
         assertEquals(titreFilm,filmInsere.getTitre());
 
         //on supprime le film de la base test
-        oeuvreService.deleteOeuvre(filmInsere.getId());
+        oeuvreService.deleteOeuvre(utilisateurTest.getLogin(),filmInsere.getId());
 
 
         //creation d'une serie
@@ -356,12 +372,12 @@ class OeuvreServiceImplTest {
         assertNotNull(serieCree);
         assertTrue(serieCree.getId()>0);
 
-        OeuvreDto serieInseree=oeuvreService.getOeuvreCompleteById(serieCree.getId());
+        OeuvreDto serieInseree=oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),serieCree.getId());
         assertNotNull(serieInseree);
         assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),serieInseree.getTypeOeuvre());
         assertEquals(titreSerie,serieInseree.getTitre());
 
-        oeuvreService.deleteOeuvre(serieInseree.getId());
+        oeuvreService.deleteOeuvre(utilisateurTest.getLogin(),serieInseree.getId());
 
     }
 
@@ -380,12 +396,12 @@ class OeuvreServiceImplTest {
         assertNotNull(filmCree);
         assertTrue(filmCree.getId()>0);
 
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),filmCree.getId());
         assertNotNull(oeuvreDtoInseree);
         assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
         assertEquals(1L,oeuvreDtoInseree.getStatutVisionnage().getId());
 
-        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
+        oeuvreService.deleteOeuvre(utilisateurTest.getLogin(),oeuvreDtoInseree.getId());
     }
 
     @Test
@@ -395,6 +411,18 @@ class OeuvreServiceImplTest {
         final String titreFilm= "film de test";
 
         OeuvreFormulaireDto newFilm= GenerateurObjetTest.createOeuvreDtoFormulaireMinimal(EnumTypeOeuvre.FILM.getLibelle(), titreFilm);
+
+        //check genre presents en base et s'assurer qu'il y a action avec ID 1 dedans
+        GenreListDto genreListDto =genreService.getAllGenres();
+        List<GenreDto> genreDtoList= genreListDto.getGenres();
+
+        for (GenreDto genre:genreDtoList) {
+            //System.out.println(genre);
+            if (genre.getId()==1L) {
+                assertEquals("Action",genre.getLibelle());
+                break;
+            }
+        }
 
         List<Long> genreIdsList = new ArrayList<>();
         genreIdsList.add(1L);
@@ -406,7 +434,7 @@ class OeuvreServiceImplTest {
         assertNotNull(filmCree);
         assertTrue(filmCree.getId()>0);
 
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),filmCree.getId());
         assertNotNull(oeuvreDtoInseree);
         assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
         assertEquals(2,oeuvreDtoInseree.getGenres().size());
@@ -417,10 +445,11 @@ class OeuvreServiceImplTest {
             }
         }
 
-        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
+        oeuvreService.deleteOeuvre(utilisateurTest.getLogin(),oeuvreDtoInseree.getId());
     }
 
     @Test
+    //@Transactional //on positionne en Transactionnel car on fait des ajout/suppression. Sinon, cela genere une javax.persistence.TransactionRequiredException
     void createOeuvre_testCreation_film() {
         Utilisateur utilisateurTest=utilisateurService.rechercherUtilisateurParLogin("u1");
 
@@ -432,10 +461,27 @@ class OeuvreServiceImplTest {
 
         OeuvreDto filmCree = oeuvreService.saveOeuvre(utilisateurTest.getLogin(),newFilm);
 
+        //check genre presents en base et s'assurer qu'il y a toujour action avec ID 1 dedans
+        GenreListDto genreListDto =genreService.getAllGenres();
+        List<GenreDto> genreDtoList= genreListDto.getGenres();
+        genreDtoList.stream().forEach(System.out::println);
+        assertEquals(4,genreDtoList.size());
+        for (GenreDto genre:genreDtoList) {
+            //System.out.println(genre);
+            if (genre.getId()==1L) {
+                assertEquals("Action",genre.getLibelle());
+                break;
+            }
+        }
+
         assertNotNull(filmCree);
         assertTrue(filmCree.getId()>0);
 
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(filmCree.getId());
+        //check a virer
+        OeuvreDto oeuvreDtoShazam=oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),1L);
+
+
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),filmCree.getId());
         assertNotNull(oeuvreDtoInseree);
 
         assertEquals(EnumTypeOeuvre.FILM.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
@@ -448,6 +494,14 @@ class OeuvreServiceImplTest {
         assertEquals(newFilm.getUrlAffiche(),oeuvreDtoInseree.getUrlAffiche());
         assertEquals(newFilm.getUrlBandeAnnonce(),oeuvreDtoInseree.getUrlBandeAnnonce());
         assertEquals(newFilm.getDuree(),oeuvreDtoInseree.getDuree());
+        assertEquals(2,oeuvreDtoInseree.getGenres().size());
+        for (GenreDto genre:oeuvreDtoInseree.getGenres()) {
+            if (genre.getId()==1L) {
+                assertEquals("Action",genre.getLibelle());
+                break;
+            }
+        }
+
 
         //je ne dois pas pouvoir sauver une oeuvre avec le meme titre mais un id different
         newFilm.setTitre("film de test");
@@ -455,7 +509,7 @@ class OeuvreServiceImplTest {
             oeuvreService.saveOeuvre(utilisateurTest.getLogin(),newFilm);
         });
 
-        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
+        oeuvreService.deleteOeuvre(utilisateurTest.getLogin(),oeuvreDtoInseree.getId());
     }
     @Test
     void createOeuvre_testCreation_serie() {
@@ -473,7 +527,7 @@ class OeuvreServiceImplTest {
         assertNotNull(serieCree);
         assertTrue(serieCree.getId()>0);
 
-        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(serieCree.getId());
+        OeuvreDto oeuvreDtoInseree=oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),serieCree.getId());
         assertNotNull(oeuvreDtoInseree);
 
         assertEquals(EnumTypeOeuvre.SERIE.getLibelle(),oeuvreDtoInseree.getTypeOeuvre());
@@ -487,7 +541,12 @@ class OeuvreServiceImplTest {
         assertEquals(newSerie.getUrlBandeAnnonce(),oeuvreDtoInseree.getUrlBandeAnnonce());
         assertEquals(newSerie.getSaisons().size(),oeuvreDtoInseree.getSaisons().size());
 
-        oeuvreService.deleteOeuvre(oeuvreDtoInseree.getId());
+        assertThrows(MauvaisParamException.class, () -> {
+            //dois jeter une exception si je ne suis pas proprietaire de l'oeuvre a supprimer
+            oeuvreService.deleteOeuvre("mauvais_login", oeuvreDtoInseree.getId());
+        });
+
+        oeuvreService.deleteOeuvre(utilisateurTest.getLogin(),oeuvreDtoInseree.getId());
 
     }
 
@@ -527,7 +586,7 @@ class OeuvreServiceImplTest {
         //friends
         final Long oeuvreId=3L;
 
-        OeuvreDto oeuvreFriends= oeuvreService.getOeuvreCompleteById(oeuvreId);
+        OeuvreDto oeuvreFriends= oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),oeuvreId);
 
         //je modifie sa saison S2 en mettant nb episode = 99
         for (SaisonDto saison: oeuvreFriends.getSaisons()) {
@@ -545,7 +604,7 @@ class OeuvreServiceImplTest {
         assertEquals(oeuvreId,serieFriends.getId());
 
         //on verifie les données en base que la saison fait bien 99 episode maintenant
-        oeuvreFriends=  oeuvreService.getOeuvreCompleteById(oeuvreId);
+        oeuvreFriends=  oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),oeuvreId);
         for (SaisonDto saison: oeuvreFriends.getSaisons()) {
             if (saison.getNumero().equals("S2")) {
                 assertEquals(99,saison.getNbEpisodes());
@@ -555,7 +614,7 @@ class OeuvreServiceImplTest {
         //on vérifie que si on essaye de changer le type d'une oeuvre existante, on a une exception
 
         assertThrows(MauvaisParamException.class, () -> {
-            OeuvreDto oeuvreFriends2=  oeuvreService.getOeuvreCompleteById(oeuvreId);
+            OeuvreDto oeuvreFriends2=  oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),oeuvreId);
             oeuvreFriends2.setTypeOeuvre(EnumTypeOeuvre.FILM.getLibelle());
             OeuvreFormulaireDto oeuvreFormulaireDto2= convertOeuvreDtoToFormulaire(oeuvreFriends2);
             oeuvreService.saveOeuvre(utilisateurTest.getLogin(),oeuvreFormulaireDto2);
@@ -563,7 +622,7 @@ class OeuvreServiceImplTest {
 
         //je modifie sa saison S2 pour la nommer S1 comme la premiere. La sauvegarde doit echouer car on ne peut avoir 2 saisons avec le meme numero
         assertThrows(MauvaisParamException.class, () -> {
-            OeuvreDto oeuvreFriends3=  oeuvreService.getOeuvreCompleteById(oeuvreId);
+            OeuvreDto oeuvreFriends3=  oeuvreService.getOeuvreCompleteById(utilisateurTest.getLogin(),oeuvreId);
             for (SaisonDto saison: oeuvreFriends3.getSaisons()) {
                 if (saison.getNumero().equals("S2")) {
                     saison.setNumero("S1");

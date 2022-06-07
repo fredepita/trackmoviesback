@@ -1,9 +1,5 @@
 package fr.epita.trackmoviesback.domaine;
 
-import fr.epita.trackmoviesback.enumerate.EnumTypeOeuvre;
-
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import java.util.List;
@@ -40,9 +36,10 @@ public class Film extends Oeuvre{
         this.duree = duree;
     }
 
-
+    @Override
     public String toString() {
         return "Film{" +
+                "utilisateur=" + getUtilisateur().getLogin() +
                 "id=" + getId() +
                 ", titre='" + getTitre() + '\'' +
                 ", genres=" + getGenres() +

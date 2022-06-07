@@ -78,7 +78,7 @@ public class OeuvreServiceImpl implements OeuvreService {
     }
 
 
-    public boolean isStatutVisionnagePresentDansLaListe(StatutVisionnage statutVisionnageAControler,List<StatutVisionnageDto> statutVisionnageList){
+    private boolean isStatutVisionnagePresentDansLaListe(StatutVisionnage statutVisionnageAControler,List<StatutVisionnageDto> statutVisionnageList){
         for (StatutVisionnageDto statutVisionnageDto: statutVisionnageList) {
             if (statutVisionnageDto.getId().equals(statutVisionnageAControler.getId())) return true;
         }
@@ -112,7 +112,7 @@ public class OeuvreServiceImpl implements OeuvreService {
     public OeuvreDto saveOeuvre(String userLogin, OeuvreFormulaireDto oeuvreFormulaireDto) {
         Oeuvre oeuvreASauver=convertirOeuvreFormulaireDtoEnOeuvre(userLogin,oeuvreFormulaireDto);
 
-        logger.debug("oeuvreASauver ={}",oeuvreASauver);
+        logger.debug("saveOeuvre() - oeuvreASauver ={}",oeuvreASauver);
 
         if (oeuvreASauver==null)
             throw new MauvaisParamException("L'oeuvre recue est vide");
@@ -151,10 +151,18 @@ public class OeuvreServiceImpl implements OeuvreService {
 
     @Override
     public void deleteOeuvre(String userLogin,Long id) {
-        logger.info("Suppression de l'oeuvre avec id = {} ",id);
-        //on recupere l'utilisateur a partir du login
-        Utilisateur utilisateur=utilisateurService.rechercherUtilisateurParLogin(userLogin);
-        long nbOeuvreSupprimee=oeuvreRepository.deleteByIdAndByUtilisateur(id,utilisateur);
+        logger.info("deleteOeuvre() - Demande suppression de l'oeuvre avec id = {} ",id);
+        //on recupere l'utilisateur dans la bdd a partir du login
+        Utilisateur utilisateurLogge=utilisateurService.rechercherUtilisateurParLogin(userLogin);
+        //on verifie que l'oeuvre appartient au user
+        Utilisateur utilisateurDeLOeuvre = oeuvreRepository.getUtilisateurDeOeuvre(id);
+
+        if (utilisateurLogge==null || utilisateurDeLOeuvre.getId()!=utilisateurLogge.getId()) {
+            throw new MauvaisParamException("Suppression annulee. L'utilisateur n'est pas proprietaire de l'oeuvre");
+        }
+        //on delete l'oeuvre sinon
+        oeuvreRepository.deleteById(id);
+
     }
 
     @Override
@@ -182,16 +190,16 @@ public class OeuvreServiceImpl implements OeuvreService {
         if (id != null && id > 0) {
             EnumTypeOeuvre typeOeuvre = oeuvreRepository.getTypeOeuvre(id,utilisateur);
             if (typeOeuvre == EnumTypeOeuvre.FILM) {
-                Optional<Film> optionalOeuvre = filmRepository.findById(id);
+                Optional<Film> optionalOeuvre = filmRepository.findByIdAndUtilisateur(id,utilisateur);
                 if (optionalOeuvre.isPresent()) {
                     Oeuvre oeuvreFilm = optionalOeuvre.get();
-                    logger.debug("Oeuvre pour id={} trouvée={}",id,oeuvreFilm);
+                    logger.debug("getOeuvreCompleteById() - Oeuvre pour id={} trouvée={}",id,oeuvreFilm);
                     return convertirOeuvreEnDto(oeuvreFilm);
                 } else {
                     return null;
                 }
             } else {
-                Oeuvre oeuvreSerie = serieRepository.getSerieComplete(id);
+                Oeuvre oeuvreSerie = serieRepository.getSerieComplete(id,utilisateur);
                 return convertirOeuvreEnDto(oeuvreSerie);
             }
         } else {

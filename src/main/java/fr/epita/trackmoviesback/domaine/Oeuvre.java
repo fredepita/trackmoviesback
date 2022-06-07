@@ -12,6 +12,13 @@ import java.util.List;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="type_oeuvre", discriminatorType = DiscriminatorType.STRING)
+@Table(//on indexe les colonnes utilisée dans nos requetes les plus courantes
+        indexes = {
+            @Index(name="utilisateur_id_index", columnList = "utilisateur_id"),//recherche des oeuvres d'un user
+            @Index(name="oeuvre_et_utilisateur_id_index", columnList = "utilisateur_id,id"), //recherche detail d'une oeuvre d'un user
+            @Index(name="titre_index", columnList = "titre") //recherche sur titre
+        }
+)
 public abstract class Oeuvre {
 
     @Id
@@ -21,7 +28,7 @@ public abstract class Oeuvre {
     //colonne gérée par le discriminator value des subclass, doit avoir seulement un getter pas de settre
     @Column(name="type_oeuvre", insertable = false, updatable = false)
     @Convert(converter = TypeOeuvreAttributeConverter.class) //permet de convertir en string l'enum pour le stocker en base de donnée. On utilise son libelle
-    protected EnumTypeOeuvre type_oeuvre;
+    protected EnumTypeOeuvre type_oeuvre; //on doit garder ce nommage pour matcher le DiscriminatorColumn name (qui lui correspond à la colonne BDD)
 
     @Column(nullable = false)
     private String titre;
@@ -53,7 +60,7 @@ public abstract class Oeuvre {
 
     @JsonIgnore
     @ManyToOne
-   // @Column(nullable = false)
+    @JoinColumn(name = "utilisateur_id" ,nullable = false)
     private Utilisateur utilisateur;
 
     protected Oeuvre() {

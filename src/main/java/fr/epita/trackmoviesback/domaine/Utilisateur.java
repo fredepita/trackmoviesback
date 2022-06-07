@@ -7,6 +7,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(//on indexe les colonnes utilisée dans nos requetes les plus courantes
+        indexes = {
+                @Index(name="login_index", columnList = "login"),//recherche d'un user par rapport à son login
+        }
+)
 public class Utilisateur {
 
     @Id

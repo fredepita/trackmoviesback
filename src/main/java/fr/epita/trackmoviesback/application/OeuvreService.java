@@ -45,6 +45,13 @@ public interface OeuvreService {
      */
     OeuvreDto saveOeuvre(String userLogin,OeuvreFormulaireDto oeuvreDto);
 
+    /**
+     * supprime une oeuvre
+     * seul une oeuvre appartenant au user loggé peut etre supprimée
+     *
+     * @param userLogin  login du user
+     * @param id id de l'oeuvre
+     */
     void deleteOeuvre(String userLogin,Long id);
 
 }
