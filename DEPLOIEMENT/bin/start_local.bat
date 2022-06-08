@@ -1,0 +1,1 @@
+java -Dspring.profiles.active=prod -Dspring.config.location=../properties/application-prod.properties   -jar ../jar/trackmoviesback-0.0.1-SNAPSHOT.jar
