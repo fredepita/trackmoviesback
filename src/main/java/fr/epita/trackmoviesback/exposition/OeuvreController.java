@@ -91,7 +91,7 @@ public class OeuvreController {
             @ApiResponse(code = 404, message = "non trouvé"),
             @ApiResponse(code = 500, message = "erreur du serveur") })
     @PostMapping("/oeuvre")
-    public ResponseEntity<OeuvreDto> create(@Valid @RequestBody OeuvreFormulaireDto oeuvreFormulaireDto) {
+    public ResponseEntity<OeuvreDto> save(@Valid @RequestBody OeuvreFormulaireDto oeuvreFormulaireDto) {
 
         try {
             logger.debug("create : oeuvreFormulaireDto={}",oeuvreFormulaireDto);

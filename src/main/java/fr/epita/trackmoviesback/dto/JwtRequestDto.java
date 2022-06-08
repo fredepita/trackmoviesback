@@ -25,24 +25,23 @@ public class JwtRequestDto implements Serializable {
     }
 
     public String getUsername() {
-        logger.info("getUsername()");
+        logger.debug("getUsername()");
         return this.username;
     }
 
     public void setUsername(final String username) {
 
-        logger.info("setUsername(username : " + username + ")");
+        logger.debug("setUsername(username : {}",username);
         this.username = username;
     }
 
     public String getPassword() {
-        logger.info("getPassword()");
+        logger.debug("getPassword()");
         return this.password;
     }
 
     public void setPassword(final String password) {
-
-        logger.info("setPassword(password : " + password + ")");
+        logger.debug("setPassword(password : xxxx");
         this.password = password;
     }
 
@@ -50,7 +49,6 @@ public class JwtRequestDto implements Serializable {
     public String toString() {
         return "JwtRequest{" +
                 "username='" + username + '\'' +
-                ", password='" + password + '\'' +
                 '}';
     }
 }

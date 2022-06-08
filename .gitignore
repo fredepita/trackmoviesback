@@ -32,3 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 /tomcat/
+/logs/trackmovies_back.log

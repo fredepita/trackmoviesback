@@ -28,9 +28,9 @@ public class JwtTokenUtil {
     // retrieve username from jwt token
     public String getUsernameFromToken(final String token) {
 
-        logger.info("getUsernameFromToken(token : " + token);
+        logger.debug("getUsernameFromToken(token : " + token);
         String usernameFromToken = getClaimFromToken(token, Claims::getSubject);
-        logger.info("usernameFromToken : " + usernameFromToken);
+        logger.debug("getUsernameFromToken() result : usernameFromToken : " + usernameFromToken);
 
         return getClaimFromToken(token, Claims::getSubject);
     }
@@ -46,14 +46,14 @@ public class JwtTokenUtil {
     }
 */
     public <T> T getClaimFromToken(final String token, final Function<Claims, T> claimsResolver) {
-        logger.info("getClaimFromToken(token : {}, claimsResolver : {}",token ,claimsResolver);
+        logger.debug("getClaimFromToken(token : {}, claimsResolver : {}",token ,claimsResolver);
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
 
     // for retrieveing any information from token we will need the secret key
     private Claims getAllClaimsFromToken(final String token) {
-        logger.info("getAllClaimsFromToken(token : {}" , token);
+        logger.debug("getAllClaimsFromToken(token : {}" , token);
         return Jwts.parser() //
                 .setSigningKey(jwtSecret) //
                 .parseClaimsJws(token) //
@@ -80,7 +80,7 @@ public class JwtTokenUtil {
      */
     public String generateToken(final UserDetails userDetails) {
 
-        logger.info("generateToken() : "
+        logger.debug("generateToken() : "
                 + "  username : {}"
                 + ", authorities : {}"
                 + ", account non expired {}: "
@@ -129,7 +129,7 @@ public class JwtTokenUtil {
      */
     public Boolean validateToken(final String token, final UserDetails userDetails) {
         String beginTokenForLog=token.substring(0,20);
-        logger.info("generateToken() : "
+        logger.debug("generateToken() : "
                         + "  token : {}"
                         + "  username : {}"
                         + ", authorities : {}"
