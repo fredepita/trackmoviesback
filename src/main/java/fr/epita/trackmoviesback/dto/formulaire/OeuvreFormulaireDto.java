@@ -9,25 +9,31 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 
-/*permet d'ignorer les champs non fourni ou fourni avec ""
+/*@JsonIgnoreProperties permet d'ignorer les champs non fourni ou fourni avec ""
 qui sont mappés vers des liste comme genreIds par exemple. Cela va de paire avec l'objet ObjectMapperConfig
 sinon ca genere des erreurs HttpMessageNotReadableException: JSON parse error: Cannot coerce empty String ("")
 */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OeuvreFormulaireDto {
     private Long id;
+
     @NotNull
     private String typeOeuvre;
+
     @NotNull
-    @Size(min = 1)
+    @Size(min = 1, max=50)
     private String titre;
 
     private List<Long> genreIds;
     private Long statutVisionnageId;
     private Integer note;
+    @Size(max = 100)
     private String createurs;
+    @Size(max = 100)
     private String acteurs;
+    @Size(max = 150)
     private String urlAffiche;
+    @Size(max = 150)
     private String urlBandeAnnonce;
 
     //donnee propre aux series
@@ -36,6 +42,7 @@ public class OeuvreFormulaireDto {
     //donnee propre aux films
     private Integer duree;
 
+    @Size(max = 250)
     private String description;
 
     public OeuvreFormulaireDto() {

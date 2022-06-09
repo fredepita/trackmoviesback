@@ -11,7 +11,7 @@ public class SaisonFormulaireDto {
 
     private Long id;
     @NotNull
-    @Size(min = 1)
+    @Size(min = 1, max=100)
     private String numero;//identifiant fonctionnel de la saison
     private Long statutVisionnageId;
     private Integer nbEpisodes;
