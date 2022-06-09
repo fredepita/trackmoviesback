@@ -59,7 +59,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     public Utilisateur rechercherUtilisateurParLogin(String login) {
         Utilisateur utilisateur= utilisateurRepository.findByLogin(login);
         if (utilisateur==null) {
-            logger.debug("utilisateur non trouvee en BDD login={}",login);
+            logger.debug("Utilisateur non trouvé en BDD login={}",login);
         }
         return utilisateur;
     }
