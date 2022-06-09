@@ -3,7 +3,11 @@ Pre requis:
 - maven installé
 - git installe
 
-Les étapes pour installer le projet et packager
+NOTE: ce repertoire deploiement n'a rien a faire dans le github. Nous l'avons mis là dans le cadre du projet pour
+simplifier et regrouper les informations en un seul endroit. Normalement, ces fichiers et descriptions d'arborescence seraient
+dans une doc d'installation a destination des equipes de prod
+
+Les étapes pour déployer le projet:
 1) recuperer le projet dans git
 - lancer une invite de commande windows (cmd)
 - cloner le projet git dans un répertoire
@@ -42,3 +46,15 @@ Les étapes pour installer le projet et packager
         c:\intall_trackmovie_back\bin
 
         et executer le .bat fournit: start_local.bat
+
+6) pour initialiser la base, executer les scripts présent dans le repertoire DEPLOIEMENT\initDB du projet
+    0 - import static data.sql   -> crée les données de référence statiques
+    1 - import users.sql  -> crée des users exemples
+    2 - import film serie for users.sql  -> crée film et serie exemple rattaché aux user
+
+    Le script "export film - serie from db.sql" est là si jamais on veut regénérer le script "2 - import film serie for users.sql"
+    à partir de données présentes dans la base.
+    A noter que si un user a été ajouté dans la BDD avec de nouvelles oeuvres, il faut ajouter à la main
+    dans le script "1 - import users.sql" le nouvel utilisateur pour etre cohérent avec le script "2 - import film serie for users.sql"
+
+
