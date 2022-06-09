@@ -23,7 +23,8 @@ public class StatutVisionnageController {
     @ApiOperation(value = "Recuperer les statuts de visionnage"
             , notes = "Permet de récupérer la liste des statuts de visionnage"
     ) //info pour le swagger
-    @GetMapping("/statuts_visionnage")
+
+    @GetMapping(value = "/statuts_visionnage", produces = {"application/json; charset=utf-8"})
     StatutVisionnageListDto getAllStatutVisionnage(){
         return service.getAllStatutVisionnage();
     }

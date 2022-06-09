@@ -36,7 +36,7 @@ public class OeuvreController {
     @ApiOperation(value = "Recuperer les oeuvres"
             , notes = "Permet de récupérer le liste des oeuvres correspondant aux critères"
     ) //info pour le swagger
-    @GetMapping(value = "/mes_oeuvres", produces = {"application/json"})
+    @GetMapping(value = "/mes_oeuvres", produces = {"application/json; charset=utf-8"})
     ResponseEntity<OeuvreLightListDto> getOeuvres(
             @ApiParam(value = "type d'oeuvre (film ou serie)")
             @RequestParam(name = "type", required = false) String typeOeuvre

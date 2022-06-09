@@ -20,7 +20,7 @@ public class GenreController {
     @ApiOperation(value = "Recuperer les genres"
             , notes = "Permet de récupérer la liste des genres"
     ) //info pour le swagger
-    @GetMapping("/genres")
+    @GetMapping(value = "/genres", produces = {"application/json; charset=utf-8"})
     GenreListDto getAllGenres(){
         return service.getAllGenres();
     }

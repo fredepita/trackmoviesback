@@ -17,7 +17,7 @@
 
     <!-- Appender to a file with plain text format for debugging without monitoring
 		tool -->
-   <appender name="logPlainText"
+    <appender name="logPlainText"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${app-log-dir}/${app-log-file-name}.log</file>
         <rollingPolicy

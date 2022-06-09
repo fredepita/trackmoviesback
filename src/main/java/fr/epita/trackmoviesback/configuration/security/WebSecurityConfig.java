@@ -39,8 +39,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-
-
     @Override
     public void configure(final AuthenticationManagerBuilder auth) throws Exception {
         logger.info("configure(auth : {}" , auth.toString());
@@ -53,7 +51,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -65,9 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(final HttpSecurity httpSecurity) throws Exception {
-        // Add a filter to validate the tokens with every request
-
-        logger.info("configure(httpSecurity : " + httpSecurity.toString());
+        logger.debug("configure(httpSecurity : " + httpSecurity.toString());
 
         //ajout d'un filtre qui valide le token pour toutes les requetes
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
@@ -87,19 +82,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/trackmovies/v1/statuts_visionnage").hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres").hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres/{id}").hasRole("USER")
-
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .and()
                 .logout()
-                .logoutUrl("/trackmovies/v1/logout")
                 .logoutSuccessUrl("/trackmovies/v1/")
-                //.invalidateHttpSession(true)
-                //.deleteCookies("JSESSIONID")
-                // Call the URL invalidate_session after logout...
-                //.logoutSuccessUrl("/trackmovies/v1/invalidate_session")
-                //.addLogoutHandler(new SecurityContextLogoutHandler())
                 .and()
                 // make sure we use stateless session; session won't be used to
                 // store user's state.

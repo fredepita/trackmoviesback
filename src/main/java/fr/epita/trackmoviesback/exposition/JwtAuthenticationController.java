@@ -6,6 +6,7 @@ import fr.epita.trackmoviesback.configuration.security.jwt.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -37,21 +38,25 @@ public class JwtAuthenticationController {
     private UserDetailsService userDetailsService;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody final JwtRequestDto authenticationRequest)
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody final JwtRequestDto authenticationRequest)
             throws Exception {
+        try {
+            logger.info("createAuthenticationToken(authenticationRequest : " + authenticationRequest.toString());
+            // Authentification avec les données en entrée
+            authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+            logger.debug("après authenticate");
 
-        logger.info("createAuthenticationToken(authenticationRequest : " + authenticationRequest.toString());
-        // Authentification avec les données en entrée
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-        logger.info("après authenticate");
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+            final String token = jwtTokenUtil.generateToken(userDetails);
+            jwtTokenUtil.setStatutUtilisateur(true);
+            logger.info("token : {}", token);
 
-        final String token = jwtTokenUtil.generateToken(userDetails);
-        jwtTokenUtil.setStatutUtilisateur(true);
-        logger.info("token : {}",token);
-
-        return ResponseEntity.ok(new JwtResponse(token));
+            return ResponseEntity.ok(new JwtResponse(token));
+        } catch (Exception e) {
+            logger.error("Echec du login de {} : {}",authenticationRequest.getUsername(), e.getMessage());
+            return new ResponseEntity("Echec du login", HttpStatus.UNAUTHORIZED);
+        }
     }
 
 
@@ -74,7 +79,7 @@ public class JwtAuthenticationController {
 
     private void authenticate(final String username, final String password) throws Exception {
         try {
-            logger.info("authenticate(username : " + username + ", password : " + password + ")");
+            logger.info("authenticate() start - username : {}", username);
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         }
         catch (final DisabledException e) {

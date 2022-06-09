@@ -47,10 +47,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private static Collection<? extends GrantedAuthority> getAuthorities(final Utilisateur utilisateur) {
-        logger.info("getAuthorities(Utilisateur : {}", utilisateur);
+        logger.debug("getAuthorities(Utilisateur : {}", utilisateur.getLogin());
         final String[] userRoles = utilisateur.getRoles().stream().map((role) -> role.name()).toArray(String[]::new);
         final Collection<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(userRoles);
-        logger.info("authorities : " + authorities.toString());
+        logger.debug("authorities resultat : " + authorities.toString());
         return authorities;
     }
 
