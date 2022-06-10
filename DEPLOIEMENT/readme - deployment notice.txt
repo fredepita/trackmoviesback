@@ -2,6 +2,14 @@ Pre requis:
 - java 8
 - maven installé
 - git installe
+- postgres installe avec pgadmin4
+    2 bdd:
+        track_movies
+        track_movies_dev
+    1 user bdd:
+        login: userjava
+        mdp: userjava
+    tous les droits pour ce user sur les 2 BDD
 
 NOTE: ce repertoire deploiement n'a rien a faire dans le github. Nous l'avons mis là dans le cadre du projet pour
 simplifier et regrouper les informations en un seul endroit. Normalement, ces fichiers et descriptions d'arborescence seraient
