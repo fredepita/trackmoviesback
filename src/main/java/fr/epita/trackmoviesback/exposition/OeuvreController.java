@@ -112,6 +112,23 @@ public class OeuvreController {
 
     }
 
+    @ApiOperation(value = "Supprimer une oeuvre par son id"
+            , notes = "Permet de supprimer une oeuvre et son détail par son id"
+    ) //info pour le swagger
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Ok"),
+            @ApiResponse(code = 401, message = "Non autorisé"),
+            @ApiResponse(code = 404, message = "non trouvé"),
+            @ApiResponse(code = 500, message = "erreur du serveur") })
+    @DeleteMapping("/oeuvre/{id}")
+    public ResponseEntity<String> deleteOeuvre(@PathVariable(value = "id") Long id) {
+        //on recupère le user login de l'utilisateur en cours dans le context
+        String userLogin= utilisateurService.getCurrentUserLoginFromSecurityContext();
+
+        service.deleteOeuvre(userLogin, id);
+        return new ResponseEntity("Oeuvre supprimée", HttpStatus.OK);
+    }
+
 
 
 }

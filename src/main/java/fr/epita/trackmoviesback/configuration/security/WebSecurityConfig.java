@@ -82,6 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/trackmovies/v1/statuts_visionnage").hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres").hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/trackmovies/v1/mes_oeuvres/{id}").hasRole("USER")
+                .antMatchers(HttpMethod.DELETE, "/trackmovies/v1/oeuvre/{id}").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
