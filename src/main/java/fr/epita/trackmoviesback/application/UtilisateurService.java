@@ -19,7 +19,7 @@ public interface UtilisateurService {
      */
     Utilisateur rechercherUtilisateurParLogin (String login);
 
-    void supprimerUtilisateur (Long id);
+    void supprimerUtilisateur (UtilisateurDto utilisateurDto);
 
     Utilisateur convertirUtilisateurEnEntity(UtilisateurDto utilisateurDto);
 

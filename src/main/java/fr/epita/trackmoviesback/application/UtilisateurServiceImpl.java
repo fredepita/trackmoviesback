@@ -32,7 +32,8 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         if (utilisateurDto != null) {
             if (verifierExistenceUtilisateur(utilisateurDto)) {
                 throw new MauvaisParamException("l'identifiant " + utilisateurDto.getIdentifiant() + " existe déjà !");
-            } else {
+            }
+            else {
                 //--> Conversion des données issues du Front (Dto) en données pour la Base de données (Entity)
                 Utilisateur utilisateur = convertirUtilisateurEnEntity(utilisateurDto);
                 //--> Encodage du mot de passe avant stockage
@@ -65,9 +66,21 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     }
 
     @Override
-    public void supprimerUtilisateur(Long id) {
-
+    public void supprimerUtilisateur(UtilisateurDto utilisateurDto) {
+        if (utilisateurDto != null) {
+            if (!verifierExistenceUtilisateur(utilisateurDto)) {
+                throw new MauvaisParamException("l'identifiant a supprimer " + utilisateurDto.getIdentifiant() + " n'existe pas !");
+            }
+            else {
+                //--> Conversion des données issues du Front (Dto) en données pour la Base de données (Entity)
+                Utilisateur utilisateur = rechercherUtilisateurParLogin(utilisateurDto.getIdentifiant());
+                //--> Encodage du mot de passe avant stockage
+                utilisateurRepository.deleteById(utilisateur.getId());
+                logger.info("Utilisateur {} supprimé !", utilisateur.getLogin());
+            }
+        }
     }
+
     @Override
     public Utilisateur convertirUtilisateurEnEntity(UtilisateurDto utilisateurDto){
         Utilisateur utilisateur = new Utilisateur();
@@ -81,7 +94,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         return utilisateur != null;
     }
 
-
     @Override
     public String getCurrentUserLoginFromSecurityContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -89,8 +101,9 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         if (authentication!=null) {
             user = (User) authentication.getPrincipal();
             return user.getUsername();
-        } else {
-            throw new UtilisateurNonLoggeException("utilisateur non loggé");
+        }
+        else {
+            throw new UtilisateurNonLoggeException("Utilisateur non loggé");
         }
     }
 }
