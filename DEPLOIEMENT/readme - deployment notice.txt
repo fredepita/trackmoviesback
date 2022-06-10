@@ -17,7 +17,7 @@ Les étapes pour déployer le projet:
 
 2) preparer le repertoire de deploiement
     - prendre celui disponible dans le repertoire cloné et qui contient les scripts et properties
-        c:\Projet_Epita\DEPLOIEMENT
+        c:\Projet_Epita\trackmoviesback\DEPLOIEMENT
     - ou en creer un nouveau
         - preparer un repertoire de deploiement dans lequel on crée les sous répertoires suivant: bin, jet, log et properties
             exemple:
